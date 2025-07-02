@@ -103,7 +103,7 @@
 
   <div class="container">
     <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
-    <input type="text" id="searchGame" placeholder="بحث باللعبة..." onkeyup="filterTable()">
+    <input type="text" id="searchStaff" placeholder="بحث بالموظف..." onkeyup="filterTable()">
     <button class="export" onclick="exportToExcel()">Excel 💾</button>
     <button class="export" onclick="exportToPDF()">PDF 📄</button>
 
@@ -161,11 +161,11 @@
 
     function filterTable() {
       const name = document.getElementById("searchName").value.toLowerCase();
-      const game = document.getElementById("searchGame").value.toLowerCase();
+      const staff = document.getElementById("searchStaff").value.toLowerCase();
       const rows = document.querySelectorAll("#attendanceTable tbody tr");
       rows.forEach(row => {
         const nameCell = row.cells[1].innerText.toLowerCase();
-        const gameCell = row.cells[4].innerText.toLowerCase();
+        const staffCell = row.cells[4].innerText.toLowerCase();
         row.style.display = nameCell.includes(name) && gameCell.includes(game) ? "" : "none";
       });
     }
