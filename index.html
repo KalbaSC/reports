@@ -2,99 +2,203 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>لوحة الحضور - نادي كلباء</title>
+  <title>لوحة حضور نادي كلباء</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
-  <!-- External Libraries -->
+  <meta name="theme-color" content="#000000">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  
+  <!-- Libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <style>
-    body {
-      background: url('black_and_yellow_grunge_background.jpg') no-repeat center center fixed;
-      background-size: cover;
-      font-family: 'NotoKufiArabic', sans-serif;
-      color: white;
-      text-align: center;
-      padding: 20px;
+    @font-face {
+      font-family: 'NotoKufiArabic';
+      src: url('NotoKufiArabic.ttf') format('truetype');
     }
 
-    h2 {
-      margin-top: 0;
+    html, body {
+      font-family: 'NotoKufiArabic', 'Cairo', sans-serif;
+      margin: 0;
+      padding: 0;
+      background: url('black_and_yellow_grunge_background.jpg') no-repeat center center fixed;
+      background-size: cover;
+      color: white;
+      text-align: center;
+    }
+
+    .page-wrapper {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .header-container {
+      background: #111;
+      border-bottom: 3px solid #f4e733;
+      width: 100%;
+    }
+
+    .header-right {
+      max-width: 1170px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 17px;
+      padding: 18px 38px;
+    }
+
+    .logo {
+      height: 40px;
+    }
+
+    .divider {
+      width: 1.5px;
+      height: 35px;
+      background-color: #f4e733;
+    }
+
+    .header-info {
+      text-align: center;
+    }
+
+    .arabic-name {
+      font-weight: bold;
+      font-size: 12px;
+    }
+
+    .english-name {
+      font-size: 10px;
+      color: #f4e733;
+    }
+
+    main {
+      padding: 30px;
+      flex: 1;
+    }
+
+    select, input, button {
+      font-size: 16px;
+      padding: 8px;
+      border-radius: 6px;
+      margin: 6px;
+    }
+
+    button {
+      background: #f4e733;
+      color: black;
+      border: none;
+      cursor: pointer;
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      background-color: white;
+      background: white;
       color: black;
-      font-size: 14px;
     }
 
     th, td {
-      border: 1px solid #ccc;
       padding: 8px;
+      border: 1px solid #ccc;
     }
 
     th {
-      background-color: #f4e733;
-    }
-
-    select, input, button {
-      padding: 8px;
-      margin: 10px 5px;
-      border-radius: 6px;
-      font-size: 16px;
+      background: #f4e733;
     }
 
     canvas {
       max-width: 100%;
-      margin-top: 40px;
+      margin-top: 30px;
       background: white;
-      border-radius: 12px;
+      border-radius: 10px;
+    }
+
+    footer {
+      background-color: #111;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      border-top: 3px solid #f4e733;
+      font-size: 12px;
+    }
+
+    .social-icons a {
+      color: white;
+      margin: 0 8px;
+      font-size: 11px;
     }
   </style>
 </head>
 <body>
+  <div class="page-wrapper">
+    <!-- Header -->
+    <header class="header-container">
+      <div class="header-right">
+        <img src="Picture3.png" class="logo">
+        <div class="divider"></div>
+        <img src="logo.png" class="logo">
+        <div class="header-info">
+          <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
+          <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
+        </div>
+      </div>
+    </header>
 
-  <h2>📋 لوحة الحضور لجميع الموظفين</h2>
+    <!-- Main Dashboard -->
+    <main>
+      <h2>📋 لوحة الحضور</h2>
 
-  <div>
-    <label>الفلترة:</label>
-    <select id="filterType" onchange="applyFilter()">
-      <option value="all">الكل</option>
-      <option value="day">يوم</option>
-      <option value="week">أسبوع</option>
-      <option value="month">شهر</option>
-    </select>
-    <input type="date" id="filterDate" onchange="applyFilter()">
+      <div>
+        <label>الفلترة:</label>
+        <select id="filterType" onchange="applyFilter()">
+          <option value="all">الكل</option>
+          <option value="day">يوم</option>
+          <option value="week">أسبوع</option>
+          <option value="month">شهر</option>
+        </select>
+        <input type="date" id="filterDate" onchange="applyFilter()">
+        <button onclick="downloadPDF()">📄 تحميل PDF</button>
+        <button onclick="downloadExcel()">📊 تحميل Excel</button>
+      </div>
+
+      <table id="attendanceTable">
+        <thead>
+          <tr>
+            <th>الوقت</th>
+            <th>الاسم</th>
+            <th>ولي الأمر</th>
+            <th>المعرف</th>
+            <th>الموظف</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+
+      <canvas id="attendanceChart" height="250"></canvas>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
+      <p style="font-size: 12px; color: #aaa; margin-top: -10px;">تم التطوير بواسطة روند أحمد الضمور</p>
+      <div class="social-icons">
+        <a href="https://facebook.com/Kalbasc1" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        <a href="https://instagram.com/kalbasc" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="https://x.com/Kalba_sc" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="https://youtube.com/@kalbasc" target="_blank"><i class="fab fa-youtube"></i></a>
+        <a href="https://tiktok.com/@kalbasc" target="_blank"><i class="fab fa-tiktok"></i></a>
+      </div>
+    </footer>
   </div>
 
-  <div>
-    <button onclick="downloadPDF()">📄 تحميل PDF</button>
-    <button onclick="downloadExcel()">📊 تحميل Excel</button>
-  </div>
-
-  <table id="attendanceTable">
-    <thead>
-      <tr>
-        <th>الوقت</th>
-        <th>الاسم</th>
-        <th>ولي الأمر</th>
-        <th>المعرف</th>
-        <th>الموظف</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-
-  <canvas id="attendanceChart"></canvas>
-
+  <!-- Script -->
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec'; // Replace this
-
     let allData = [];
     let chart;
 
@@ -104,8 +208,7 @@
         allData = await res.json();
         applyFilter();
       } catch (err) {
-        alert("⚠️ فشل تحميل البيانات من الخادم");
-        console.error(err);
+        alert("⚠️ فشل تحميل البيانات");
       }
     }
 
@@ -118,15 +221,15 @@
         const selectedDate = new Date(selected);
         filtered = allData.filter(row => {
           const date = new Date(row["Timestamp"]);
-          if (type === "day") {
-            return date.toDateString() === selectedDate.toDateString();
-          } else if (type === "week") {
-            const weekStart = new Date(selectedDate);
-            weekStart.setDate(weekStart.getDate() - weekStart.getDay());
-            const weekEnd = new Date(weekStart);
-            weekEnd.setDate(weekEnd.getDate() + 6);
-            return date >= weekStart && date <= weekEnd;
-          } else if (type === "month") {
+          if (type === "day") return date.toDateString() === selectedDate.toDateString();
+          if (type === "week") {
+            const start = new Date(selectedDate);
+            start.setDate(start.getDate() - start.getDay());
+            const end = new Date(start);
+            end.setDate(end.getDate() + 6);
+            return date >= start && date <= end;
+          }
+          if (type === "month") {
             return date.getMonth() === selectedDate.getMonth() &&
                    date.getFullYear() === selectedDate.getFullYear();
           }
@@ -150,15 +253,14 @@
         `;
         tbody.appendChild(tr);
       });
-
       updateChart(data);
     }
 
     function updateChart(data) {
       const countPerDay = {};
       data.forEach(row => {
-        const date = new Date(row["Timestamp"]).toLocaleDateString('ar-EG');
-        countPerDay[date] = (countPerDay[date] || 0) + 1;
+        const d = new Date(row["Timestamp"]).toLocaleDateString('ar-EG');
+        countPerDay[d] = (countPerDay[d] || 0) + 1;
       });
 
       const ctx = document.getElementById("attendanceChart").getContext("2d");
@@ -169,13 +271,14 @@
         data: {
           labels: Object.keys(countPerDay),
           datasets: [{
-            label: "عدد الحضور لكل يوم",
+            label: "عدد الحضور في اليوم",
             data: Object.values(countPerDay),
+            backgroundColor: "#f4e733",
+            borderColor: "#000",
             borderWidth: 1
           }]
         },
         options: {
-          responsive: true,
           plugins: { legend: { display: false }},
           scales: { y: { beginAtZero: true }}
         }
@@ -185,23 +288,19 @@
     function downloadPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.setFont("Helvetica", "bold");
       doc.text("تقرير الحضور - نادي كلباء", 105, 15, null, null, "center");
-
-      const rows = document.querySelectorAll("#attendanceTable tbody tr");
-      const data = [...rows].map(tr => [...tr.children].map(td => td.innerText));
-
+      const rows = [...document.querySelectorAll("#attendanceTable tbody tr")]
+        .map(tr => [...tr.children].map(td => td.innerText));
       let y = 30;
-      data.forEach(row => {
-        row.forEach((cell, i) => doc.text(cell, 20 + i * 35, y));
+      rows.forEach(r => {
+        r.forEach((c, i) => doc.text(c, 20 + i * 35, y));
         y += 10;
       });
-
       doc.save("attendance-report.pdf");
     }
 
     function downloadExcel() {
-      const ws = XLSX.utils.table_to_sheet(document.getElementById('attendanceTable'));
+      const ws = XLSX.utils.table_to_sheet(document.getElementById("attendanceTable"));
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, "الحضور");
       XLSX.writeFile(wb, "attendance-report.xlsx");
