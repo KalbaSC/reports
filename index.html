@@ -103,27 +103,40 @@
   <div class="header">
     <h1>لوحة حضور المخيم الصيفي - نادي كلباء</h1>
   </div>
+
   <nav>
     <button onclick="filterData('day')">اليوم</button>
     <button onclick="filterData('week')">هذا الأسبوع</button>
     <button onclick="filterData('month')">هذا الشهر</button>
   </nav>
+
   <div class="container">
     <div class="controls">
       <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
-      <input type="text" id="searchGame" placeholder="بحث باللعبة..." onkeyup="filterTable()">
+      <input type="text" id="searchGame" placeholder="بحث بالموظف..." onkeyup="filterTable()">
       <button class="export" onclick="exportToExcel()">Excel 💾</button>
       <button class="export" onclick="exportToPDF()">PDF 📄</button>
     </div>
+
     <div class="summary" id="summary">إجمالي الحضور: 0</div>
+    <div class="summary" id="filteredSummary"></div>
+
     <table id="attendanceTable">
       <thead>
-        <tr><th>الوقت</th><th>الاسم</th><th>ولي الأمر</th><th>المعرف</th><th>الموظف</th></tr>
+        <tr>
+          <th>الوقت</th>
+          <th>الاسم</th>
+          <th>ولي الأمر</th>
+          <th>المعرف</th>
+          <th>الموظف</th>
+        </tr>
       </thead>
       <tbody></tbody>
     </table>
+
     <canvas id="attendanceChart" height="200"></canvas>
   </div>
+
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
     let allData = [], chart;
@@ -166,6 +179,7 @@
         perDay[day] = (perDay[day] || 0) + 1;
       });
       document.getElementById("summary").innerText = `إجمالي الحضور: ${data.length}`;
+      document.getElementById("filteredSummary").innerText = "";
       updateChart(perDay);
     }
 
@@ -173,11 +187,18 @@
       const name = document.getElementById("searchName").value.toLowerCase();
       const game = document.getElementById("searchGame").value.toLowerCase();
       const rows = document.querySelectorAll("#attendanceTable tbody tr");
+
+      let visibleCount = 0;
       rows.forEach(row => {
         const nameCell = row.cells[1].innerText.toLowerCase();
         const gameCell = row.cells[4].innerText.toLowerCase();
-        row.style.display = nameCell.includes(name) && gameCell.includes(game) ? "" : "none";
+        const match = nameCell.includes(name) && gameCell.includes(game);
+        row.style.display = match ? "" : "none";
+        if (match) visibleCount++;
       });
+
+      document.getElementById("filteredSummary").innerText =
+        (name || game) ? `عدد النتائج المطابقة: ${visibleCount}` : "";
     }
 
     function exportToExcel() {
