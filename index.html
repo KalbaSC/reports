@@ -100,10 +100,22 @@
       color: #f4e733;
     }
     .summary-inline {
-      font-size: 14px;
+      font-size: 12px;
       margin-right: 10px;
       color: #f4e733;
     }
+    .controls-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.summaries {
+  text-align: left;
+}
+
   </style>
 </head>
 <body>
@@ -119,14 +131,21 @@
     <div class="nav-summary" id="filteredSummary"></div>
   </nav>
 
-  <div class="container">
-    <div class="controls">
+
+    <div class="controls-container">
+  <div class="controls">
       <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
       <input type="text" id="searchID" placeholder="بحث بالمعرف..." onkeyup="filterTable()">
       <input type="text" id="searchGame" placeholder="بحث بالموظف..." onkeyup="filterTable()">
-      <button class="export" onclick="exportToExcel()">Excel 💾</button>
-      <button class="export" onclick="exportToPDF()">PDF 📄</button>
-    </div>
+    <button class="export" onclick="exportToExcel()">Excel 💾</button>
+    <button class="export" onclick="exportToPDF()">PDF 📄</button>
+  </div>
+  <div class="summaries">
+    <div class="summary" id="summary">إجمالي الحضور: 0</div>
+    <div class="summary" id="filteredSummary"></div>
+  </div>
+</div>
+
 
     <table id="attendanceTable">
       <thead>
