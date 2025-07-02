@@ -23,14 +23,48 @@
       margin: 0;
       padding: 0;
     }
-    .header {
-      background-color: #111;
-      border-bottom: 3px solid #f4e733;
-      padding: 20px;
-      text-align: center;
-    }
-    .header h1 {
+.header-container {
+  width: 100%;
+  background: #111;
+  border-bottom: 3px solid #f4e733;
+}
+.header-right {
+  width: 100%;
+  max-width: 1170px;
+  margin: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  padding: 20px 42px;
+  background-color: #111;
+  color: white;
+  box-sizing: border-box;
+}
+.header-right img.logo {
+  height: 70px;
+}
+.divider {
+  width: 1.5px;
+  height: 65px;
+  background-color: #f4e733;
+}
+.header-info {
+  text-align: center;
+}
+.arabic-name {
+  font-weight: bold;
+  font-size: 20px;
+}
+.english-name {
+  font-size: 14px;
+  color: #f4e733;
+}
+   .header h1 {
       color: #f4e733;
+     font-size: 11px;
+     text-align: center;
+     font-weight: bold;
     }
     nav {
       background-color: #111;
@@ -117,7 +151,22 @@
   </style>
 </head>
 <body>
-  <div class="header">
+  <header class="header-container">
+  <div class="header-right">
+    <img src="Picture3.png" alt="شعار الشارقة" class="logo">
+    <div class="divider"></div>
+    <img src="logo.png" alt="شعار نادي كلباء" class="logo">
+    <div class="header-info">
+      <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
+      <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
+    </div>
+  </div>
+      <div class="title">
+    <h1>لوحة حضور المخيم الصيفي - نادي كلباء</h1>
+  </div>
+</header>
+
+  <div class="title">
     <h1>لوحة حضور المخيم الصيفي - نادي كلباء</h1>
   </div>
 
