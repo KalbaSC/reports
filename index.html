@@ -49,12 +49,20 @@
       cursor: pointer;
     }
     .container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
       max-width: 1200px;
       margin: auto;
       padding: 20px;
-      background: rgba(0, 0, 0, 0.85);
+      background: rgba(0, 0, 0, 0.9);
       border-radius: 10px;
       margin-top: 30px;
+    }
+    .controls, .summary, canvas {
+      background: #222;
+      padding: 15px;
+      border-radius: 10px;
     }
     input {
       padding: 10px;
@@ -81,21 +89,13 @@
       text-align: center;
     }
     th {
-      background-color: #222;
+      background-color: #333;
+      color: #f4e733;
     }
     .summary {
-      margin-top: 20px;
       color: #f4e733;
       font-weight: bold;
-    }
-    .hidden {
-      display: none;
-    }
-    canvas {
-      background: white;
-      border-radius: 12px;
-      padding: 20px;
-      margin-top: 20px;
+      text-align: center;
     }
   </style>
 </head>
@@ -103,39 +103,30 @@
   <div class="header">
     <h1>لوحة حضور المخيم الصيفي - نادي كلباء</h1>
   </div>
-
   <nav>
     <button onclick="filterData('day')">اليوم</button>
     <button onclick="filterData('week')">هذا الأسبوع</button>
     <button onclick="filterData('month')">هذا الشهر</button>
-    <button onclick="showStats()">📊 الإحصائيات</button>
   </nav>
-
-  <div class="container" id="tablePage">
-    <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
-    <input type="text" id="searchStaff" placeholder="بحث بالموظف..." onkeyup="filterTable()">
-    <button class="export" onclick="exportToExcel()">Excel 💾</button>
-    <button class="export" onclick="exportToPDF()">PDF 📄</button>
-
+  <div class="container">
+    <div class="controls">
+      <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
+      <input type="text" id="searchGame" placeholder="بحث باللعبة..." onkeyup="filterTable()">
+      <button class="export" onclick="exportToExcel()">Excel 💾</button>
+      <button class="export" onclick="exportToPDF()">PDF 📄</button>
+    </div>
+    <div class="summary" id="summary">إجمالي الحضور: 0</div>
     <table id="attendanceTable">
       <thead>
         <tr><th>الوقت</th><th>الاسم</th><th>ولي الأمر</th><th>المعرف</th><th>الموظف</th></tr>
       </thead>
       <tbody></tbody>
     </table>
-
-    <div class="summary" id="summary">إجمالي الحضور: 0</div>
+    <canvas id="attendanceChart" height="200"></canvas>
   </div>
-
-  <div class="container hidden" id="statsPage">
-    <h2>📊 إحصائيات الحضور</h2>
-    <canvas id="chartPerDay"></canvas>
-    <canvas id="chartPerStaff"></canvas>
-  </div>
-
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec'; 
-    let allData = [];
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
+    let allData = [], chart;
 
     async function fetchData() {
       const res = await fetch(scriptURL);
@@ -161,6 +152,7 @@
     function renderTable(data) {
       const tbody = document.querySelector("#attendanceTable tbody");
       tbody.innerHTML = "";
+      const perDay = {};
       data.forEach(row => {
         const tr = document.createElement("tr");
         tr.innerHTML = `
@@ -168,21 +160,23 @@
           <td>${row["Child Name"]}</td>
           <td>${row["Parent"]}</td>
           <td>${row["ID"]}</td>
-          <td>${row["Scanned By"]}</td>
-        `;
+          <td>${row["Scanned By"]}</td>`;
         tbody.appendChild(tr);
+        const day = new Date(row["Timestamp"]).toLocaleDateString('ar-EG');
+        perDay[day] = (perDay[day] || 0) + 1;
       });
       document.getElementById("summary").innerText = `إجمالي الحضور: ${data.length}`;
+      updateChart(perDay);
     }
 
     function filterTable() {
       const name = document.getElementById("searchName").value.toLowerCase();
-      const staff = document.getElementById("searchStaff").value.toLowerCase();
+      const game = document.getElementById("searchGame").value.toLowerCase();
       const rows = document.querySelectorAll("#attendanceTable tbody tr");
       rows.forEach(row => {
         const nameCell = row.cells[1].innerText.toLowerCase();
-        const staffCell = row.cells[4].innerText.toLowerCase();
-        row.style.display = nameCell.includes(name) && staffCell.includes(staff) ? "" : "none";
+        const gameCell = row.cells[4].innerText.toLowerCase();
+        row.style.display = nameCell.includes(name) && gameCell.includes(game) ? "" : "none";
       });
     }
 
@@ -203,51 +197,24 @@
       doc.save("attendance.pdf");
     }
 
-    function showStats() {
-      document.getElementById("tablePage").classList.add("hidden");
-      document.getElementById("statsPage").classList.remove("hidden");
-      renderCharts();
-    }
-
-    function renderCharts() {
-      const dayCounts = {};
-      const staffCounts = {};
-      allData.forEach(row => {
-        const date = new Date(row["Timestamp"]).toLocaleDateString("ar-EG");
-        dayCounts[date] = (dayCounts[date] || 0) + 1;
-
-        const staff = row["Scanned By"];
-        staffCounts[staff] = (staffCounts[staff] || 0) + 1;
-      });
-
-      new Chart(document.getElementById("chartPerDay"), {
-        type: "bar",
+    function updateChart(dayCounts) {
+      const ctx = document.getElementById("attendanceChart").getContext("2d");
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'bar',
         data: {
           labels: Object.keys(dayCounts),
           datasets: [{
-            label: "عدد الحضور لكل يوم",
+            label: 'عدد الحضور اليومي',
             data: Object.values(dayCounts),
-            backgroundColor: "#f4e733",
-            borderColor: "black",
+            backgroundColor: '#f4e733',
+            borderColor: '#000',
             borderWidth: 1
           }]
         },
         options: {
-          scales: {
-            y: { beginAtZero: true }
-          }
-        }
-      });
-
-      new Chart(document.getElementById("chartPerStaff"), {
-        type: "pie",
-        data: {
-          labels: Object.keys(staffCounts),
-          datasets: [{
-            label: "عدد الحضور لكل موظف",
-            data: Object.values(staffCounts),
-            backgroundColor: ["#f4e733", "#FF6384", "#36A2EB", "#FFCE56"]
-          }]
+          plugins: { legend: { display: false }},
+          scales: { y: { beginAtZero: true } }
         }
       });
     }
