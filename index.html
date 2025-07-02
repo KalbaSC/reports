@@ -117,12 +117,18 @@
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  width: 100%;
+  width: 60%;
 }
 
 .search-group input {
-  flex: 1 1 100%;
+  flex: 1 1 60%;
   box-sizing: border-box;
+}
+.export-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
     .controls .summary-box {
@@ -491,18 +497,31 @@ footer p {
     }
 
 function exportToPDF() {
+    const rows = document.querySelectorAll("#attendanceTable tbody tr");
+  if (rows.length === 0) {
+    alert("لا يوجد بيانات لتصديرها إلى PDF");
+    return;
+  }
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
-  const table = document.getElementById("attendanceTable");
 
-  html2canvas(table, { scale: 2, useCORS: true }).then(canvas => {
+  const table = document.querySelector("#attendanceTable");
+
+  // إزالة أي قيود على overflow لتظهر البيانات
+  table.style.overflow = "visible";
+
+  html2canvas(table, {
+    scale: 2,
+    backgroundColor: "#fff", // ضروري لأن خلفيتك داكنة
+    useCORS: true
+  }).then(canvas => {
     const imgData = canvas.toDataURL("image/png");
-    const imgWidth = 190; // A4 width with margins
-    const pageHeight = 297; // A4 height
+    const imgWidth = 190;
+    const pageHeight = 297;
     const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    let heightLeft = imgHeight;
     let position = 10;
+    let heightLeft = imgHeight;
 
     doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
     heightLeft -= pageHeight;
@@ -516,8 +535,8 @@ function exportToPDF() {
 
     doc.save("attendance.pdf");
   });
-}
-
+}  
+    
     function updateChart(dayCounts) {
       const ctx = document.getElementById("attendanceChart").getContext("2d");
       if (chart) chart.destroy();
