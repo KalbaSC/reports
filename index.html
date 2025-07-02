@@ -11,7 +11,8 @@
   <title>لوحة حضور المخيم الصيفي - نادي كلباء</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @font-face {
@@ -216,6 +217,18 @@
     margin-bottom: 20px;
     line-height: 1.4;
   }
+ button.export {
+  padding: 10px 8px;
+  font-size: 14px;
+  width: 100%;
+  margin: 4px 0;
+}
+      .download-icon {
+  width: 14px;
+  height: 14px;
+  margin-left: 4px;
+}
+
 .summary-box {
   flex-direction: column !important;
   align-items: center !important;
@@ -466,29 +479,20 @@ footer p {
 
 function exportToPDF() {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
+  const doc = new jsPDF('p', 'mm', 'a4');
+  
+  const table = document.getElementById("attendanceTable");
+  html2canvas(table, { scale: 2, useCORS: true }).then(canvas => {
+    const imgData = canvas.toDataURL("image/png");
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const imgProps = doc.getImageProperties(imgData);
+    const ratio = imgProps.width / imgProps.height;
+    const imgHeight = pageWidth / ratio;
 
-  doc.setFont("Arial");
-  doc.setFontSize(12);
-  doc.text("تقرير الحضور", 10, 10);
-
-  const head = Array.from(document.querySelectorAll("#attendanceTable thead th"))
-    .map(th => th.innerText);
-  const rows = Array.from(document.querySelectorAll("#attendanceTable tbody tr"))
-    .map(row => Array.from(row.cells).map(cell => cell.innerText));
-
-  doc.autoTable({
-    head: [head],
-    body: rows,
-    styles: {
-      font: 'helvetica',
-      fontSize: 10,
-      cellPadding: 2
-    },
-    margin: { top: 20 }
+    doc.addImage(imgData, 'PNG', 10, 10, pageWidth - 20, imgHeight);
+    doc.save("attendance.pdf");
   });
-
-  doc.save("attendance.pdf");
 }
 
     function updateChart(dayCounts) {
