@@ -104,6 +104,16 @@
       background-color: #333;
       color: #f4e733;
     }
+    .download-icon {
+  display: inline-block;
+  width: 18px;
+  height: 18px;
+  background: black;
+  clip-path: polygon(50% 0%, 100% 50%, 75% 50%, 75% 100%, 25% 100%, 25% 50%, 0% 50%);
+  margin-left: 5px;
+  vertical-align: middle;
+}
+
   </style>
 </head>
 <body>
@@ -122,11 +132,17 @@
     <div class="controls">
       <div>
         <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
-        <input type="text" id="searchGame" placeholder="بحث بالمشرف..." onkeyup="filterTable()">
+        <input type="text" id="searchGame" placeholder="بحث بالموظف المسؤول..." onkeyup="filterTable()">
       </div>
       <div>
-        <button class="export" onclick="exportToExcel()">Excel 💾</button>
-        <button class="export" onclick="exportToPDF()">PDF 📄</button>
+<button class="export" onclick="exportToExcel()">
+  <span class="download-icon"></span> Excel
+</button>
+
+<button class="export" onclick="exportToPDF()">
+  <span class="download-icon"></span> PDF
+</button>
+
       </div>
       <div class="summary-box">
         <span id="summary">إجمالي الحضور: 0</span>
@@ -147,13 +163,13 @@
       <tbody></tbody>
     </table>
 
-    <canvas id="attendanceChart" height="200"></canvas>
   </div>
 
   <div class="container" id="statsView" style="display: none;">
     <h2 style="color:#f4e733; text-align:center">إحصائيات الحضور</h2>
     <canvas id="pieStaff" height="200"></canvas>
     <canvas id="earlyLate" height="200"></canvas>
+    <canvas id="attendanceChart" height="200"></canvas>
   </div>
 
   <script>
@@ -212,7 +228,7 @@
       new Chart(document.getElementById("earlyLate").getContext("2d"), {
         type: 'bar',
         data: {
-          labels: ['حضور مبكر (4:20 - 5:20)', 'حضور متأخر (بعد 5:20)'],
+          labels: ['حضور بالوقت (4:20 - 5:05)', 'حضور متأخر (بعد 5:05)'],
           datasets: [{
             data: [early.early, early.late],
             backgroundColor: ['#66cc66', '#cc3333']
