@@ -9,7 +9,7 @@
   <title>لوحة حضور المخيم الصيفي - نادي كلباء</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @font-face {
       font-family: 'NotoKufiArabic';
@@ -88,6 +88,15 @@
       color: #f4e733;
       font-weight: bold;
     }
+    .hidden {
+      display: none;
+    }
+    canvas {
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      margin-top: 20px;
+    }
   </style>
 </head>
 <body>
@@ -99,9 +108,10 @@
     <button onclick="filterData('day')">اليوم</button>
     <button onclick="filterData('week')">هذا الأسبوع</button>
     <button onclick="filterData('month')">هذا الشهر</button>
+    <button onclick="showStats()">📊 الإحصائيات</button>
   </nav>
 
-  <div class="container">
+  <div class="container" id="tablePage">
     <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
     <input type="text" id="searchStaff" placeholder="بحث بالموظف..." onkeyup="filterTable()">
     <button class="export" onclick="exportToExcel()">Excel 💾</button>
@@ -117,8 +127,14 @@
     <div class="summary" id="summary">إجمالي الحضور: 0</div>
   </div>
 
+  <div class="container hidden" id="statsPage">
+    <h2>📊 إحصائيات الحضور</h2>
+    <canvas id="chartPerDay"></canvas>
+    <canvas id="chartPerStaff"></canvas>
+  </div>
+
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec'; // Replace with your endpoint
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec'; 
     let allData = [];
 
     async function fetchData() {
@@ -166,7 +182,7 @@
       rows.forEach(row => {
         const nameCell = row.cells[1].innerText.toLowerCase();
         const staffCell = row.cells[4].innerText.toLowerCase();
-        row.style.display = nameCell.includes(name) && gameCell.includes(game) ? "" : "none";
+        row.style.display = nameCell.includes(name) && staffCell.includes(staff) ? "" : "none";
       });
     }
 
@@ -185,6 +201,55 @@
         .map(th => th.innerText);
       doc.autoTable({ head: [head], body: rows });
       doc.save("attendance.pdf");
+    }
+
+    function showStats() {
+      document.getElementById("tablePage").classList.add("hidden");
+      document.getElementById("statsPage").classList.remove("hidden");
+      renderCharts();
+    }
+
+    function renderCharts() {
+      const dayCounts = {};
+      const staffCounts = {};
+      allData.forEach(row => {
+        const date = new Date(row["Timestamp"]).toLocaleDateString("ar-EG");
+        dayCounts[date] = (dayCounts[date] || 0) + 1;
+
+        const staff = row["Scanned By"];
+        staffCounts[staff] = (staffCounts[staff] || 0) + 1;
+      });
+
+      new Chart(document.getElementById("chartPerDay"), {
+        type: "bar",
+        data: {
+          labels: Object.keys(dayCounts),
+          datasets: [{
+            label: "عدد الحضور لكل يوم",
+            data: Object.values(dayCounts),
+            backgroundColor: "#f4e733",
+            borderColor: "black",
+            borderWidth: 1
+          }]
+        },
+        options: {
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+
+      new Chart(document.getElementById("chartPerStaff"), {
+        type: "pie",
+        data: {
+          labels: Object.keys(staffCounts),
+          datasets: [{
+            label: "عدد الحضور لكل موظف",
+            data: Object.values(staffCounts),
+            backgroundColor: ["#f4e733", "#FF6384", "#36A2EB", "#FFCE56"]
+          }]
+        }
+      });
     }
 
     fetchData();
