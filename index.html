@@ -113,17 +113,21 @@
   color: #f4e733;
   font-weight: bold;
 }
-    .search-group {
+    
+.search-group {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: space-between;
+  width: 100%;
   gap: 10px;
-  width: 60%;
 }
 
 .search-group input {
-  flex: 1 1 60%;
+  flex: 1;
+  min-width: 0;
   box-sizing: border-box;
 }
+   
 .export-buttons {
   display: flex;
   flex-direction: column;
@@ -231,14 +235,19 @@
 
   .title {
     font-size: 18px;
-    margin-bottom: 20px;
+    margin-top: 15px;
+    margin-bottom: 17px;
     line-height: 1.4;
   }
- button.export {
-  padding: 10px 8px;
-  font-size: 14px;
+
+      .search-group {
+  flex-direction: row !important;
+  flex-wrap: nowrap;
+}
+
+.search-group input {
   width: 100%;
-  margin: 4px 0;
+  flex: 1;
 }
       .download-icon {
   width: 14px;
@@ -246,13 +255,6 @@
   margin-left: 4px;
 }
 
-.summary-box {
-  flex-direction: column !important;
-  align-items: center !important;
-  text-align: center !important;
-  font-size: 14px;
-  gap: 5px;
-}
   .controls {
     flex-direction: column;
     align-items: stretch;
@@ -293,7 +295,7 @@
     height: auto !important;
   }
 
-          footer {
+  footer {
   text-align: center;
   padding: 15px 10px;
 }
@@ -512,7 +514,7 @@ function exportToPDF() {
 
   html2canvas(table, {
     scale: 2,
-    backgroundColor: "#fff", // ضروري لأن خلفيتك داكنة
+    backgroundColor: "#000000", // ضروري لأن خلفيتك داكنة
     useCORS: true
   }).then(canvas => {
     const imgData = canvas.toDataURL("image/png");
