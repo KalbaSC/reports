@@ -10,7 +10,6 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>لوحة حضور المخيم الصيفي - نادي كلباء</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -248,10 +247,20 @@
     font-size: 14px;
     margin: 2px 0;
   }
+      .search-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.search-group input {
+  flex: 1 1 100%;
+}
 
   button.export {
-    width: 100%;
-    font-size: 15px;
+    width: 80%;
+    font-size: 12px;
     padding: 10px;
   }
 
@@ -323,10 +332,10 @@ footer p {
   </div>
 
   <div class="controls">
-    <div>
-      <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
-      <input type="text" id="searchGame" placeholder="بحث بالموظف المسؤول..." onkeyup="filterTable()">
-    </div>
+<div class="search-group">
+  <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
+  <input type="text" id="searchGame" placeholder="بحث بالموظف المسؤول..." onkeyup="filterTable()">
+</div>
 
     <div>
       <button class="export" onclick="exportToExcel()">
@@ -480,17 +489,27 @@ footer p {
 function exportToPDF() {
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
-  
   const table = document.getElementById("attendanceTable");
+
   html2canvas(table, { scale: 2, useCORS: true }).then(canvas => {
     const imgData = canvas.toDataURL("image/png");
-    const pageWidth = doc.internal.pageSize.getWidth();
-    const pageHeight = doc.internal.pageSize.getHeight();
-    const imgProps = doc.getImageProperties(imgData);
-    const ratio = imgProps.width / imgProps.height;
-    const imgHeight = pageWidth / ratio;
+    const imgWidth = 190; // A4 width with margins
+    const pageHeight = 297; // A4 height
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
-    doc.addImage(imgData, 'PNG', 10, 10, pageWidth - 20, imgHeight);
+    let heightLeft = imgHeight;
+    let position = 10;
+
+    doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      doc.addPage();
+      doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
     doc.save("attendance.pdf");
   });
 }
