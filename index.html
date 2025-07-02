@@ -2,7 +2,9 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
+    <meta name="mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#000000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -182,36 +184,37 @@
   }
 
   .container {
-    padding: 10px;
+    padding: 12px;
     margin: 10px auto;
     width: 95%;
   }
 
   .title {
     font-size: 18px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
+    line-height: 1.4;
   }
 
   .controls {
     flex-direction: column;
     align-items: stretch;
-    padding: 10px;
+    gap: 10px;
   }
 
   .controls input {
     width: 100%;
-    margin: 5px 0;
+    padding: 8px;
     font-size: 14px;
+    margin: 2px 0;
   }
 
   button.export {
     width: 100%;
-    margin-top: 5px;
-    font-size: 14px;
+    font-size: 15px;
+    padding: 10px;
   }
 
   .summary-box {
-    flex-direction: column;
     text-align: center;
     font-size: 14px;
   }
@@ -223,12 +226,32 @@
   }
 
   th, td {
-    padding: 8px;
+    padding: 6px;
   }
 
   canvas {
     width: 100% !important;
     height: auto !important;
+  }
+
+          footer {
+  text-align: center;
+  padding: 15px 10px;
+}
+
+footer p {
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+
+.social-icons {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+  .social-icons a {
+    font-size: 18px;
   }
 }
   </style>
@@ -449,5 +472,16 @@
 
     fetchData();
   </script>
+  <footer>
+  <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
+    <p style="font-size: 14px; color: #aaa; margin-top: -10px;">تم التطوير بواسطة روند أحمد الضمور</p>
+  <div class="social-icons">
+    <a href="https://facebook.com/Kalbasc1" target="_blank"><i class="fab fa-facebook-f"></i></a>
+    <a href="https://instagram.com/kalbasc" target="_blank"><i class="fab fa-instagram"></i></a>
+    <a href="https://x.com/Kalba_sc" target="_blank"><i class="fab fa-twitter"></i></a>
+    <a href="https://youtube.com/@kalbasc" target="_blank"><i class="fab fa-youtube"></i></a>
+    <a href="https://tiktok.com/@kalbasc" target="_blank"><i class="fab fa-tiktok"></i></a>
+  </div>
+</footer>
 </body>
 </html>
