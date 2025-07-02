@@ -36,8 +36,10 @@
       background-color: #111;
       display: flex;
       justify-content: space-around;
+      align-items: center;
       border-bottom: 3px solid #f4e733;
       border-top: 3px solid #f4e733;
+      flex-wrap: wrap;
     }
     nav button {
       flex: 1;
@@ -47,6 +49,11 @@
       font-size: 18px;
       padding: 15px;
       cursor: pointer;
+    }
+    .nav-summary {
+      font-size: 14px;
+      color: #f4e733;
+      margin: 10px;
     }
     .container {
       display: grid;
@@ -59,7 +66,7 @@
       border-radius: 10px;
       margin-top: 30px;
     }
-    .controls, .summary, canvas {
+    .controls, canvas {
       background: #222;
       padding: 15px;
       border-radius: 10px;
@@ -92,10 +99,10 @@
       background-color: #333;
       color: #f4e733;
     }
-    .summary {
+    .summary-inline {
+      font-size: 14px;
+      margin-right: 10px;
       color: #f4e733;
-      font-weight: bold;
-      text-align: center;
     }
   </style>
 </head>
@@ -108,18 +115,18 @@
     <button onclick="filterData('day')">اليوم</button>
     <button onclick="filterData('week')">هذا الأسبوع</button>
     <button onclick="filterData('month')">هذا الشهر</button>
+    <div class="nav-summary" id="summary">إجمالي الحضور: 0</div>
+    <div class="nav-summary" id="filteredSummary"></div>
   </nav>
 
   <div class="container">
     <div class="controls">
       <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
+      <input type="text" id="searchID" placeholder="بحث بالمعرف..." onkeyup="filterTable()">
       <input type="text" id="searchGame" placeholder="بحث بالموظف..." onkeyup="filterTable()">
       <button class="export" onclick="exportToExcel()">Excel 💾</button>
       <button class="export" onclick="exportToPDF()">PDF 📄</button>
     </div>
-
-    <div class="summary" id="summary">إجمالي الحضور: 0</div>
-    <div class="summary" id="filteredSummary"></div>
 
     <table id="attendanceTable">
       <thead>
@@ -135,11 +142,12 @@
     </table>
 
     <canvas id="attendanceChart" height="200"></canvas>
+    <canvas id="pieChart" height="200"></canvas>
   </div>
 
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
-    let allData = [], chart;
+    let allData = [], chart, pie;
 
     async function fetchData() {
       const res = await fetch(scriptURL);
@@ -165,40 +173,50 @@
     function renderTable(data) {
       const tbody = document.querySelector("#attendanceTable tbody");
       tbody.innerHTML = "";
-      const perDay = {};
+      const perDay = {}, staffCount = {}, early = [], late = [];
       data.forEach(row => {
         const tr = document.createElement("tr");
+        const date = new Date(row["Timestamp"]);
+        const hour = date.getHours() + date.getMinutes() / 60;
+        if (hour >= 16.33 && hour <= 17.33) early.push(row);
+        else late.push(row);
         tr.innerHTML = `
-          <td>${new Date(row["Timestamp"]).toLocaleString('ar-EG')}</td>
+          <td>${date.toLocaleString('ar-EG')}</td>
           <td>${row["Child Name"]}</td>
           <td>${row["Parent"]}</td>
           <td>${row["ID"]}</td>
           <td>${row["Scanned By"]}</td>`;
         tbody.appendChild(tr);
-        const day = new Date(row["Timestamp"]).toLocaleDateString('ar-EG');
+        const day = date.toLocaleDateString('ar-EG');
         perDay[day] = (perDay[day] || 0) + 1;
+        staffCount[row["Scanned By"]] = (staffCount[row["Scanned By"]] || 0) + 1;
       });
       document.getElementById("summary").innerText = `إجمالي الحضور: ${data.length}`;
-      document.getElementById("filteredSummary").innerText = "";
+      document.getElementById("filteredSummary").innerText = `مبكر: ${early.length} | متأخر: ${late.length}`;
       updateChart(perDay);
+      updatePieChart(staffCount);
     }
 
     function filterTable() {
       const name = document.getElementById("searchName").value.toLowerCase();
       const game = document.getElementById("searchGame").value.toLowerCase();
+      const id = document.getElementById("searchID").value.toLowerCase();
       const rows = document.querySelectorAll("#attendanceTable tbody tr");
 
       let visibleCount = 0;
       rows.forEach(row => {
         const nameCell = row.cells[1].innerText.toLowerCase();
+        const parentCell = row.cells[2].innerText.toLowerCase();
+        const idCell = row.cells[3].innerText.toLowerCase();
         const gameCell = row.cells[4].innerText.toLowerCase();
-        const match = nameCell.includes(name) && gameCell.includes(game);
+        const match = nameCell.includes(name) && gameCell.includes(game) && idCell.includes(id);
         row.style.display = match ? "" : "none";
         if (match) visibleCount++;
       });
 
-      document.getElementById("filteredSummary").innerText =
-        (name || game) ? `عدد النتائج المطابقة: ${visibleCount}` : "";
+      document.getElementById("filteredSummary").innerText = (name || game || id)
+        ? `عدد النتائج المطابقة: ${visibleCount}`
+        : "";
     }
 
     function exportToExcel() {
@@ -236,6 +254,25 @@
         options: {
           plugins: { legend: { display: false }},
           scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    function updatePieChart(staffCount) {
+      const ctx = document.getElementById("pieChart").getContext("2d");
+      if (pie) pie.destroy();
+      pie = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(staffCount),
+          datasets: [{
+            label: 'عدد المسح لكل موظف',
+            data: Object.values(staffCount),
+            backgroundColor: Object.keys(staffCount).map(() => `hsl(${Math.random() * 360}, 70%, 60%)`)
+          }]
+        },
+        options: {
+          plugins: { legend: { position: 'bottom' } }
         }
       });
     }
