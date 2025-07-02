@@ -113,6 +113,18 @@
   color: #f4e733;
   font-weight: bold;
 }
+    .search-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  width: 100%;
+}
+
+.search-group input {
+  flex: 1 1 100%;
+  box-sizing: border-box;
+}
+
     .controls .summary-box {
       display: flex;
       gap: 15px;
@@ -247,20 +259,11 @@
     font-size: 14px;
     margin: 2px 0;
   }
-      .search-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  width: 100%;
-}
-
-.search-group input {
-  flex: 1 1 100%;
-}
 
   button.export {
     width: 80%;
     font-size: 12px;
+    align-items: center;
     padding: 10px;
   }
 
@@ -332,19 +335,20 @@ footer p {
   </div>
 
   <div class="controls">
+    
 <div class="search-group">
   <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
   <input type="text" id="searchGame" placeholder="بحث بالموظف المسؤول..." onkeyup="filterTable()">
 </div>
 
-    <div>
-      <button class="export" onclick="exportToExcel()">
-        <span class="download-icon"></span> Excel
-      </button>
-      <button class="export" onclick="exportToPDF()">
-        <span class="download-icon"></span> PDF
-      </button>
-    </div>
+<div class="export-buttons">
+  <button class="export" onclick="exportToExcel()">
+    <span class="download-icon"></span> Excel
+  </button>
+  <button class="export" onclick="exportToPDF()">
+    <span class="download-icon"></span> PDF
+  </button>
+</div>
 
     <div class="summary-box">
       <span id="summary">إجمالي الحضور: 0</span>
