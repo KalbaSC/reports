@@ -11,6 +11,7 @@
   <title>لوحة حضور المخيم الصيفي - نادي كلباء</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     @font-face {
@@ -406,7 +407,7 @@ footer p {
       new Chart(document.getElementById("earlyLate").getContext("2d"), {
         type: 'bar',
         data: {
-          labels: ['حضور بالوقت (4:20 - 5:05)', 'حضور متأخر (بعد 5:05)'],
+          labels: ['حضور بالوقت (4:20 - 5:17)', 'حضور متأخر (بعد 5:17)'],
           datasets: [{
             data: [early.early, early.late],
             backgroundColor: ['#66cc66', '#cc3333']
@@ -463,17 +464,32 @@ footer p {
       XLSX.writeFile(wb, "attendance.xlsx");
     }
 
-    function exportToPDF() {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      doc.text("تقرير الحضور", 10, 10);
-      const rows = Array.from(document.querySelectorAll("#attendanceTable tbody tr"))
-        .map(row => Array.from(row.cells).map(cell => cell.innerText));
-      const head = Array.from(document.querySelectorAll("#attendanceTable thead th"))
-        .map(th => th.innerText);
-      doc.autoTable({ head: [head], body: rows });
-      doc.save("attendance.pdf");
-    }
+function exportToPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFont("Arial");
+  doc.setFontSize(12);
+  doc.text("تقرير الحضور", 10, 10);
+
+  const head = Array.from(document.querySelectorAll("#attendanceTable thead th"))
+    .map(th => th.innerText);
+  const rows = Array.from(document.querySelectorAll("#attendanceTable tbody tr"))
+    .map(row => Array.from(row.cells).map(cell => cell.innerText));
+
+  doc.autoTable({
+    head: [head],
+    body: rows,
+    styles: {
+      font: 'helvetica',
+      fontSize: 10,
+      cellPadding: 2
+    },
+    margin: { top: 20 }
+  });
+
+  doc.save("attendance.pdf");
+}
 
     function updateChart(dayCounts) {
       const ctx = document.getElementById("attendanceChart").getContext("2d");
