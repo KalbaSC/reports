@@ -1,14 +1,12 @@
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>لوحة حضور نادي كلباء</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="theme-color" content="#000000">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-  <!-- Libraries -->
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <title>لوحة حضور المخيم الصيفي - نادي كلباء</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
@@ -17,228 +15,130 @@
       font-family: 'NotoKufiArabic';
       src: url('NotoKufiArabic.ttf') format('truetype');
     }
-
-    html, body {
-      font-family: 'NotoKufiArabic', 'Cairo', sans-serif;
-      margin: 0;
-      padding: 0;
+    body {
+      font-family: 'NotoKufiArabic', sans-serif;
       background: url('black_and_yellow_grunge_background.jpg') no-repeat center center fixed;
       background-size: cover;
       color: white;
-      text-align: center;
+      margin: 0;
+      padding: 0;
     }
-
-    .page-wrapper {
-      display: flex;
-      flex-direction: column;
-      min-height: 100vh;
-    }
-
-    .header-container {
-      background: #111;
-      border-bottom: 3px solid #f4e733;
-      width: 100%;
-    }
-
-    .header-right {
-      width: 100%;
-      max-width: 1170px;
-      margin: auto;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 20px;
-      padding: 20px 42px;
+    .header {
       background-color: #111;
-      box-sizing: border-box;
-    }
-
-    .logo {
-      height: 70px;
-    }
-
-    .divider {
-      width: 1.5px;
-      height: 65px;
-      background-color: #f4e733;
-    }
-
-    .header-info {
+      border-bottom: 3px solid #f4e733;
+      padding: 20px;
       text-align: center;
     }
-
-    .arabic-name {
-      font-weight: bold;
-      font-size: 20px;
-    }
-
-    .english-name {
-      font-size: 14px;
+    .header h1 {
       color: #f4e733;
     }
-
-    main {
-      padding: 30px;
+    nav {
+      background-color: #111;
+      display: flex;
+      justify-content: space-around;
+      border-bottom: 3px solid #f4e733;
+      border-top: 3px solid #f4e733;
+    }
+    nav button {
       flex: 1;
-    }
-
-    select, input, button {
-      font-size: 16px;
-      padding: 8px;
-      border-radius: 6px;
-      margin: 6px;
-    }
-
-    button {
-      background: #f4e733;
-      color: black;
+      background: none;
       border: none;
+      color: #f4e733;
+      font-size: 18px;
+      padding: 15px;
       cursor: pointer;
     }
-
+    .container {
+      max-width: 1200px;
+      margin: auto;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.85);
+      border-radius: 10px;
+      margin-top: 30px;
+    }
+    input {
+      padding: 10px;
+      border-radius: 5px;
+      margin: 5px;
+    }
+    button.export {
+      background: #f4e733;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      margin: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      background: white;
-      color: black;
     }
-
     th, td {
-      padding: 10px;
       border: 1px solid #f4e733;
-    }
-
-    th {
-      background: #222;
-      color: #f4e733;
-    }
-
-    canvas {
-      max-width: 100%;
-      margin-top: 30px;
-      background: white;
-      border-radius: 10px;
-    }
-
-    footer {
-      background-color: #111;
-      color: white;
+      padding: 10px;
       text-align: center;
-      padding: 20px;
-      border-top: 3px solid #f4e733;
-      font-size: 12px;
     }
-
-    .social-icons a {
-      color: white;
-      margin: 0 8px;
-      font-size: 11px;
+    th {
+      background-color: #222;
+    }
+    .summary {
+      margin-top: 20px;
+      color: #f4e733;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div class="page-wrapper">
-    <!-- Header -->
-    <header class="header-container">
-      <div class="header-right">
-        <img src="Picture3.png" class="logo">
-        <div class="divider"></div>
-        <img src="logo.png" class="logo">
-        <div class="header-info">
-          <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
-          <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
-        </div>
-      </div>
-    </header>
-
-    <!-- Main Dashboard -->
-    <main>
-      <h2>📋 لوحة الحضور</h2>
-
-      <div>
-        <label>الفلترة:</label>
-        <select id="filterType" onchange="applyFilter()">
-          <option value="all">الكل</option>
-          <option value="day">يوم</option>
-          <option value="week">أسبوع</option>
-          <option value="month">شهر</option>
-        </select>
-        <input type="date" id="filterDate" onchange="applyFilter()">
-        <button onclick="downloadPDF()">📄 تحميل PDF</button>
-        <button onclick="downloadExcel()">📊 تحميل Excel</button>
-      </div>
-
-      <table id="attendanceTable">
-        <thead>
-          <tr>
-            <th>الوقت</th>
-            <th>الاسم</th>
-            <th>ولي الأمر</th>
-            <th>المعرف</th>
-            <th>الموظف</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-
-      <canvas id="attendanceChart" height="250"></canvas>
-    </main>
-
-    <!-- Footer -->
-    <footer>
-      <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
-      <p style="font-size: 12px; color: #aaa; margin-top: -10px;">تم التطوير بواسطة روند أحمد الضمور</p>
-      <div class="social-icons">
-        <a href="https://facebook.com/Kalbasc1" target="_blank"><i class="fab fa-facebook-f"></i></a>
-        <a href="https://instagram.com/kalbasc" target="_blank"><i class="fab fa-instagram"></i></a>
-        <a href="https://x.com/Kalba_sc" target="_blank"><i class="fab fa-twitter"></i></a>
-        <a href="https://youtube.com/@kalbasc" target="_blank"><i class="fab fa-youtube"></i></a>
-        <a href="https://tiktok.com/@kalbasc" target="_blank"><i class="fab fa-tiktok"></i></a>
-      </div>
-    </footer>
+  <div class="header">
+    <h1>لوحة حضور المخيم الصيفي - نادي كلباء</h1>
   </div>
 
-  <!-- Script -->
+  <nav>
+    <button onclick="filterData('day')">اليوم</button>
+    <button onclick="filterData('week')">هذا الأسبوع</button>
+    <button onclick="filterData('month')">هذا الشهر</button>
+  </nav>
+
+  <div class="container">
+    <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
+    <input type="text" id="searchGame" placeholder="بحث باللعبة..." onkeyup="filterTable()">
+    <button class="export" onclick="exportToExcel()">Excel 💾</button>
+    <button class="export" onclick="exportToPDF()">PDF 📄</button>
+
+    <table id="attendanceTable">
+      <thead>
+        <tr><th>الوقت</th><th>الاسم</th><th>ولي الأمر</th><th>المعرف</th><th>الموظف</th></tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+
+    <div class="summary" id="summary">إجمالي الحضور: 0</div>
+  </div>
+
   <script>
-    const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec'; // Replace this
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec'; // Replace with your endpoint
     let allData = [];
-    let chart;
 
     async function fetchData() {
-      try {
-        const res = await fetch(scriptURL);
-        allData = await res.json();
-        applyFilter();
-      } catch (err) {
-        alert("⚠️ فشل تحميل البيانات");
-      }
+      const res = await fetch(scriptURL);
+      allData = await res.json();
+      filterData('day');
     }
 
-    function applyFilter() {
-      const type = document.getElementById("filterType").value;
-      const selected = document.getElementById("filterDate").value;
-      let filtered = allData;
-
-      if (type !== 'all' && selected) {
-        const selectedDate = new Date(selected);
-        filtered = allData.filter(row => {
-          const date = new Date(row["Timestamp"]);
-          if (type === "day") return date.toDateString() === selectedDate.toDateString();
-          if (type === "week") {
-            const start = new Date(selectedDate);
-            start.setDate(start.getDate() - start.getDay());
-            const end = new Date(start);
-            end.setDate(end.getDate() + 6);
-            return date >= start && date <= end;
-          }
-          if (type === "month") {
-            return date.getMonth() === selectedDate.getMonth() &&
-                   date.getFullYear() === selectedDate.getFullYear();
-          }
-        });
-      }
-
+    function filterData(type) {
+      const now = new Date();
+      let filtered = allData.filter(row => {
+        const d = new Date(row["Timestamp"]);
+        if (type === 'day') return d.toDateString() === now.toDateString();
+        if (type === 'week') {
+          const start = new Date(now); start.setDate(now.getDate() - 7);
+          return d >= start && d <= now;
+        }
+        if (type === 'month') return d.getMonth() === now.getMonth();
+        return true;
+      });
       renderTable(filtered);
     }
 
@@ -256,57 +156,35 @@
         `;
         tbody.appendChild(tr);
       });
-      updateChart(data);
+      document.getElementById("summary").innerText = `إجمالي الحضور: ${data.length}`;
     }
 
-    function updateChart(data) {
-      const countPerDay = {};
-      data.forEach(row => {
-        const d = new Date(row["Timestamp"]).toLocaleDateString('ar-EG');
-        countPerDay[d] = (countPerDay[d] || 0) + 1;
-      });
-
-      const ctx = document.getElementById("attendanceChart").getContext("2d");
-      if (chart) chart.destroy();
-
-      chart = new Chart(ctx, {
-        type: "bar",
-        data: {
-          labels: Object.keys(countPerDay),
-          datasets: [{
-            label: "عدد الحضور في اليوم",
-            data: Object.values(countPerDay),
-            backgroundColor: "#f4e733",
-            borderColor: "#000",
-            borderWidth: 1
-          }]
-        },
-        options: {
-          plugins: { legend: { display: false }},
-          scales: { y: { beginAtZero: true }}
-        }
+    function filterTable() {
+      const name = document.getElementById("searchName").value.toLowerCase();
+      const game = document.getElementById("searchGame").value.toLowerCase();
+      const rows = document.querySelectorAll("#attendanceTable tbody tr");
+      rows.forEach(row => {
+        const nameCell = row.cells[1].innerText.toLowerCase();
+        const gameCell = row.cells[4].innerText.toLowerCase();
+        row.style.display = nameCell.includes(name) && gameCell.includes(game) ? "" : "none";
       });
     }
 
-    function downloadPDF() {
+    function exportToExcel() {
+      const wb = XLSX.utils.table_to_book(document.getElementById("attendanceTable"));
+      XLSX.writeFile(wb, "attendance.xlsx");
+    }
+
+    function exportToPDF() {
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
-      doc.text("تقرير الحضور - نادي كلباء", 105, 15, null, null, "center");
-      const rows = [...document.querySelectorAll("#attendanceTable tbody tr")]
-        .map(tr => [...tr.children].map(td => td.innerText));
-      let y = 30;
-      rows.forEach(r => {
-        r.forEach((c, i) => doc.text(c, 20 + i * 35, y));
-        y += 10;
-      });
-      doc.save("attendance-report.pdf");
-    }
-
-    function downloadExcel() {
-      const ws = XLSX.utils.table_to_sheet(document.getElementById("attendanceTable"));
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "الحضور");
-      XLSX.writeFile(wb, "attendance-report.xlsx");
+      doc.text("تقرير الحضور", 10, 10);
+      const rows = Array.from(document.querySelectorAll("#attendanceTable tbody tr"))
+        .map(row => Array.from(row.cells).map(cell => cell.innerText));
+      const head = Array.from(document.querySelectorAll("#attendanceTable thead th"))
+        .map(th => th.innerText);
+      doc.autoTable({ head: [head], body: rows });
+      doc.save("attendance.pdf");
     }
 
     fetchData();
