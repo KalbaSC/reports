@@ -383,6 +383,13 @@ footer p {
       </thead>
       <tbody></tbody>
     </table>
+  
+  <div id="todayStats" style="background:#222; padding:20px; border-radius:10px; margin-top:20px; color:#f4e733">
+  <h3 style="margin-bottom:15px;">إحصاءات اليوم:</h3>
+  <div id="staffToday"></div>
+  <div id="timingToday" style="margin-top:10px;"></div>
+</div>
+
 </div>
 
 
@@ -446,7 +453,7 @@ function filterByDate() {
         const hour = new Date(row["Timestamp"]).getHours();
         const min = new Date(row["Timestamp"]).getMinutes();
         const time = hour * 60 + min;
-        if (time >= 260 && time <= 320) early.early++;
+        if (time < 311) early.early++;
         else early.late++;
       });
 
@@ -496,6 +503,25 @@ function filterByDate() {
       document.getElementById("summary").innerText = `إجمالي الحضور: ${data.length}`;
       document.getElementById("filteredSummary").innerText = "";
       updateChart(perDay);
+      // إحصاءات اليوم (صندوق صغير)
+const staffToday = {};
+let early = 0, late = 0;
+data.forEach(row => {
+  const name = row["Scanned By"] || "غير معروف";
+  staffToday[name] = (staffToday[name] || 0) + 1;
+
+  const time = new Date(row["Timestamp"]);
+  const totalMinutes = time.getHours() * 60 + time.getMinutes();
+  if (totalMinutes < 311) early++;
+  else late++;
+});
+
+const staffList = Object.entries(staffToday)
+  .map(([name, count]) => `${name}: ${count}`)
+  .join("<br>");
+
+document.getElementById("staffToday").innerHTML = `<strong>حسب الموظف:</strong><br>${staffList}`;
+document.getElementById("timingToday").innerHTML = `<strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}`;
     }
 
     function filterTable() {
