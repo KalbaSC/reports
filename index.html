@@ -189,6 +189,13 @@
       margin: 0 8px;
       font-size: 20px;
     }
+    #datePicker {
+  background: white;
+  color: black;
+  border: none;
+  padding: 10px;
+  border-radius: 5px;
+}
     @media (max-width: 768px) {
  .header-right {
     padding: 10px 10px;
@@ -347,7 +354,7 @@ footer p {
 <div class="search-group">
   <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
   <input type="text" id="searchGame" placeholder="بحث بالموظف المسؤول..." onkeyup="filterTable()">
-  <input type="date" id="datePicker" onchange="filterByDate()">
+<input type="date" id="datePicker" onchange="filterByDate()" />
 </div>
 
 <div class="export-buttons">
@@ -393,7 +400,10 @@ footer p {
     async function fetchData() {
       const res = await fetch(scriptURL);
       allData = await res.json();
-      filterData('day');
+
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("datePicker").value = today;
+      filterByDate();
     }
 
     function filterData(type) {
