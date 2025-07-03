@@ -453,7 +453,7 @@ function filterByDate() {
         const hour = new Date(row["Timestamp"]).getHours();
         const min = new Date(row["Timestamp"]).getMinutes();
         const time = hour * 60 + min;
-        if (time < 311) early.early++;
+        if (time < (17 * 60 + 11)) early.early++;
         else early.late++;
       });
 
@@ -511,9 +511,13 @@ data.forEach(row => {
   staffToday[name] = (staffToday[name] || 0) + 1;
 
   const time = new Date(row["Timestamp"]);
-  const totalMinutes = time.getHours() * 60 + time.getMinutes();
-  if (totalMinutes < 311) early++;
-  else late++;
+const hours = time.getHours();
+const minutes = time.getMinutes();
+const totalMinutes = hours * 60 + minutes;
+
+// ✅ نعتبر قبل 17:11 (5:11 مساءً) "بالوقت"
+if (totalMinutes < (17 * 60 + 11)) early++;
+else late++;
 });
 
 const staffList = Object.entries(staffToday)
