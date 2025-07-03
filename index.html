@@ -347,6 +347,7 @@ footer p {
 <div class="search-group">
   <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
   <input type="text" id="searchGame" placeholder="بحث بالموظف المسؤول..." onkeyup="filterTable()">
+  <input type="date" id="datePicker" onchange="filterByDate()">
 </div>
 
 <div class="export-buttons">
@@ -411,7 +412,19 @@ footer p {
       });
       renderTable(filtered);
     }
+function filterByDate() {
+  const selectedDate = document.getElementById("datePicker").value;
+  if (!selectedDate) return;
 
+  const filtered = allData.filter(row => {
+    const rowDate = new Date(row["Timestamp"]).toISOString().split("T")[0];
+    return rowDate === selectedDate;
+  });
+
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("statsView").style.display = "none";
+  renderTable(filtered);
+}
     function showStats() {
       document.getElementById("mainView").style.display = "none";
       document.getElementById("statsView").style.display = "block";
