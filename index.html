@@ -355,7 +355,8 @@ footer p {
   <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
   <input type="text" id="searchGame" placeholder="بحث بالموظف المسؤول..." onkeyup="filterTable()">
   <input type="text" id="searchActivity" placeholder="بحث بالنشاط..." onkeyup="filterTable()">
-<input type="date" id="datePicker" onchange="filterByDate()" />
+  <input type="date" id="datePicker" onchange="filterByDate()" />
+  <button onclick="clearFilters()" style="padding:10px; background:#f4e733; color:black; border:none; border-radius:8px;">مسح البحث</button>
 </div>
 
 <div class="export-buttons">
@@ -557,6 +558,12 @@ rows.forEach(row => {
     (name || game || activity) ? `عدد النتائج المطابقة: ${visibleCount}` : "";
     }
 
+function clearFilters() {
+  document.getElementById("searchName").value = "";
+  document.getElementById("searchGame").value = "";
+  document.getElementById("searchActivity")?.value = ""; 
+  filterTable(); 
+}
     function exportToExcel() {
       const wb = XLSX.utils.table_to_book(document.getElementById("attendanceTable"));
       XLSX.writeFile(wb, "attendance.xlsx");
