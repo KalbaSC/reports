@@ -354,6 +354,7 @@ footer p {
 <div class="search-group">
   <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
   <input type="text" id="searchGame" placeholder="بحث بالموظف المسؤول..." onkeyup="filterTable()">
+  <input type="text" id="searchActivity" placeholder="بحث بالنشاط..." onkeyup="filterTable()">
 <input type="date" id="datePicker" onchange="filterByDate()" />
 </div>
 
@@ -379,6 +380,8 @@ footer p {
           <th>ولي الأمر</th>
           <th>المعرف</th>
           <th>الموظف</th>
+          <th>الحضور العام</th>
+          <th>النشاط</th>
         </tr>
       </thead>
       <tbody></tbody>
@@ -495,7 +498,9 @@ function filterByDate() {
           <td>${row["Child Name"]}</td>
           <td>${row["Parent"]}</td>
           <td>${row["ID"]}</td>
-          <td>${row["Scanned By"]}</td>`;
+          <td>${row["Scanned By"]}</td>
+          <td>${row["General"] || ""}</td>
+          <td>${row["Activity"] || ""}</td>`;
         tbody.appendChild(tr);
         const day = new Date(row["Timestamp"]).toLocaleDateString('ar-EG');
         perDay[day] = (perDay[day] || 0) + 1;
@@ -531,19 +536,25 @@ document.getElementById("timingToday").innerHTML = `<strong>حسب الوقت:</
     function filterTable() {
       const name = document.getElementById("searchName").value.toLowerCase();
       const game = document.getElementById("searchGame").value.toLowerCase();
+      const activity = document.getElementById("searchActivity").value.toLowerCase();
       const rows = document.querySelectorAll("#attendanceTable tbody tr");
 
       let visibleCount = 0;
-      rows.forEach(row => {
-        const nameCell = row.cells[1].innerText.toLowerCase();
-        const gameCell = row.cells[4].innerText.toLowerCase();
-        const match = nameCell.includes(name) && gameCell.includes(game);
-        row.style.display = match ? "" : "none";
-        if (match) visibleCount++;
+rows.forEach(row => {
+  const nameCell = row.cells[1].innerText.toLowerCase();
+  const gameCell = row.cells[4].innerText.toLowerCase();
+  const activityCell = row.cells[6]?.innerText.toLowerCase() || "";
+
+  const match = nameCell.includes(name) &&
+                gameCell.includes(game) &&
+                activityCell.includes(activity);
+
+  row.style.display = match ? "" : "none";
+  if (match) visibleCount++;
       });
 
-      document.getElementById("filteredSummary").innerText =
-        (name || game) ? `عدد النتائج المطابقة: ${visibleCount}` : "";
+    document.getElementById("filteredSummary").innerText =
+    (name || game || activity) ? `عدد النتائج المطابقة: ${visibleCount}` : "";
     }
 
     function exportToExcel() {
