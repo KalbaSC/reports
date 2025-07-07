@@ -415,15 +415,20 @@ footer p {
   <div class="controls">
     
 <div class="search-group">
-  <input id="searchName" placeholder="الاسم أو ولي الأمر..." onkeyup="filterTable()">
-  <select id="searchGame" onchange="filterTable()">
-    <option value="">كل الموظفين</option>
+  <select onchange="showFilterOptions(this.value)">
+    <option value="">🔍 بحث حسب...</option>
+    <option value="name">الاسم</option>
+    <option value="id">المعرّف</option>
+    <option value="staff">الموظف</option>
+    <option value="activity">النشاط</option>
   </select>
-  <select id="searchActivity" onchange="filterTable()">
-    <option value="">كل الأنشطة</option>
-  </select>
-  <input id="searchID" placeholder="بحث بالمعرّف..." onkeyup="filterTable()">
+
+  <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." onkeyup="filterTable()">
+  <input id="filter-id" class="hidden" placeholder="أدخل المعرف..." onkeyup="filterTable()">
+  <select id="filter-staff" class="hidden" onchange="filterTable()"></select>
+  <select id="filter-activity" class="hidden" onchange="filterTable()"></select>
   <input type="date" id="datePicker" onchange="filterByDate()" />
+  
   <button onclick="clearFilters()" style="padding:10px; background:#f4e733; color:black; border:none; border-radius:8px;">مسح</button>
 </div>
 
@@ -612,7 +617,7 @@ function filterByDate() {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${new Date(row["Timestamp"]).toLocaleString('ar-EG')}</td>
-          <td><strong>${row["Child Name"]}</strong><br>${row["Parent"]}</td>
+          <td>${row["Child Name"]} ${row["Parent"]}</td>
           <td>${row["ID"]}</td>
           <td>${row["Scanned By"]}</td>
           <td>${row["Activity"] || ""}</td>`;
@@ -761,6 +766,17 @@ function exportToPDF() {
   renderTable(filtered);
 }
 
+    function showFilterOptions(value) {
+  document.getElementById("filter-name").classList.add("hidden");
+  document.getElementById("filter-id").classList.add("hidden");
+  document.getElementById("filter-staff").classList.add("hidden");
+  document.getElementById("filter-activity").classList.add("hidden");
+
+  if (value === "name") document.getElementById("filter-name").classList.remove("hidden");
+  else if (value === "id") document.getElementById("filter-id").classList.remove("hidden");
+  else if (value === "staff") document.getElementById("filter-staff").classList.remove("hidden");
+  else if (value === "activity") document.getElementById("filter-activity").classList.remove("hidden");
+}
   </script>
   <footer>
   <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
