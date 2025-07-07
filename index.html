@@ -460,24 +460,37 @@ footer p {
 }
 
 
-    function filterData(type) {
-        setActiveNav(type); 
+function filterData(type) {
+  setActiveNav(type);
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("statsView").style.display = "none";
 
-      document.getElementById("mainView").style.display = "block";
-      document.getElementById("statsView").style.display = "none";
-      const now = new Date();
-      let filtered = allData.filter(row => {
-        const d = new Date(row["Timestamp"]);
-        if (type === 'day') return d.toDateString() === now.toDateString();
-        if (type === 'week') {
-          const start = new Date(now); start.setDate(now.getDate() - 7);
-          return d >= start && d <= now;
-        }
-        if (type === 'month') return d.getMonth() === now.getMonth();
-        return true;
-      });
-      renderTable(filtered);
+  const now = new Date();
+  const seen = new Set(); 
+
+  let filtered = allData.filter(row => {
+    const d = new Date(row["Timestamp"]);
+
+    let dateMatch = false;
+    if (type === 'day') dateMatch = d.toDateString() === now.toDateString();
+    else if (type === 'week') {
+      const start = new Date(now); start.setDate(now.getDate() - 7);
+      dateMatch = d >= start && d <= now;
     }
+    else if (type === 'month') dateMatch = d.getMonth() === now.getMonth();
+    else dateMatch = true;
+
+    if (!dateMatch) return false;
+
+    const key = `${row["ID"]}_${d.toDateString()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+
+  renderTable(filtered);
+}
+    
 function filterByDate() {
   const selectedDate = document.getElementById("datePicker").value;
   if (!selectedDate) return;
