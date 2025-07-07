@@ -793,8 +793,9 @@ function showFilterOptions(value) {
   else if (value === "staff") document.getElementById("filter-staff").classList.remove("hidden");
   else if (value === "activity") document.getElementById("filter-activity").classList.remove("hidden");
 }
-      fetchData().then(() => filterData('day'));
-
+window.onload = () => {
+  fetchData().then(() => filterData('day'));
+};
   </script>
   <footer>
   <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
