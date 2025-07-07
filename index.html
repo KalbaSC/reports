@@ -342,6 +342,7 @@ footer p {
     <button onclick="filterData('week')">هذا الأسبوع</button>
     <button onclick="filterData('month')">هذا الشهر</button>
     <button onclick="showStats()">الإحصائيات</button>
+    <button onclick="showActivities()">الأنشطة</button>
   </nav>
 
 <div class="container" id="mainView">
@@ -377,11 +378,9 @@ footer p {
       <thead>
         <tr>
           <th>الوقت</th>
-          <th>الاسم</th>
-          <th>ولي الأمر</th>
+          <th>الاسم وولي الأمر</th>
           <th>المعرف</th>
           <th>الموظف</th>
-          <th>الحضور العام</th>
           <th>النشاط</th>
         </tr>
       </thead>
@@ -496,8 +495,7 @@ function filterByDate() {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${new Date(row["Timestamp"]).toLocaleString('ar-EG')}</td>
-          <td>${row["Child Name"]}</td>
-          <td>${row["Parent"]}</td>
+          <td>${row["Child Name"]} ${row["Parent"]}</td>
           <td>${row["ID"]}</td>
           <td>${row["Scanned By"]}</td>
           <td>${row["General"] || ""}</td>
@@ -509,7 +507,7 @@ function filterByDate() {
       document.getElementById("summary").innerText = `إجمالي الحضور: ${data.length}`;
       document.getElementById("filteredSummary").innerText = "";
       updateChart(perDay);
-      // إحصاءات اليوم (صندوق صغير)
+
 const staffToday = {};
 let early = 0, late = 0;
 data.forEach(row => {
@@ -521,7 +519,7 @@ const hours = time.getHours();
 const minutes = time.getMinutes();
 const totalMinutes = hours * 60 + minutes;
 
-// ✅ نعتبر قبل 17:11 (5:11 مساءً) "بالوقت"
+//  قبل 17:11
 if (totalMinutes < (17 * 60 + 11)) early++;
 else late++;
 });
@@ -633,6 +631,15 @@ function exportToPDF() {
     }
 
     fetchData();
+    
+    function showActivities() {
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("statsView").style.display = "none";
+
+  const filtered = allData.filter(row => row["Activity"] && row["Activity"] !== "");
+  renderTable(filtered);
+}
+
   </script>
   <footer>
   <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
