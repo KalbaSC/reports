@@ -64,7 +64,6 @@
   font-size: 14px;
   color: #f4e733;
 }
-
     nav {
       background-color: #111;
       display: flex;
@@ -106,35 +105,48 @@
       border-radius: 5px;
       margin: 5px;
     }
-    .summary-box {
+ .summary-box {
   display: flex;
   gap: 15px;
   align-items: center;
   color: #f4e733;
   font-weight: bold;
+}    
+.filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
 }
-    
+
 .search-group {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  width: 100%;
+  flex: 1;
 }
 
 .search-group select,
 .search-group input,
-.search-group button {
-  flex: 1;
-  min-width: 150px;
-  padding: 10px;
-  border-radius: 6px;
+.search-group button.clear-btn {
+  height: 40px;
+  padding: 8px 12px;
   font-size: 15px;
+  border-radius: 6px;
+  border: none;
   box-sizing: border-box;
+  flex: 1;
+  min-width: 140px;
 }
 
-.search-group select {
-  appearance: none;
+.clear-btn {
+  background-color: #f4e733;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
 }
 .export-buttons {
   display: flex;
@@ -420,31 +432,33 @@ footer p {
 
   <div class="controls">
     
-<div class="search-group">
-  <select onchange="showFilterOptions(this.value)">
-    <option value="">🔍 بحث حسب...</option>
-    <option value="name">الاسم</option>
-    <option value="id">المعرّف</option>
-    <option value="staff">الموظف</option>
-    <option value="activity">النشاط</option>
-  </select>
+<div class="filter-bar">
+  <div class="search-group">
+    <select onchange="showFilterOptions(this.value)">
+      <option value="">🔍 بحث حسب...</option>
+      <option value="name">الاسم</option>
+      <option value="id">المعرّف</option>
+      <option value="staff">الموظف</option>
+      <option value="activity">النشاط</option>
+    </select>
 
-  <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." onkeyup="filterTable()">
-  <input id="filter-id" class="hidden" placeholder="أدخل المعرف..." onkeyup="filterTable()">
-  <select id="filter-staff" class="hidden" onchange="filterTable()"></select>
-  <select id="filter-activity" class="hidden" onchange="filterTable()"></select>
-  <input type="date" id="datePicker" onchange="filterByDate()" />
-  
-  <button onclick="clearFilters()" style="padding:10px; background:#f4e733; color:black; border:none; border-radius:8px;">مسح</button>
-</div>
+    <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." onkeyup="filterTable()">
+    <input id="filter-id" class="hidden" placeholder="أدخل المعرف..." onkeyup="filterTable()">
+    <select id="filter-staff" class="hidden" onchange="filterTable()"></select>
+    <select id="filter-activity" class="hidden" onchange="filterTable()"></select>
 
-<div class="export-buttons">
-  <button class="export" onclick="exportToExcel()">
-    <span class="download-icon"></span> Excel
-  </button>
-  <button class="export" onclick="exportToPDF()">
-    <span class="download-icon"></span> PDF
-  </button>
+    <input type="date" id="datePicker" onchange="filterByDate()" />
+    <button onclick="clearFilters()" class="clear-btn">مسح</button>
+  </div>
+
+  <div class="export-buttons">
+    <button class="export" onclick="exportToExcel()">
+      <span class="download-icon"></span> Excel
+    </button>
+    <button class="export" onclick="exportToPDF()">
+      <span class="download-icon"></span> PDF
+    </button>
+  </div>
 </div>
 
     <div class="summary-box">
