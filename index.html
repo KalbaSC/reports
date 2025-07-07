@@ -166,6 +166,35 @@
       background-color: #333;
       color: #f4e733;
     }
+    .dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #222;
+  min-width: 120px;
+  z-index: 1;
+  border: 1px solid #f4e733;
+}
+
+.dropdown-content a {
+  color: #f4e733;
+  padding: 10px 14px;
+  display: block;
+  text-align: right;
+  cursor: pointer;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+    nav a.active, nav button.active {
+  background-color: #f4e733;
+  color: black !important;
+}
     .download-icon {
   display: inline-block;
   width: 18px;
@@ -336,14 +365,20 @@ footer p {
     </div>
   </div>
 </header>
+  
+<nav>
+  <div class="dropdown">
+    <button>العام ▼</button>
+    <div class="dropdown-content">
+      <a onclick="filterData('day')">اليوم</a>
+      <a onclick="filterData('week')">هذا الأسبوع</a>
+      <a onclick="filterData('month')">هذا الشهر</a>
+    </div>
+  </div>
+  <button onclick="showStats()">الإحصائيات</button>
+  <button onclick="showActivities()">الأنشطة</button>
+</nav>
 
-  <nav>
-    <button onclick="filterData('day')">اليوم</button>
-    <button onclick="filterData('week')">هذا الأسبوع</button>
-    <button onclick="filterData('month')">هذا الشهر</button>
-    <button onclick="showStats()">الإحصائيات</button>
-    <button onclick="showActivities()">الأنشطة</button>
-  </nav>
 
 <div class="container" id="mainView">
   <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
@@ -415,8 +450,19 @@ footer p {
       document.getElementById("datePicker").value = today;
       filterByDate();
     }
+    
+    function setActiveNav(type) {
+  const buttons = document.querySelectorAll("nav a"); 
+  buttons.forEach(btn => btn.classList.remove("active"));
+
+  const map = { day: 0, week: 1, month: 2 };
+  if (map[type] !== undefined) buttons[map[type]].classList.add("active");
+}
+
 
     function filterData(type) {
+        setActiveNav(type); 
+
       document.getElementById("mainView").style.display = "block";
       document.getElementById("statsView").style.display = "none";
       const now = new Date();
@@ -495,10 +541,9 @@ function filterByDate() {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${new Date(row["Timestamp"]).toLocaleString('ar-EG')}</td>
-          <td>${row["Child Name"]} ${row["Parent"]}</td>
+          <td><strong>${row["Child Name"]}</strong><br><small>${row["Parent"]}</small></td>
           <td>${row["ID"]}</td>
           <td>${row["Scanned By"]}</td>
-          <td>${row["General"] || ""}</td>
           <td>${row["Activity"] || ""}</td>`;
         tbody.appendChild(tr);
         const day = new Date(row["Timestamp"]).toLocaleDateString('ar-EG');
