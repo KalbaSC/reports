@@ -487,7 +487,7 @@ footer p {
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
     let allData = [], chart;
     
-    function populateDropdowns() {
+function populateDropdowns() {
   const activities = new Set();
   const staff = new Set();
 
@@ -496,7 +496,8 @@ footer p {
     if (row["Scanned By"]) staff.add(row["Scanned By"]);
   });
 
-  const activitySelect = document.getElementById("searchActivity");
+  const activitySelect = document.getElementById("filter-activity");
+  activitySelect.innerHTML = '<option value="">اختر النشاط</option>';
   [...activities].forEach(act => {
     const opt = document.createElement("option");
     opt.value = act;
@@ -504,11 +505,12 @@ footer p {
     activitySelect.appendChild(opt);
   });
 
-  const staffSelect = document.getElementById("searchGame");
-  [...staff].forEach(staff => {
+  const staffSelect = document.getElementById("filter-staff");
+  staffSelect.innerHTML = '<option value="">اختر الموظف</option>';
+  [...staff].forEach(stf => {
     const opt = document.createElement("option");
-    opt.value = staff;
-    opt.textContent = staff;
+    opt.value = stf;
+    opt.textContent = stf;
     staffSelect.appendChild(opt);
   });
 }
