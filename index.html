@@ -64,13 +64,6 @@
   font-size: 14px;
   color: #f4e733;
 }
-    nav {
-      background-color: #111;
-      display: flex;
-      justify-content: space-around;
-      border-bottom: 3px solid #f4e733;
-      border-top: 1px solid #f4e733;
-    }
     nav button {
       flex: 1;
       background: none;
@@ -141,13 +134,6 @@
   flex: 1;
   min-width: 140px;
 }
-
-.clear-btn {
-  background-color: #f4e733;
-  color: black;
-  font-weight: bold;
-  cursor: pointer;
-}
 .export-buttons {
   display: flex;
   flex-direction: row;
@@ -184,13 +170,15 @@
       background-color: #333;
       color: #f4e733;
     }
-    nav {
+nav {
   display: flex;
   justify-content: center;
   gap: 10px;
   flex-wrap: wrap;
+  background-color: #111;
+  border-bottom: 3px solid #f4e733;
+  border-top: 1px solid #f4e733;
 }
-
 nav button, .dropdown > button {
   font-size: 16px;
   padding: 10px 20px;
@@ -224,7 +212,7 @@ nav button, .dropdown > button {
 .dropdown:hover .dropdown-content {
   display: block;
 }
-    nav a.active, nav button.active {
+nav button.active {
   background-color: #f4e733;
   color: black !important;
 }
