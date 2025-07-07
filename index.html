@@ -316,37 +316,60 @@ nav button.active {
       width: 100%;
     }
 
-    .filter-bar {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      width: 100%;
-    }
+  .filter-bar {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(0, 0, 0, 0.85);
+  padding: 12px;
+  border-radius: 12px;
+  margin: 10px auto;
+  width: 100%;
+}
 
-    .search-group {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-    }
+.search-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
 
-    .search-group select,
-    .search-group input,
-    .search-group button,
-    #datePicker {
-      width: 100%;
-      padding: 12px;
-      font-size: 15px;
-      box-sizing: border-box;
-      border-radius: 8px;
-    }
+.search-group select,
+.search-group input,
+.search-group button,
+#datePicker {
+  width: 100%;
+  padding: 10px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: none;
+}
 
-    .export-buttons {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: 100%;
-    }
+.clear-btn {
+  background-color: #f4e733;
+  color: black;
+  font-weight: bold;
+  border-radius: 8px;
+  border: none;
+  padding: 10px;
+}
+
+.export-buttons {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.export-buttons .export {
+  flex: 1;
+  background-color: #f4e733;
+  border: none;
+  color: black;
+  font-weight: bold;
+  font-size: 14px;
+  padding: 10px;
+  border-radius: 8px;
+}
       
   .summary-box {
     text-align: center;
