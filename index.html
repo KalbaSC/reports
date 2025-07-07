@@ -127,14 +127,14 @@
   min-width: 0;
   box-sizing: border-box;
 }
-   
+    
 .export-buttons {
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 10px;
   width: 100%;
 }
-
     .controls .summary-box {
       display: flex;
       gap: 15px;
@@ -219,6 +219,9 @@ nav button, .dropdown > button {
   margin-left: 5px;
   vertical-align: middle;
 }
+    .hidden {
+  display: none;
+}
            footer {
       background-color: #111;
       color: white;
@@ -272,8 +275,14 @@ nav button, .dropdown > button {
     height: 50px !important;
     max-height: 50px !important;
   }
-  nav button {
-    flex: 1 1 50%;
+  nav {
+    flex-direction: row;
+    justify-content: center;
+    gap: 5px;
+  }
+
+  nav button, .dropdown > button {
+    flex: 1 1 auto;
     font-size: 15px;
     padding: 10px;
   }
@@ -295,49 +304,38 @@ nav button, .dropdown > button {
   flex-direction: row !important;
   flex-wrap: nowrap;
 }
-
 .search-group input {
   width: 100%;
   flex: 1;
 }
-      .search-group {
-  flex-direction: column !important;
-  gap: 10px;
-}
-
-.search-group input,
-.search-group select {
-  width: 100%;
-  padding: 10px;
-  font-size: 15px;
-  border-radius: 6px;
-}
+  .search-group select,
+  .search-group input {
+    font-size: 15px;
+    padding: 10px;
+    width: 100%;
+    border-radius: 6px;
+  }
       .download-icon {
   width: 14px;
   height: 14px;
   margin-left: 4px;
 }
-
   .controls {
     flex-direction: column;
     align-items: stretch;
     gap: 10px;
   }
-
   .controls input {
     width: 100%;
     padding: 8px;
     font-size: 14px;
     margin: 2px 0;
   }
-
-  button.export {
-    width: 80%;
-    font-size: 12px;
-    align-items: center;
-    padding: 10px;
+  .export-buttons {
+    flex-direction: row !important;
+    justify-content: center;
+    gap: 15px;
   }
-
   .summary-box {
     text-align: center;
     font-size: 14px;
@@ -357,7 +355,9 @@ nav button, .dropdown > button {
     width: 100% !important;
     height: auto !important;
   }
-
+      .hidden {
+  display: none;
+}
   footer {
   text-align: center;
   padding: 15px 10px;
@@ -704,12 +704,11 @@ function exportToPDF() {
 
   const table = document.querySelector("#attendanceTable");
 
-  // إزالة أي قيود على overflow لتظهر البيانات
   table.style.overflow = "visible";
 
   html2canvas(table, {
     scale: 2,
-    backgroundColor: "#000000", // ضروري لأن خلفيتك داكنة
+    backgroundColor: "#000000",
     useCORS: true
   }).then(canvas => {
     const imgData = canvas.toDataURL("image/png");
@@ -755,8 +754,6 @@ function exportToPDF() {
         }
       });
     }
-
-  fetchData().then(() => filterData('day'));
     
     function showActivities() {
   document.getElementById("mainView").style.display = "block";
@@ -766,7 +763,7 @@ function exportToPDF() {
   renderTable(filtered);
 }
 
-    function showFilterOptions(value) {
+function showFilterOptions(value) {
   document.getElementById("filter-name").classList.add("hidden");
   document.getElementById("filter-id").classList.add("hidden");
   document.getElementById("filter-staff").classList.add("hidden");
@@ -777,6 +774,8 @@ function exportToPDF() {
   else if (value === "staff") document.getElementById("filter-staff").classList.remove("hidden");
   else if (value === "activity") document.getElementById("filter-activity").classList.remove("hidden");
 }
+      fetchData().then(() => filterData('day'));
+
   </script>
   <footer>
   <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
