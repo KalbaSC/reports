@@ -388,11 +388,16 @@ footer p {
   <div class="controls">
     
 <div class="search-group">
-  <input type="text" id="searchName" placeholder="بحث بالاسم..." onkeyup="filterTable()">
-  <input type="text" id="searchGame" placeholder="بحث بالموظف المسؤول..." onkeyup="filterTable()">
-  <input type="text" id="searchActivity" placeholder="بحث بالنشاط..." onkeyup="filterTable()">
+  <input id="searchName" placeholder="الاسم أو ولي الأمر..." onkeyup="filterTable()">
+  <select id="searchGame" onchange="filterTable()">
+    <option value="">كل الموظفين</option>
+  </select>
+  <select id="searchActivity" onchange="filterTable()">
+    <option value="">كل الأنشطة</option>
+  </select>
+  <input id="searchID" placeholder="بحث بالمعرّف..." onkeyup="filterTable()">
   <input type="date" id="datePicker" onchange="filterByDate()" />
-  <button onclick="clearFilters()" style="padding:10px; background:#f4e733; color:black; border:none; border-radius:8px;">مسح البحث</button>
+  <button onclick="clearFilters()" style="padding:10px; background:#f4e733; color:black; border:none; border-radius:8px;">مسح</button>
 </div>
 
 <div class="export-buttons">
@@ -441,7 +446,32 @@ footer p {
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
     let allData = [], chart;
+    
+    function populateDropdowns() {
+  const activities = new Set();
+  const staff = new Set();
 
+  allData.forEach(row => {
+    if (row["Activity"]) activities.add(row["Activity"]);
+    if (row["Scanned By"]) staff.add(row["Scanned By"]);
+  });
+
+  const activitySelect = document.getElementById("searchActivity");
+  [...activities].forEach(act => {
+    const opt = document.createElement("option");
+    opt.value = act;
+    opt.textContent = act;
+    activitySelect.appendChild(opt);
+  });
+
+  const staffSelect = document.getElementById("searchGame");
+  [...staff].forEach(staff => {
+    const opt = document.createElement("option");
+    opt.value = staff;
+    opt.textContent = staff;
+    staffSelect.appendChild(opt);
+  });
+}
     async function fetchData() {
       const res = await fetch(scriptURL);
       allData = await res.json();
@@ -449,6 +479,7 @@ footer p {
       const today = new Date().toISOString().split("T")[0];
       document.getElementById("datePicker").value = today;
       filterByDate();
+      populateDropdowns();
     }
     
     function setActiveNav(type) {
