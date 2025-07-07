@@ -554,7 +554,7 @@ function filterByDate() {
         const tr = document.createElement("tr");
         tr.innerHTML = `
           <td>${new Date(row["Timestamp"]).toLocaleString('ar-EG')}</td>
-          <td><strong>${row["Child Name"]}</strong><br><small>${row["Parent"]}</small></td>
+          <td><strong>${row["Child Name"]}</strong><br>${row["Parent"]}</td>
           <td>${row["ID"]}</td>
           <td>${row["Scanned By"]}</td>
           <td>${row["Activity"] || ""}</td>`;
@@ -688,7 +688,7 @@ function exportToPDF() {
       });
     }
 
-    fetchData();
+  fetchData().then(() => filterData('day'));
     
     function showActivities() {
   document.getElementById("mainView").style.display = "block";
