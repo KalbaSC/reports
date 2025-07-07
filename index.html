@@ -660,10 +660,10 @@ document.getElementById("timingToday").innerHTML = `<strong>حسب الوقت:</
     }
 
 function filterTable() {
-  const name = document.getElementById("searchName").value.toLowerCase();
-  const game = document.getElementById("searchGame").value.toLowerCase();
-  const activity = document.getElementById("searchActivity").value.toLowerCase();
-  const id = document.getElementById("searchID").value.toLowerCase();
+  const name = document.getElementById("filter-name").value.toLowerCase();
+  const id = document.getElementById("filter-id").value.toLowerCase();
+  const staff = document.getElementById("filter-staff").value.toLowerCase();
+  const activity = document.getElementById("filter-activity").value.toLowerCase();
 
   const rows = document.querySelectorAll("#attendanceTable tbody tr");
 
@@ -671,21 +671,21 @@ function filterTable() {
   rows.forEach(row => {
     const nameCell = row.cells[1].innerText.toLowerCase();
     const idCell = row.cells[2].innerText.toLowerCase();
-    const gameCell = row.cells[3].innerText.toLowerCase();
+    const staffCell = row.cells[3].innerText.toLowerCase();
     const activityCell = row.cells[4]?.innerText.toLowerCase() || "";
 
     const match =
       nameCell.includes(name) &&
-      gameCell.includes(game) &&
-      activityCell.includes(activity) &&
-      idCell.includes(id);
+      idCell.includes(id) &&
+      staffCell.includes(staff) &&
+      activityCell.includes(activity);
 
     row.style.display = match ? "" : "none";
     if (match) visibleCount++;
   });
 
   document.getElementById("filteredSummary").innerText =
-    (name || game || activity || id) ? `عدد النتائج المطابقة: ${visibleCount}` : "";
+    (name || id || staff || activity) ? `عدد النتائج المطابقة: ${visibleCount}` : "";
 }
 
 function clearFilters() {
