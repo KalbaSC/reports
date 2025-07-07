@@ -585,6 +585,8 @@ else if (type === 'week') {
 
     if (!dateMatch) return false;
 
+    if (row["General"] !== "✔️ حضر" && row["General"] !== "") return false;
+
     const key = `${row["ID"]}_${d.toDateString()}`;
     if (seen.has(key)) return false;
     seen.add(key);
@@ -600,7 +602,11 @@ function filterByDate() {
 
   const filtered = allData.filter(row => {
     const rowDate = new Date(row["Timestamp"]).toISOString().split("T")[0];
-    return rowDate === selectedDate;
+  if (rowDate !== selectedDate) return false;
+  
+  if (row["General"] !== "✔️ حضر" && row["General"] !== "") return false;
+
+  return true;
   });
 
   document.getElementById("mainView").style.display = "block";
