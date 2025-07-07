@@ -116,24 +116,30 @@
     
 .search-group {
   display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  width: 100%;
-  gap: 10px;
-}
-
-.search-group input {
-  flex: 1;
-  min-width: 0;
-  box-sizing: border-box;
-}
-    
-.export-buttons {
-  display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   align-items: center;
   gap: 10px;
   width: 100%;
+}
+
+.search-group select,
+.search-group input,
+.search-group button {
+  flex: 1;
+  min-width: 150px;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 15px;
+  box-sizing: border-box;
+}
+
+.search-group select {
+  appearance: none;
+}
+.export-buttons {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
 }
     .controls .summary-box {
       display: flex;
@@ -333,8 +339,8 @@ nav button, .dropdown > button {
   }
   .export-buttons {
     flex-direction: row !important;
-    justify-content: center;
-    gap: 15px;
+    flex-direction: column; 
+    width: 100%;
   }
   .summary-box {
     text-align: center;
@@ -510,7 +516,6 @@ footer p {
 
       const today = new Date().toISOString().split("T")[0];
       document.getElementById("datePicker").value = today;
-      filterByDate();
       populateDropdowns();
     }
     
