@@ -545,7 +545,7 @@ function populateDropdowns() {
       const res = await fetch(scriptURL);
       allData = await res.json();
 
-      const today = new Date().toISOString().split("T")[0];
+     const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
       document.getElementById("datePicker").value = today;
       populateDropdowns();
     }
