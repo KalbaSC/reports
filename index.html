@@ -566,11 +566,11 @@ async function fetchData() {
     // Sort entries by time
     entries.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
 
-    // Find first general entry with ✔️
-    const generalEntry = entries.find(e => (e.General || '').includes('✔️'));
+    // Find first general entry (regardless of content)
+    const generalEntry = entries.find(e => e.General !== undefined && e.General !== null && e.General !== '');
 
     if (generalEntry) {
-      uniqueFirstScan.push(generalEntry); // ✅ if حضر ✔️ exists, push it
+      uniqueFirstScan.push(generalEntry);
     } else {
       // fallback to first valid activity
       const firstActivity = entries.find(e => (e.Activity || '').trim() !== '');
