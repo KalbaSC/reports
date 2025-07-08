@@ -513,6 +513,7 @@ footer p {
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
     let allData = [], chart;
+    let pieStaffChart = null, earlyLateChart = null;
     
 function populateDropdowns() {
   const activities = new Set();
@@ -614,6 +615,9 @@ function filterByDate() {
   renderTable(filtered);
 }
     function showStats() {
+      if (pieStaffChart) pieStaffChart.destroy();
+      if (earlyLateChart) earlyLateChart.destroy();
+
       document.getElementById("mainView").style.display = "none";
       document.getElementById("statsView").style.display = "block";
       const staffCounts = {}, early = { early: 0, late: 0 };
@@ -627,32 +631,33 @@ function filterByDate() {
         if (time < (17 * 60 + 11)) early.early++;
         else early.late++;
       });
+      
+    pieStaffChart = new Chart(document.getElementById("pieStaff").getContext("2d"), {
+      type: 'pie',
+      data: {
+      labels: Object.keys(staffCounts),
+      datasets: [{
+      data: Object.values(staffCounts),
+      backgroundColor: ['#f4e733', '#ffbb00', '#ffaa00', '#ccaa00', '#999900']
+         }]
+       }
+    });
 
-      new Chart(document.getElementById("pieStaff").getContext("2d"), {
-        type: 'pie',
-        data: {
-          labels: Object.keys(staffCounts),
-          datasets: [{
-            data: Object.values(staffCounts),
-            backgroundColor: ['#f4e733', '#ffbb00', '#ffaa00', '#ccaa00', '#999900']
-          }]
-        }
-      });
-
-      new Chart(document.getElementById("earlyLate").getContext("2d"), {
-        type: 'bar',
-        data: {
+     earlyLateChart = new Chart(document.getElementById("earlyLate").getContext("2d"), {
+          type: 'bar',
+          data: {
           labels: ['حضور بالوقت', 'حضور متأخر'],
           datasets: [{
-            data: [early.early, early.late],
-            backgroundColor: ['#66cc66', '#cc3333']
-          }]
-        },
-        options: {
-          plugins: { legend: { display: false } },
-          scales: { y: { beginAtZero: true } }
-        }
-      });
+          data: [early.early, early.late],
+          backgroundColor: ['#66cc66', '#cc3333']
+       }]
+       },
+     options: {
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true } }
+         }
+     });
+
     }
 
     function renderTable(data) {
