@@ -606,13 +606,19 @@ function filterByDate() {
   const selectedDate = document.getElementById("datePicker").value;
   if (!selectedDate) return;
 
+  const seen = new Set();
   const filtered = allData.filter(row => {
-    const rowDate = new Date(row["Timestamp"]).toISOString().split("T")[0];
-  if (rowDate !== selectedDate) return false;
-  
-  if (row["General"] === "" && (!row["Activity"] || row["Activity"].trim() === "")) return false;
+    const d = new Date(row["Timestamp"]);
+    const rowDate = d.toISOString().split("T")[0];
+    if (rowDate !== selectedDate) return false;
 
-  return true;
+    if (row["General"] === "" && (!row["Activity"] || row["Activity"].trim() === "")) return false;
+
+    const key = `${row["ID"]}_${d.toDateString()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    
+    return true;
   });
 
   document.getElementById("mainView").style.display = "block";
