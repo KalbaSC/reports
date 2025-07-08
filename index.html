@@ -69,6 +69,22 @@
   background-color: #f4e733;
   color: black;
 }
+    .filter-btn {
+  background-color: #111;
+  color: #f4e733;
+  border: 1px solid #f4e733;
+  padding: 10px 18px;
+  margin: 5px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.filter-btn.active {
+  background-color: #f4e733;
+  color: black;
+}
+
     .container {
       display: grid;
       grid-template-columns: 1fr;
@@ -431,17 +447,15 @@ footer p {
 </header>
   
 <nav>
-  <div class="dropdown">
-    <button>العام ▼</button>
-    <div class="dropdown-content">
-      <a onclick="filterData('day')">اليوم</a>
-      <a onclick="filterData('week')">هذا الأسبوع</a>
-      <a onclick="filterData('month')">هذا الشهر</a>
-    </div>
-  </div>
 <button onclick="showView('general')">العام</button>
 <button onclick="showView('stats')">الإحصائيات</button>
 <button onclick="showView('activity')">الأنشطة</button>
+<div id="dateFilters" style="margin-top: 10px; text-align: center;">
+  <button onclick="filterData('day')" class="filter-btn">اليوم</button>
+  <button onclick="filterData('week')" class="filter-btn">هذا الأسبوع</button>
+  <button onclick="filterData('month')" class="filter-btn">هذا الشهر</button>
+</div>
+
 </nav>
 
 
@@ -595,6 +609,12 @@ window.onload = () => {
 function filterData(type) {
   console.log("filterData called with:", type);
   setActiveNav(type); // ✅ Keep dropdown highlight
+  console.log("filterData called with:", type);
+  setActiveNav(type);
+  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+  if (type === 'day') document.querySelector('.filter-btn:nth-child(1)').classList.add('active');
+  if (type === 'week') document.querySelector('.filter-btn:nth-child(2)').classList.add('active');
+  if (type === 'month') document.querySelector('.filter-btn:nth-child(3)').classList.add('active');
 }
 
 function showStats() {
