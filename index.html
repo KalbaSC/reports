@@ -546,13 +546,10 @@ function populateDropdowns() {
 }
     async function fetchData() {
       
-    document.getElementById("loading").style.display = "block";
-    const res = await fetch(scriptURL);
-    allData = await res.json();
-    document.getElementById("loading").style.display = "none";
-      
-      const res = await fetch(scriptURL);
-      allData = await res.json();
+  document.getElementById("loading").style.display = "block";
+  const res = await fetch(scriptURL);
+  allData = await res.json();
+  document.getElementById("loading").style.display = "none";
 
      const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
       document.getElementById("datePicker").value = today;
