@@ -845,6 +845,51 @@ function exportToPDF() {
       });
     }
     
+    function filterData(type) {
+  const now = new Date();
+  const todayStr = now.toISOString().split("T")[0];
+  const weekStart = new Date(now);
+  weekStart.setDate(now.getDate() - now.getDay()); // بداية الأسبوع (الأحد)
+
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1); // بداية الشهر
+
+  const seen = new Set();
+  const legacyCutoff = new Date("2025-07-07");
+
+  const filtered = allData.filter(row => {
+    const d = new Date(row["Timestamp"]);
+    const rowDate = d.toISOString().split("T")[0];
+    const dayKey = `${row["ID"]}_${d.toDateString()}`;
+
+    let inRange = false;
+    if (type === "day") {
+      inRange = rowDate === todayStr;
+    } else if (type === "week") {
+      inRange = d >= weekStart;
+    } else if (type === "month") {
+      inRange = d >= monthStart;
+    }
+
+    if (!inRange || seen.has(dayKey)) return false;
+
+    let attended = false;
+    if (row["General"] === "✔️ حضر") attended = true;
+    else if (!row["General"] || row["General"].trim() === "") {
+      if (row["Activity"] && row["Activity"].trim() !== "") attended = true;
+      else if (d < legacyCutoff) attended = true;
+    }
+
+    if (!attended) return false;
+    seen.add(dayKey);
+    return true;
+  });
+
+  setActiveNav(type);
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("statsView").style.display = "none";
+  renderTable(filtered);
+}
+    
 function showActivities() {
   document.getElementById("mainView").style.display = "block";
   document.getElementById("statsView").style.display = "none";
