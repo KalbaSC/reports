@@ -547,44 +547,46 @@ footer p {
 async function fetchData() {
   const res = await fetch(scriptURL);
   const raw = await res.json();
-  allData = raw.filter(e => e.ID); // remove empty IDs
+
+  // Remove entries without ID
+  allData = raw.filter(e => e.ID);
 
   const idMap = new Map();
 
   // Group all entries by ID
-  raw.forEach(entry => {
+  allData.forEach(entry => {
     const id = entry.ID;
     if (!idMap.has(id)) idMap.set(id, []);
     idMap.get(id).push(entry);
   });
 
-  // Process logic for unique attendance per ID
   const uniqueFirstScan = [];
-  
-idMap.forEach(entries => {
-  // Sort entries by timestamp
-  entries.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
 
-  // Find first general entry
-  const firstGeneral = entries.find(e => (e.General || '').includes('✔️'));
+  idMap.forEach(entries => {
+    // Sort entries by time
+    entries.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
 
-  if (firstGeneral) {
-    uniqueFirstScan.push(firstGeneral);
-  } else {
-    // Fallback to first activity entry
-    const firstActivity = entries.find(e => e.Activity && e.Activity.trim() !== '');
-    if (firstActivity) uniqueFirstScan.push(firstActivity);
-  }
-});
-// Post-process to ensure no duplicates
-const seenIDs = new Set();
-filteredData = uniqueFirstScan.filter(entry => {
-  if (seenIDs.has(entry.ID)) return false;
-  seenIDs.add(entry.ID);
-  return true;
-});
+    // Find first general entry with ✔️
+    const generalEntry = entries.find(e => (e.General || '').includes('✔️'));
 
-renderGeneralTable(filteredData);
+    if (generalEntry) {
+      uniqueFirstScan.push(generalEntry); // ✅ if حضر ✔️ exists, push it
+    } else {
+      // fallback to first valid activity
+      const firstActivity = entries.find(e => (e.Activity || '').trim() !== '');
+      if (firstActivity) uniqueFirstScan.push(firstActivity);
+    }
+  });
+
+  // Final deduplication just in case
+  const seen = new Set();
+  filteredData = uniqueFirstScan.filter(e => {
+    if (seen.has(e.ID)) return false;
+    seen.add(e.ID);
+    return true;
+  });
+
+  renderGeneralTable(filteredData);
 }
 
     function showView(view) {
