@@ -694,7 +694,7 @@ function renderTable(data) {
       <td>${row["Child Name"]} ${row["Parent"]}</td>
       <td>${row["ID"]}</td>
       <td>${row["Scanned By"]}</td>
-      <td>${row["Activity"] ? row["Activity"] : ""}</td>
+     <td>${row["Activity"] && row["Activity"].trim() !== "" ? row["Activity"] : ""}</td>
     `;
     tbody.appendChild(tr);
 
@@ -756,8 +756,17 @@ function filterTable() {
     if (match) visibleCount++;
   });
 
-  document.getElementById("filteredSummary").innerText =
-    (name || id || staff || activity) ? `عدد النتائج المطابقة: ${visibleCount}` : "";
+const somethingTyped = name || id || staff || activity;
+
+document.getElementById("filteredSummary").innerText = somethingTyped
+  ? `عدد النتائج المطابقة: ${visibleCount}`
+  : "";
+  
+  if (visibleCount === 0) {
+  const tbody = document.querySelector("#attendanceTable tbody");
+  tbody.innerHTML = `<tr><td colspan="5">لا توجد نتائج مطابقة</td></tr>`;
+}
+  
 }
 
 function clearFilters() {
