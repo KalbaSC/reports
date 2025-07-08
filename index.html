@@ -252,9 +252,6 @@ nav button.active {
   margin: auto;
 }
 
-    .hidden {
-  display: none;
-}
            footer {
       background-color: #111;
       color: white;
@@ -421,9 +418,6 @@ table {
     height: auto !important;
   }
     
-      .hidden {
-  display: none;
-}
   footer {
   text-align: center;
   padding: 15px 10px;
@@ -534,22 +528,11 @@ footer p {
 
 </div>
 
-  <div id="generalView">
-    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="بحث بالاسم أو المعرف">
-    <table id="attendanceTable">
-      <thead><tr><th>الوقت</th><th>الاسم وولي الأمر</th><th>المعرف</th><th>الموظف</th><th>النشاط</th></tr></thead>
-      <tbody></tbody>
-    </table>
-    <button onclick="exportToExcel()">تصدير Excel</button>
-    <button onclick="exportToPDF()">تصدير PDF</button>
-  </div>
   <div id="activityView" class="hidden">
     <h3>الحضور حسب الأنشطة</h3>
     <table id="activityTable"><thead><tr><th>الوقت</th><th>الاسم</th><th>المعرف</th><th>الموظف</th><th>النشاط</th></tr></thead><tbody></tbody></table>
   </div>
-  <div id="statsView" class="hidden">
-    <canvas id="attendanceChart"></canvas>
-  </div>
+
   <div class="container" id="statsView" style="display: none;">
     <h2 style="color:#f4e733; text-align:center">إحصائيات الحضور</h2>
     <canvas id="pieStaff" height="200"></canvas>
@@ -651,8 +634,12 @@ footer p {
       });
     }
 
-    window.onload = () => fetchData().then(() => showView('general'));
-  </script>
+window.onload = () => fetchData().then(() => {
+  filterData('day');
+  showView('general');
+});
+
+   </script>
   
   <footer>
   <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
