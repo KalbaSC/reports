@@ -564,6 +564,7 @@ function showView(view) {
     document.getElementById("generalView").style.display = "block";
     document.querySelector("nav button[onclick=\"showView('general')\"]").classList.add("active");
     filterData('day');
+    renderGeneralTable(allData);
   } else if (view === 'stats') {
     document.getElementById("statsView").style.display = "block";
     document.querySelector("nav button[onclick=\"showView('stats')\"]").classList.add("active");
@@ -593,22 +594,29 @@ function setActiveNav(type) {
 window.onload = () => {
   fetchData().then(() => {
     showView('general');
-    setActiveNav('day');
-  });
+   });
 };
 
-    function fetchData() {
+async function fetchData() {
+  const response = await fetch(scriptURL);
+  const rawData = await response.json();
 
-      return new Promise(resolve => {
-    allData = []; // empty array
-    console.log("fetchData() called");
-    resolve();
+  const seenIDs = new Set();
+  allData = [];
+
+  rawData.forEach(entry => {
+    const id = entry["ID"];
+    if (id && !seenIDs.has(id)) {
+      seenIDs.add(id);
+      allData.push(entry);
+    }
   });
+
+  renderGeneralTable(allData);
 }
 
 function filterData(type) {
   console.log("filterData called with:", type);
-  setActiveNav(type); // ✅ Keep dropdown highlight
   console.log("filterData called with:", type);
   setActiveNav(type);
   document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
@@ -617,14 +625,31 @@ function filterData(type) {
   if (type === 'month') document.querySelector('.filter-btn:nth-child(3)').classList.add('active');
 }
 
+function renderGeneralTable(data) {
+  const tbody = document.querySelector("#attendanceTable tbody");
+  tbody.innerHTML = "";
+
+  data.forEach(entry => {
+    const row = document.createElement("tr");
+    row.innerHTML = `
+      <td>${entry["Timestamp"] || ""}</td>
+      <td>${entry["Child Name"] || ""} - ${entry["Parent"] || ""}</td>
+      <td>${entry["ID"] || ""}</td>
+      <td>${entry["Scanned By"] || ""}</td>
+      <td>${entry["Activity"] || entry["General"] || ""}</td>
+    `;
+    tbody.appendChild(row);
+  });
+
+  document.getElementById("summary").textContent = `إجمالي الحضور: ${data.length}`;
+}
+
 function showStats() {
   console.log("showStats() called");
-  // You can later render charts here
 }
 
 function renderActivityTable() {
   console.log("renderActivityTable() called");
-  // You can later show filtered activity table here
 }
   </script>
   <footer>
