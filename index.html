@@ -276,6 +276,18 @@ nav button.active {
   padding: 10px;
   border-radius: 5px;
 }
+
+    body { font-family: 'Arial', sans-serif; background-color: #000; color: white; margin: 0; padding: 0; }
+    nav button.active { background-color: #f4e733; color: black !important; }
+    .filter-btn.active { background-color: #f4e733; color: black; }
+    .hidden { display: none; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #f4e733; padding: 10px; text-align: center; }
+    th { background-color: #333; color: #f4e733; }
+
+    
+
+    
     @media (max-width: 768px) {
  .header-right {
     padding: 10px 10px;
@@ -446,17 +458,16 @@ footer p {
   </div>
 </header>
   
-<nav>
-<button onclick="showView('general')">العام</button>
-<button onclick="showView('stats')">الإحصائيات</button>
-<button onclick="showView('activity')">الأنشطة</button>
-<div id="dateFilters" style="margin-top: 10px; text-align: center;">
-  <button onclick="filterData('day')" class="filter-btn">اليوم</button>
-  <button onclick="filterData('week')" class="filter-btn">هذا الأسبوع</button>
-  <button onclick="filterData('month')" class="filter-btn">هذا الشهر</button>
-</div>
-
-</nav>
+  <nav>
+    <button onclick="showView('general')">العام</button>
+    <button onclick="showView('stats')">الإحصائيات</button>
+    <button onclick="showView('activity')">الأنشطة</button>
+    <div id="dateFilters">
+      <button onclick="filterData('day')" class="filter-btn">اليوم</button>
+      <button onclick="filterData('week')" class="filter-btn">هذا الأسبوع</button>
+      <button onclick="filterData('month')" class="filter-btn">هذا الشهر</button>
+    </div>
+  </nav>
 
 
 <div class="container" id="generalView">
@@ -523,24 +534,22 @@ footer p {
 
 </div>
 
-<div class="container" id="activityView" style="display: none;">
-  <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
-    الحضور حسب الأنشطة
+  <div id="generalView">
+    <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="بحث بالاسم أو المعرف">
+    <table id="attendanceTable">
+      <thead><tr><th>الوقت</th><th>الاسم وولي الأمر</th><th>المعرف</th><th>الموظف</th><th>النشاط</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button onclick="exportToExcel()">تصدير Excel</button>
+    <button onclick="exportToPDF()">تصدير PDF</button>
   </div>
-  <table id="activityTable">
-    <thead>
-      <tr>
-        <th>الوقت</th>
-        <th>الاسم وولي الأمر</th>
-        <th>المعرف</th>
-        <th>الموظف</th>
-        <th>النشاط</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
-  
+  <div id="activityView" class="hidden">
+    <h3>الحضور حسب الأنشطة</h3>
+    <table id="activityTable"><thead><tr><th>الوقت</th><th>الاسم</th><th>المعرف</th><th>الموظف</th><th>النشاط</th></tr></thead><tbody></tbody></table>
+  </div>
+  <div id="statsView" class="hidden">
+    <canvas id="attendanceChart"></canvas>
+  </div>
   <div class="container" id="statsView" style="display: none;">
     <h2 style="color:#f4e733; text-align:center">إحصائيات الحضور</h2>
     <canvas id="pieStaff" height="200"></canvas>
@@ -548,110 +557,103 @@ footer p {
     <canvas id="attendanceChart" height="200"></canvas>
   </div>
 
-  <script>
+   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
-    let allData = [], chart;
-    let pieStaffChart = null, earlyLateChart = null;
-    
-function showView(view) {
-  document.getElementById("generalView").style.display = "none";
-  document.getElementById("statsView").style.display = "none";
-  document.getElementById("activityView").style.display = "none";
+    let allData = [], filteredData = [];
 
-  document.querySelectorAll("nav button").forEach(btn => btn.classList.remove("active"));
-
-  if (view === 'general') {
-    document.getElementById("generalView").style.display = "block";
-    document.querySelector("nav button[onclick=\"showView('general')\"]").classList.add("active");
-    filterData('day');
-    renderGeneralTable(allData);
-  } else if (view === 'stats') {
-    document.getElementById("statsView").style.display = "block";
-    document.querySelector("nav button[onclick=\"showView('stats')\"]").classList.add("active");
-    showStats();
-  } else if (view === 'activity') {
-    document.getElementById("activityView").style.display = "block";
-    document.querySelector("nav button[onclick=\"showView('activity')\"]").classList.add("active");
-    renderActivityTable();
-  }
-}
-
-function setActiveNav(type) {
-  const filterButtons = document.querySelectorAll("#dateFilters .filter-btn");
-  filterButtons.forEach(btn => btn.classList.remove("active"));
-
-  const map = { day: 0, week: 1, month: 2 };
-  if (map[type] !== undefined && filterButtons[map[type]]) {
-    filterButtons[map[type]].classList.add("active");
-  }
-}
-
- document.querySelectorAll(".dropdown-content a").forEach(link => {
-  link.addEventListener("click", () => {
-    document.querySelectorAll(".dropdown-content a").forEach(el => el.classList.remove("active"));
-    link.classList.add("active");
-  });
-});
-
-window.onload = () => {
-  fetchData().then(() => {
-    showView('general');
-   });
-};
-
-async function fetchData() {
-  const response = await fetch(scriptURL);
-  const rawData = await response.json();
-
-  const seenIDs = new Set();
-  allData = [];
-
-  rawData.forEach(entry => {
-    const id = entry["ID"];
-    if (id && !seenIDs.has(id)) {
-      seenIDs.add(id);
-      allData.push(entry);
+    async function fetchData() {
+      const res = await fetch(scriptURL);
+      const raw = await res.json();
+      allData = raw.filter((e, i, self) => e.ID && i === self.findIndex(t => t.ID === e.ID));
+      filteredData = [...allData];
+      renderGeneralTable(filteredData);
     }
-  });
 
-  renderGeneralTable(allData);
-}
+    function showView(view) {
+      ['generalView', 'statsView', 'activityView'].forEach(id => document.getElementById(id).classList.add('hidden'));
+      document.getElementById(view + 'View').classList.remove('hidden');
+      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
+      document.querySelector(`nav button[onclick="showView('${view}')"]`).classList.add('active');
+      if (view === 'activity') renderActivityTable();
+      if (view === 'stats') showStats();
+    }
 
-function filterData(type) {
-  setActiveNav(type);
-  document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-  if (type === 'day') document.querySelector('.filter-btn:nth-child(1)').classList.add('active');
-  if (type === 'week') document.querySelector('.filter-btn:nth-child(2)').classList.add('active');
-  if (type === 'month') document.querySelector('.filter-btn:nth-child(3)').classList.add('active');
-}
+    function filterData(type) {
+      const now = new Date();
+      let cutoff;
+      if (type === 'day') cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      if (type === 'week') cutoff = new Date(now.setDate(now.getDate() - now.getDay()));
+      if (type === 'month') cutoff = new Date(now.getFullYear(), now.getMonth(), 1);
+      filteredData = allData.filter(row => new Date(row.Timestamp) >= cutoff);
+      renderGeneralTable(filteredData);
+      document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+      document.querySelector(`.filter-btn[onclick="filterData('${type}')"]`).classList.add("active");
+    }
 
-function renderGeneralTable(data) {
-  const tbody = document.querySelector("#attendanceTable tbody");
-  tbody.innerHTML = "";
+    function renderGeneralTable(data) {
+      const tbody = document.querySelector("#attendanceTable tbody");
+      tbody.innerHTML = "";
+      data.forEach(entry => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${entry["Timestamp"] || ""}</td><td>${entry["Child Name"] || ""} - ${entry["Parent"] || ""}</td><td>${entry["ID"]}</td><td>${entry["Scanned By"]}</td><td>${entry["Activity"] || entry["General"]}</td>`;
+        tbody.appendChild(row);
+      });
+    }
 
-  data.forEach(entry => {
-    const row = document.createElement("tr");
-    row.innerHTML = `
-      <td>${entry["Timestamp"] || ""}</td>
-      <td>${entry["Child Name"] || ""} - ${entry["Parent"] || ""}</td>
-      <td>${entry["ID"] || ""}</td>
-      <td>${entry["Scanned By"] || ""}</td>
-      <td>${entry["Activity"] || entry["General"] || ""}</td>
-    `;
-    tbody.appendChild(row);
-  });
+    function filterTable() {
+      const val = document.getElementById("searchInput").value.toLowerCase();
+      const rows = filteredData.filter(d => (d["Child Name"] + d["ID"]).toLowerCase().includes(val));
+      renderGeneralTable(rows);
+    }
 
-  document.getElementById("summary").textContent = `إجمالي الحضور: ${data.length}`;
-}
+    function exportToExcel() {
+      const ws = XLSX.utils.json_to_sheet(filteredData);
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Attendance");
+      XLSX.writeFile(wb, "attendance.xlsx");
+    }
 
-function showStats() {
-  console.log("showStats() called");
-}
+    function exportToPDF() {
+      html2canvas(document.querySelector("#attendanceTable")).then(canvas => {
+        const imgData = canvas.toDataURL("image/png");
+        const pdf = new jspdf.jsPDF();
+        pdf.addImage(imgData, "PNG", 10, 10, 190, 0);
+        pdf.save("attendance.pdf");
+      });
+    }
 
-function renderActivityTable() {
-  console.log("renderActivityTable() called");
-}
+    function renderActivityTable() {
+      const tbody = document.querySelector("#activityTable tbody");
+      tbody.innerHTML = "";
+      const activities = allData.filter(e => e.Activity);
+      activities.forEach(entry => {
+        const row = document.createElement("tr");
+        row.innerHTML = `<td>${entry["Timestamp"]}</td><td>${entry["Child Name"]}</td><td>${entry["ID"]}</td><td>${entry["Scanned By"]}</td><td>${entry["Activity"]}</td>`;
+        tbody.appendChild(row);
+      });
+    }
+
+    function showStats() {
+      const ctx = document.getElementById('attendanceChart').getContext('2d');
+      const counts = {};
+      filteredData.forEach(e => { counts[e["Scanned By"]] = (counts[e["Scanned By"]] || 0) + 1 });
+      if (window.myChart) window.myChart.destroy();
+      window.myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(counts),
+          datasets: [{ label: 'عدد الحضور', data: Object.values(counts), backgroundColor: '#f4e733' }]
+        },
+        options: {
+          responsive: true,
+          plugins: { legend: { display: false } }
+        }
+      });
+    }
+
+    window.onload = () => fetchData().then(() => showView('general'));
   </script>
+  
   <footer>
   <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
     <p style="font-size: 14px; color: #aaa; margin-top: -10px;">تم التطوير بواسطة روند أحمد الضمور</p>
