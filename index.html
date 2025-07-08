@@ -65,6 +65,10 @@
   font-size: 14px;
   color: #f4e733;
 }
+    .dropdown-content a:hover {
+  background-color: #f4e733;
+  color: black;
+}
     .container {
       display: grid;
       grid-template-columns: 1fr;
@@ -531,19 +535,25 @@ footer p {
   </div>
 
   <script>
-    function showView(view) {
+function showView(view) {
   document.getElementById("generalView").style.display = "none";
   document.getElementById("statsView").style.display = "none";
   document.getElementById("activityView").style.display = "none";
 
+  document.querySelectorAll("nav button").forEach(btn => btn.classList.remove("active"));
+
   if (view === 'general') {
     document.getElementById("generalView").style.display = "block";
+    document.querySelector("nav button[onclick=\"showView('general')\"]").classList.add("active");
     filterData('day');
+    setActiveNav('day'); 
   } else if (view === 'stats') {
     document.getElementById("statsView").style.display = "block";
+    document.querySelector("nav button[onclick=\"showView('stats')\"]").classList.add("active");
     showStats();
   } else if (view === 'activity') {
     document.getElementById("activityView").style.display = "block";
+    document.querySelector("nav button[onclick=\"showView('activity')\"]").classList.add("active");
     renderActivityTable();
   }
 }
