@@ -576,23 +576,35 @@ function filterData(type) {
 
   const now = new Date();
   const seen = new Set(); 
+  const legacyCutoff = new Date("2025-07-07");
 
   let filtered = allData.filter(row => {
     const d = new Date(row["Timestamp"]);
+    const rowDateOnly = new Date(d.toDateString());
 
     let dateMatch = false;
     if (type === 'day') dateMatch = d.toDateString() === now.toDateString();
-else if (type === 'week') {
-  const start = new Date(now); start.setDate(now.getDate() - 7);
-  dateMatch = d >= start && d <= now && isAllowedWeekDay(d);
-}
-    else if (type === 'month') dateMatch = d.getMonth() === now.getMonth();
-    else dateMatch = true;
+    else if (type === 'week') {
+      const start = new Date(now); 
+      start.setDate(now.getDate() - 7);
+      dateMatch = d >= start && d <= now && isAllowedWeekDay(d);
+    } else if (type === 'month') {
+      dateMatch = d.getMonth() === now.getMonth();
+    } else {
+      dateMatch = true;
+    }
 
     if (!dateMatch) return false;
 
-    if (row["General"] === "" && (!row["Activity"] || row["Activity"].trim() === "")) return false;
+    // ✅ نتحقق من إذا نحسبه كحضور
+    let attended = false;
+    if (row["General"] === "✔️ حضر") attended = true;
+    else if (row["Activity"] && row["Activity"].trim() !== "") attended = true;
+    else if (rowDateOnly < legacyCutoff) attended = true;
 
+    if (!attended) return false;
+
+    // ✅ ما نكرر الطالب في نفس اليوم
     const key = `${row["ID"]}_${d.toDateString()}`;
     if (seen.has(key)) return false;
     seen.add(key);
