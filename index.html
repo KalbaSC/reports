@@ -597,10 +597,22 @@ function filterData(type) {
     if (!dateMatch) return false;
 
     //  نتحقق من إذا نحسبه كحضور
-    let attended = false;
-    if (row["General"] === "✔️ حضر") attended = true;
-    else if (row["Activity"] && row["Activity"].trim() !== "") attended = true;
-    else if (rowDateOnly < legacyCutoff) attended = true;
+let attended = false;
+
+// أولوية 1: إذا مسجل حضر صراحةً
+if (row["General"] === "✔️ حضر") {
+  attended = true;
+}
+// أولوية 2: إذا ما فيه "حضر"، لكن فيه نشاط
+else if (!row["General"] || row["General"].trim() === "") {
+  if (row["Activity"] && row["Activity"].trim() !== "") {
+    attended = true;
+  }
+  // أولوية 3: إذا ما فيه General ولا Activity، لكنه من أيام زمان
+  else if (rowDateOnly < legacyCutoff) {
+    attended = true;
+  }
+}
 
     if (!attended) return false;
 
