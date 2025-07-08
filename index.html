@@ -575,7 +575,7 @@ function filterData(type) {
   document.getElementById("statsView").style.display = "none";
 
   const now = new Date();
-  const seen = new Set(); 
+  const seen = new Set();
   const legacyCutoff = new Date("2025-07-07");
 
   allData.sort((a, b) => new Date(a["Timestamp"]) - new Date(b["Timestamp"]));
@@ -587,7 +587,7 @@ function filterData(type) {
     let dateMatch = false;
     if (type === 'day') dateMatch = d.toDateString() === now.toDateString();
     else if (type === 'week') {
-      const start = new Date(now); 
+      const start = new Date(now);
       start.setDate(now.getDate() - 7);
       dateMatch = d >= start && d <= now && isAllowedWeekDay(d);
     } else if (type === 'month') {
@@ -598,31 +598,52 @@ function filterData(type) {
 
     if (!dateMatch) return false;
 
-    //  نتحقق من إذا نحسبه كحضور
-let attended = false;
+    // نتحقق من إذا نحسبه كحضور
+    let attended = false;
 
-// أولوية 1: إذا مسجل حضر 
-if (row["General"] === "✔️ حضر") {
-  attended = true;
-}
-// أولوية 2: إذا ما فيه "حضر"، لكن فيه نشاط
-else if (!row["General"] || row["General"].trim() === "") {
-  if (row["Activity"] && row["Activity"].trim() !== "") {
-    attended = true;
-  }
-  // أولوية 3: إذا ما فيه General ولا Activity، 
-  else if (rowDateOnly < legacyCutoff) {
-    attended = true;
-  }
-}
+    if (row["General"] === "✔️ حضر") {
+      attended = true;
+    } else if (!row["General"] || row["General"].trim() === "") {
+      if (row["Activity"] && row["Activity"].trim() !== "") {
+        attended = true;
+      } else if (rowDateOnly < legacyCutoff) {
+        attended = true;
+      }
+    }
 
     if (!attended) return false;
 
-    //  ما نكرر الطالب في نفس اليوم
     const key = `${row["ID"]}_${d.toDateString()}`;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
+  });
+
+  renderTable(filtered);
+}
+
+function showActivities() {
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("statsView").style.display = "none";
+
+  const seen = new Set();
+  const attended = new Set();
+
+  allData.forEach(row => {
+    const d = new Date(row["Timestamp"]);
+    const key = `${row["ID"]}_${d.toDateString()}`;
+    if (row["General"] === "✔️ حضر") {
+      attended.add(key);
+    }
+  });
+
+  const filtered = allData.filter(row => {
+    const d = new Date(row["Timestamp"]);
+    const key = `${row["ID"]}_${d.toDateString()}`;
+    if (seen.has(key)) return false;
+    if (attended.has(key)) return false;
+    seen.add(key);
+    return row["Activity"] && row["Activity"].trim() !== "";
   });
 
   renderTable(filtered);
