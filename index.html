@@ -65,26 +65,6 @@
   font-size: 14px;
   color: #f4e733;
 }
-    .dropdown-content a:hover {
-  background-color: #f4e733;
-  color: black;
-}
-    .filter-btn {
-  background-color: #111;
-  color: #f4e733;
-  border: 1px solid #f4e733;
-  padding: 10px 18px;
-  margin: 5px;
-  border-radius: 6px;
-  font-size: 16px;
-  cursor: pointer;
-}
-
-.filter-btn.active {
-  background-color: #f4e733;
-  color: black;
-}
-
     .container {
       display: grid;
       grid-template-columns: 1fr;
@@ -243,15 +223,9 @@ nav button.active {
   margin-left: 5px;
   vertical-align: middle;
 }
-    .dropdown-content a.active {
-  background-color: #f4e733;
-  color: black !important;
+    .hidden {
+  display: none;
 }
-    .filter-bar {
-  max-width: 1200px;
-  margin: auto;
-}
-
            footer {
       background-color: #111;
       color: white;
@@ -273,18 +247,6 @@ nav button.active {
   padding: 10px;
   border-radius: 5px;
 }
-
-    body { font-family: 'Arial', sans-serif; background-color: #000; color: white; margin: 0; padding: 0; }
-    nav button.active { background-color: #f4e733; color: black !important; }
-    .filter-btn.active { background-color: #f4e733; color: black; }
-    .hidden { display: none; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #f4e733; padding: 10px; text-align: center; }
-    th { background-color: #333; color: #f4e733; }
-
-    
-
-    
     @media (max-width: 768px) {
  .header-right {
     padding: 10px 10px;
@@ -329,75 +291,50 @@ nav button.active {
     text-align: center;
   }
 
+  .container {
+    padding: 12px;
+    margin: 10px auto;
+    width: 95%;
+  }
+
   .title {
     font-size: 18px;
     margin-top: 15px;
     margin-bottom: 17px;
     line-height: 1.4;
   }
-.controls {
-  display: flex;
-  flex-direction: column;
-  align-items: center; 
-  gap: 15px;
-  background: #222;
-  padding: 20px;
-  border-radius: 10px;
-  width: 100%;
-  box-sizing: border-box;
-}
 
-.filter-bar {
-  width: 100%;
-  max-width: 600px;  
-  margin: 0 auto;      
-}
+  .filter-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
 
-.search-group {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  box-sizing: border-box;
-}
+  .search-group {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+    width: 100%;
+  }
 
-.search-group select,
-.search-group input,
-.search-group button,
-#datePicker {
-  width: 100%;
-  padding: 10px;
-  font-size: 14px;
-  border-radius: 8px;
-  border: none;
-}
+  .search-group select,
+  .search-group input,
+  .search-group button.clear-btn,
+  #datePicker {
+    width: 100%;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
 
-.clear-btn {
-  background-color: #f4e733;
-  color: black;
-  font-weight: bold;
-  border-radius: 8px;
-  border: none;
-  padding: 10px;
-}
+  .export-buttons {
+    flex-direction: row;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+  }
 
-.export-buttons {
-  display: flex;
-  flex-direction: row;
-  justify-content: space-between;
-  gap: 10px;
-}
-
-.export-buttons .export {
-  flex: 1;
-  background-color: #f4e733;
-  border: none;
-  color: black;
-  font-weight: bold;
-  font-size: 14px;
-  padding: 10px;
-  border-radius: 8px;
-}
-      
   .summary-box {
     text-align: center;
     font-size: 14px;
@@ -417,7 +354,9 @@ table {
     width: 100% !important;
     height: auto !important;
   }
-    
+      .hidden {
+  display: none;
+}
   footer {
   text-align: center;
   padding: 15px 10px;
@@ -442,35 +381,37 @@ footer p {
 <body>
   <header class="header-container">
   <div class="header-right">
-    <img src="Picture3.png" alt="شعار مجلس الشارقة الرياضي" class="logo">
+    <img src="Picture3.png" alt="شعار الشارقة" class="logo">
     <div class="divider"></div>
-    <img src="logo.png" alt="شعار نادي كلباء الرياضي الثقافي" class="logo">
+    <img src="logo.png" alt="شعار نادي كلباء" class="logo">
     <div class="header-info">
       <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
       <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
     </div>
   </div>
 </header>
-  
-  <nav>
-    <button onclick="showView('general')">العام</button>
-    <button onclick="showView('stats')">الإحصائيات</button>
-    <button onclick="showView('activity')">الأنشطة</button>
-    <div id="dateFilters">
-      <button onclick="filterData('day')" class="filter-btn">اليوم</button>
-      <button onclick="filterData('week')" class="filter-btn">هذا الأسبوع</button>
-      <button onclick="filterData('month')" class="filter-btn">هذا الشهر</button>
+
+<nav>
+  <div class="dropdown">
+    <button>العام ▼</button>
+    <div class="dropdown-content">
+      <a onclick="filterData('day')">اليوم</a>
+      <a onclick="filterData('week')">هذا الأسبوع</a>
+      <a onclick="filterData('month')">هذا الشهر</a>
     </div>
-  </nav>
+  </div>
+  <button onclick="showStats()">الإحصائيات</button>
+  <button onclick="showActivities()">الأنشطة</button>
+</nav>
 
 
-<div class="container" id="generalView">
+<div class="container" id="mainView">
   <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
     حضور صيف الشارقة الرياضي - عطلتنا غير
   </div>
 
   <div class="controls">
-    
+
 <div class="filter-bar">
   <div class="search-group">
     <select onchange="showFilterOptions(this.value)">
@@ -517,8 +458,6 @@ footer p {
       </thead>
       <tbody></tbody>
     </table>
-  
-  <div id="loading" style="text-align:center;color:#f4e733;">جاري التحميل...</div>
 
   <div id="todayStats" style="background:#222; padding:20px; border-radius:10px; margin-top:20px; color:#f4e733">
   <h3 style="margin-bottom:15px;">إحصاءات اليوم:</h3>
@@ -528,10 +467,6 @@ footer p {
 
 </div>
 
-  <div id="activityView" class="hidden">
-    <h3>الحضور حسب الأنشطة</h3>
-    <table id="activityTable"><thead><tr><th>الوقت</th><th>الاسم</th><th>المعرف</th><th>الموظف</th><th>النشاط</th></tr></thead><tbody></tbody></table>
-  </div>
 
   <div class="container" id="statsView" style="display: none;">
     <h2 style="color:#f4e733; text-align:center">إحصائيات الحضور</h2>
@@ -540,191 +475,310 @@ footer p {
     <canvas id="attendanceChart" height="200"></canvas>
   </div>
 
-   <script>
+  <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
-    let allData = [], filteredData = [];
+    let allData = [], chart;
 
-async function fetchData() {
-  const res = await fetch(scriptURL);
-  const raw = await res.json();
+function populateDropdowns() {
+  const activities = new Set();
+  const staff = new Set();
 
-  // Remove entries without ID
-  allData = raw.filter(e => e.ID);
-
-  const idMap = new Map();
-
-  // Group all entries by ID
-  allData.forEach(entry => {
-    const id = entry.ID;
-    if (!idMap.has(id)) idMap.set(id, []);
-    idMap.get(id).push(entry);
+  allData.forEach(row => {
+    if (row["Activity"]) activities.add(row["Activity"]);
+    if (row["Scanned By"]) staff.add(row["Scanned By"]);
   });
 
-  const uniqueFirstScan = [];
+  const activitySelect = document.getElementById("filter-activity");
+  activitySelect.innerHTML = '<option value="">اختر النشاط</option>';
+  [...activities].forEach(act => {
+    const opt = document.createElement("option");
+    opt.value = act;
+    opt.textContent = act;
+    activitySelect.appendChild(opt);
+  });
 
-  idMap.forEach(entries => {
-    // Sort entries by time
-    entries.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+  const staffSelect = document.getElementById("filter-staff");
+  staffSelect.innerHTML = '<option value="">اختر الموظف</option>';
+  [...staff].forEach(stf => {
+    const opt = document.createElement("option");
+    opt.value = stf;
+    opt.textContent = stf;
+    staffSelect.appendChild(opt);
+  });
+}
+    async function fetchData() {
+      const res = await fetch(scriptURL);
+      allData = await res.json();
 
-    // Find first general entry (regardless of content)
-    const generalEntry = entries.find(e => e.General !== undefined && e.General !== null && e.General !== '');
-
-    if (generalEntry) {
-      uniqueFirstScan.push(generalEntry);
-    } else {
-      // fallback to first valid activity
-      const firstActivity = entries.find(e => (e.Activity || '').trim() !== '');
-      if (firstActivity) uniqueFirstScan.push(firstActivity);
+      const today = new Date().toISOString().split("T")[0];
+      document.getElementById("datePicker").value = today;
+      populateDropdowns();
     }
-  });
 
-  // Final deduplication just in case
-  const seen = new Set();
-  filteredData = uniqueFirstScan.filter(e => {
-    if (seen.has(e.ID)) return false;
-    seen.add(e.ID);
+    function setActiveNav(type) {
+  const buttons = document.querySelectorAll("nav a"); 
+  buttons.forEach(btn => btn.classList.remove("active"));
+
+  const map = { day: 0, week: 1, month: 2 };
+  if (map[type] !== undefined) buttons[map[type]].classList.add("active");
+}
+
+
+function filterData(type) {
+  setActiveNav(type);
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("statsView").style.display = "none";
+
+  const now = new Date();
+  const seen = new Set(); 
+
+  let filtered = allData.filter(row => {
+    const d = new Date(row["Timestamp"]);
+
+    let dateMatch = false;
+    if (type === 'day') dateMatch = d.toDateString() === now.toDateString();
+    else if (type === 'week') {
+      const start = new Date(now); start.setDate(now.getDate() - 7);
+      dateMatch = d >= start && d <= now;
+    }
+    else if (type === 'month') dateMatch = d.getMonth() === now.getMonth();
+    else dateMatch = true;
+
+    if (!dateMatch) return false;
+
+    const key = `${row["ID"]}_${d.toDateString()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
     return true;
   });
 
-  renderGeneralTable(filteredData);
+  renderTable(filtered);
 }
 
-    function showView(view) {
-      ['generalView', 'statsView', 'activityView'].forEach(id => document.getElementById(id).classList.add('hidden'));
-      document.getElementById(view + 'View').classList.remove('hidden');
-      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active'));
-      document.querySelector(`nav button[onclick="showView('${view}')"]`).classList.add('active');
-      if (view === 'activity') renderActivityTable();
-      if (view === 'stats') showStats();
-    }
-
-function filterData(type) {
-  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Dubai" }));
-  let cutoff;
-
-  if (type === 'day') cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  if (type === 'week') cutoff = new Date(now.setDate(now.getDate() - now.getDay()));
-  if (type === 'month') cutoff = new Date(now.getFullYear(), now.getMonth(), 1);
-
- filteredData = filteredData.filter(row => {
-    const localDate = new Date(new Date(row.Timestamp).toLocaleString("en-US", { timeZone: "Asia/Dubai" }));
-    return localDate >= cutoff;
-  });
-
-  renderGeneralTable(filteredData);
-  document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
-  document.querySelector(`.filter-btn[onclick="filterData('${type}')"]`).classList.add("active");
-}
-     
-function formatLocalTime(timestamp) {
-  if (!timestamp) return "";
-  const date = new Date(timestamp);
-  return date.toLocaleString("ar-EG", { timeZone: "Asia/Dubai", hour12: true });
-}
-
-    function renderGeneralTable(data) {
-      const tbody = document.querySelector("#attendanceTable tbody");
-      tbody.innerHTML = "";
-      
-  if (data.length === 0) {
-  const row = document.createElement("tr");
-  row.innerHTML = `<td colspan="5" style="color:#f4e733">لا يوجد حضور</td>`;
-  tbody.appendChild(row);
-}
-      data.forEach(entry => {
-        const row = document.createElement("tr");
-  row.innerHTML = `
-  <td>${new Date(entry["Timestamp"]).toLocaleString("en-US", { timeZone: "Asia/Dubai" })}</td>
-  <td>${entry["Child Name"] || ""}${entry["Parent"] ? " " + entry["Parent"] : ""}</td>
-  <td>${entry["ID"]}</td>
-  <td>${entry["Scanned By"]}</td>
-  <td>${entry["General"] || "" || entry["Activity"] || ""}</td>
-`;
-        tbody.appendChild(row);
-      });
-  document.getElementById("summary").textContent = `إجمالي الحضور: ${data.length}`;
-  document.getElementById("todayStats").style.display = data.length ? "block" : "none";
-  document.getElementById("loading").style.display = "none";
-    }
-
-    function filterTable() {
-      const val = document.getElementById("searchInput").value.toLowerCase();
-      const rows = filteredData.filter(d => (d["Child Name"] + d["ID"]).toLowerCase().includes(val));
-      renderGeneralTable(rows);
-    }
-
-    function exportToExcel() {
-      const ws = XLSX.utils.json_to_sheet(filteredData);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Attendance");
-      XLSX.writeFile(wb, "attendance.xlsx");
-    }
-
-    function exportToPDF() {
-      html2canvas(document.querySelector("#attendanceTable")).then(canvas => {
-        const imgData = canvas.toDataURL("image/png");
-        const pdf = new jspdf.jsPDF();
-        pdf.addImage(imgData, "PNG", 10, 10, 190, 0);
-        pdf.save("attendance.pdf");
-      });
-    }
-
-    function renderActivityTable() {
-      const tbody = document.querySelector("#activityTable tbody");
-      tbody.innerHTML = "";
-      const activities = allData.filter(e => e.Activity);
-      activities.forEach(entry => {
-        const row = document.createElement("tr");
-        row.innerHTML = `<td>${entry["Timestamp"]}</td><td>${entry["Child Name"]}</td><td>${entry["ID"]}</td><td>${entry["Scanned By"]}</td><td>${entry["Activity"]}</td>`;
-        tbody.appendChild(row);
-      });
-    }
-
-    function showStats() {
-      const ctx = document.getElementById('attendanceChart').getContext('2d');
-      const counts = {};
-      filteredData.forEach(e => { counts[e["Scanned By"]] = (counts[e["Scanned By"]] || 0) + 1 });
-      if (window.myChart) window.myChart.destroy();
-      window.myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: Object.keys(counts),
-          datasets: [{ label: 'عدد الحضور', data: Object.values(counts), backgroundColor: '#f4e733' }]
-        },
-        options: {
-          responsive: true,
-          plugins: { legend: { display: false } }
-        }
-      });
-    }
-     
 function filterByDate() {
   const selectedDate = document.getElementById("datePicker").value;
   if (!selectedDate) return;
 
-  const dateOnly = new Date(selectedDate).toISOString().split("T")[0];
-
-  const results = allData.filter(row => {
-    const rowDate = new Date(row.Timestamp).toISOString().split("T")[0];
-    return rowDate === dateOnly;
+  const filtered = allData.filter(row => {
+    const rowDate = new Date(row["Timestamp"]).toISOString().split("T")[0];
+    return rowDate === selectedDate;
   });
 
-filteredData = filteredData.filter(row => {
-  const rowDate = new Date(row.Timestamp).toISOString().split("T")[0];
-  return rowDate === dateOnly;
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("statsView").style.display = "none";
+  renderTable(filtered);
+}
+    function showStats() {
+      document.getElementById("mainView").style.display = "none";
+      document.getElementById("statsView").style.display = "block";
+      const staffCounts = {}, early = { early: 0, late: 0 };
+
+      allData.forEach(row => {
+        const name = row["Scanned By"] || "غير معروف";
+        staffCounts[name] = (staffCounts[name] || 0) + 1;
+        const hour = new Date(row["Timestamp"]).getHours();
+        const min = new Date(row["Timestamp"]).getMinutes();
+        const time = hour * 60 + min;
+        if (time < (17 * 60 + 11)) early.early++;
+        else early.late++;
+      });
+
+      new Chart(document.getElementById("pieStaff").getContext("2d"), {
+        type: 'pie',
+        data: {
+          labels: Object.keys(staffCounts),
+          datasets: [{
+            data: Object.values(staffCounts),
+            backgroundColor: ['#f4e733', '#ffbb00', '#ffaa00', '#ccaa00', '#999900']
+          }]
+        }
+      });
+
+      new Chart(document.getElementById("earlyLate").getContext("2d"), {
+        type: 'bar',
+        data: {
+          labels: ['حضور بالوقت', 'حضور متأخر'],
+          datasets: [{
+            data: [early.early, early.late],
+            backgroundColor: ['#66cc66', '#cc3333']
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    function renderTable(data) {
+      const tbody = document.querySelector("#attendanceTable tbody");
+      tbody.innerHTML = "";
+      const perDay = {};
+      data.forEach(row => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${new Date(row["Timestamp"]).toLocaleString('ar-EG')}</td>
+          <td>${row["Child Name"]} ${row["Parent"]}</td>
+          <td>${row["ID"]}</td>
+          <td>${row["Scanned By"]}</td>
+          <td>${row["Activity"] || ""}</td>`;
+        tbody.appendChild(tr);
+        const day = new Date(row["Timestamp"]).toLocaleDateString('ar-EG');
+        perDay[day] = (perDay[day] || 0) + 1;
+      });
+      document.getElementById("summary").innerText = `إجمالي الحضور: ${data.length}`;
+      document.getElementById("filteredSummary").innerText = "";
+      updateChart(perDay);
+
+const staffToday = {};
+let early = 0, late = 0;
+data.forEach(row => {
+  const name = row["Scanned By"] || "غير معروف";
+  staffToday[name] = (staffToday[name] || 0) + 1;
+
+  const time = new Date(row["Timestamp"]);
+const hours = time.getHours();
+const minutes = time.getMinutes();
+const totalMinutes = hours * 60 + minutes;
+
+//  قبل 17:11
+if (totalMinutes < (17 * 60 + 11)) early++;
+else late++;
 });
 
-  renderGeneralTable(filteredData);
-  document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+const staffList = Object.entries(staffToday)
+  .map(([name, count]) => `${name}: ${count}`)
+  .join("<br>");
+
+document.getElementById("staffToday").innerHTML = `<strong>حسب الموظف:</strong><br>${staffList}`;
+document.getElementById("timingToday").innerHTML = `<strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}`;
+    }
+
+function filterTable() {
+  const name = document.getElementById("filter-name").value.toLowerCase();
+  const id = document.getElementById("filter-id").value.toLowerCase();
+  const staff = document.getElementById("filter-staff").value.toLowerCase();
+  const activity = document.getElementById("filter-activity").value.toLowerCase();
+
+  const rows = document.querySelectorAll("#attendanceTable tbody tr");
+
+  let visibleCount = 0;
+  rows.forEach(row => {
+    const nameCell = row.cells[1].innerText.toLowerCase();
+    const idCell = row.cells[2].innerText.toLowerCase();
+    const staffCell = row.cells[3].innerText.toLowerCase();
+    const activityCell = row.cells[4]?.innerText.toLowerCase() || "";
+
+    const match =
+      nameCell.includes(name) &&
+      idCell.includes(id) &&
+      staffCell.includes(staff) &&
+      activityCell.includes(activity);
+
+    row.style.display = match ? "" : "none";
+    if (match) visibleCount++;
+  });
+
+  document.getElementById("filteredSummary").innerText =
+    (name || id || staff || activity) ? `عدد النتائج المطابقة: ${visibleCount}` : "";
 }
 
-window.onload = () => fetchData().then(() => {
-  filterData('day');
-  showView('general');
-});
+function clearFilters() {
+  document.getElementById("searchName").value = "";
+  document.getElementById("searchGame").value = "";
+  document.getElementById("searchActivity").value = "";
+  filterTable(); 
+}
+    function exportToExcel() {
+      const wb = XLSX.utils.table_to_book(document.getElementById("attendanceTable"));
+      XLSX.writeFile(wb, "attendance.xlsx");
+    }
 
-   </script>
-  
+function exportToPDF() {
+    const rows = document.querySelectorAll("#attendanceTable tbody tr");
+  if (rows.length === 0) {
+    alert("لا يوجد بيانات لتصديرها إلى PDF");
+    return;
+  }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+
+  const table = document.querySelector("#attendanceTable");
+
+  table.style.overflow = "visible";
+
+  html2canvas(table, {
+    scale: 2,
+    backgroundColor: "#000000",
+    useCORS: true
+  }).then(canvas => {
+    const imgData = canvas.toDataURL("image/png");
+    const imgWidth = 190;
+    const pageHeight = 297;
+    const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+    let position = 10;
+    let heightLeft = imgHeight;
+
+    doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+    heightLeft -= pageHeight;
+
+    while (heightLeft > 0) {
+      position = heightLeft - imgHeight;
+      doc.addPage();
+      doc.addImage(imgData, 'PNG', 10, position, imgWidth, imgHeight);
+      heightLeft -= pageHeight;
+    }
+
+    doc.save("attendance.pdf");
+  });
+}  
+
+    function updateChart(dayCounts) {
+      const ctx = document.getElementById("attendanceChart").getContext("2d");
+      if (chart) chart.destroy();
+      chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: Object.keys(dayCounts),
+          datasets: [{
+            label: 'عدد الحضور اليومي',
+            data: Object.values(dayCounts),
+            backgroundColor: '#f4e733',
+            borderColor: '#000',
+            borderWidth: 1
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    function showActivities() {
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("statsView").style.display = "none";
+
+  const filtered = allData.filter(row => row["Activity"] && row["Activity"] !== "");
+  renderTable(filtered);
+}
+
+function showFilterOptions(value) {
+  document.getElementById("filter-name").classList.add("hidden");
+  document.getElementById("filter-id").classList.add("hidden");
+  document.getElementById("filter-staff").classList.add("hidden");
+  document.getElementById("filter-activity").classList.add("hidden");
+
+  if (value === "name") document.getElementById("filter-name").classList.remove("hidden");
+  else if (value === "id") document.getElementById("filter-id").classList.remove("hidden");
+  else if (value === "staff") document.getElementById("filter-staff").classList.remove("hidden");
+  else if (value === "activity") document.getElementById("filter-activity").classList.remove("hidden");
+}
+window.onload = () => {
+  fetchData().then(() => filterData('day'));
+};
+  </script>
   <footer>
   <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
     <p style="font-size: 14px; color: #aaa; margin-top: -10px;">تم التطوير بواسطة روند أحمد الضمور</p>
