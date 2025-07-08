@@ -684,10 +684,12 @@ function filterTable() {
 }
 
 function clearFilters() {
-  document.getElementById("searchName").value = "";
-  document.getElementById("searchGame").value = "";
-  document.getElementById("searchActivity").value = "";
-  filterTable(); 
+  // Reset all inputs
+  document.getElementById("filter-name").value = "";
+  document.getElementById("filter-id").value = "";
+  document.getElementById("filter-staff").value = "";
+  document.getElementById("filter-activity").value = "";
+    renderTable(allData);
 }
     function exportToExcel() {
       const wb = XLSX.utils.table_to_book(document.getElementById("attendanceTable"));
