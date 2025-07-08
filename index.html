@@ -605,7 +605,7 @@ function filterData(type) {
   if (type === 'week') cutoff = new Date(now.setDate(now.getDate() - now.getDay()));
   if (type === 'month') cutoff = new Date(now.getFullYear(), now.getMonth(), 1);
 
-  filteredData = allData.filter(row => {
+ filteredData = filteredData.filter(row => {
     const localDate = new Date(new Date(row.Timestamp).toLocaleString("en-US", { timeZone: "Asia/Dubai" }));
     return localDate >= cutoff;
   });
@@ -708,7 +708,11 @@ function filterByDate() {
     return rowDate === dateOnly;
   });
 
-  filteredData = results;
+filteredData = filteredData.filter(row => {
+  const rowDate = new Date(row.Timestamp).toISOString().split("T")[0];
+  return rowDate === dateOnly;
+});
+
   renderGeneralTable(filteredData);
   document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
 }
