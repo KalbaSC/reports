@@ -578,6 +578,8 @@ function filterData(type) {
   const seen = new Set(); 
   const legacyCutoff = new Date("2025-07-07");
 
+  allData.sort((a, b) => new Date(a["Timestamp"]) - new Date(b["Timestamp"]));
+
   let filtered = allData.filter(row => {
     const d = new Date(row["Timestamp"]);
     const rowDateOnly = new Date(d.toDateString());
@@ -599,7 +601,7 @@ function filterData(type) {
     //  نتحقق من إذا نحسبه كحضور
 let attended = false;
 
-// أولوية 1: إذا مسجل حضر صراحةً
+// أولوية 1: إذا مسجل حضر 
 if (row["General"] === "✔️ حضر") {
   attended = true;
 }
@@ -608,7 +610,7 @@ else if (!row["General"] || row["General"].trim() === "") {
   if (row["Activity"] && row["Activity"].trim() !== "") {
     attended = true;
   }
-  // أولوية 3: إذا ما فيه General ولا Activity، لكنه من أيام زمان
+  // أولوية 3: إذا ما فيه General ولا Activity، 
   else if (rowDateOnly < legacyCutoff) {
     attended = true;
   }
