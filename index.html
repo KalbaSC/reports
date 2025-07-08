@@ -544,13 +544,34 @@ footer p {
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
     let allData = [], filteredData = [];
 
-    async function fetchData() {
-      const res = await fetch(scriptURL);
-      const raw = await res.json();
-      allData = raw.filter((e, i, self) => e.ID && i === self.findIndex(t => t.ID === e.ID));
-      filteredData = [...allData];
-      renderGeneralTable(filteredData);
+async function fetchData() {
+  const res = await fetch(scriptURL);
+  const raw = await res.json();
+  allData = raw.filter(e => e.ID); 
+
+  const idMap = new Map();
+  allData.forEach(entry => {
+    const id = entry.ID;
+    if (!idMap.has(id)) idMap.set(id, []);
+    idMap.get(id).push(entry);
+  });
+
+  // now build filteredData with the logic
+  const uniqueFirstScan = [];
+  idMap.forEach(rows => {
+    const hasGeneral = rows.some(r => (r.General || '').includes('✔️'));
+    const hasActivity = rows.some(r => r.Activity && r.Activity.trim() !== '');
+    if (hasGeneral || hasActivity) {
+      const earliest = rows.reduce((a, b) =>
+        new Date(a.Timestamp) < new Date(b.Timestamp) ? a : b
+      );
+      uniqueFirstScan.push(earliest);
     }
+  });
+
+  filteredData = [...uniqueFirstScan];
+  renderGeneralTable(filteredData);
+}
 
     function showView(view) {
       ['generalView', 'statsView', 'activityView'].forEach(id => document.getElementById(id).classList.add('hidden'));
