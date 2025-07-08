@@ -556,57 +556,38 @@ function populateDropdowns() {
       populateDropdowns();
     }
     
-    function setActiveNav(type) {
-  const buttons = document.querySelectorAll("nav a"); 
-  buttons.forEach(btn => btn.classList.remove("active"));
+function setActiveNav(type) {
+  const links = document.querySelectorAll(".dropdown-content a");
+  links.forEach(link => link.classList.remove("active"));
 
   const map = { day: 0, week: 1, month: 2 };
-  if (map[type] !== undefined) buttons[map[type]].classList.add("active");
+  if (map[type] !== undefined) links[map[type]].classList.add("active");
 }
-    
+  
 function isAllowedWeekDay(date) {
   const day = date.getDay();
   return (day >= 1 && day <= 3); // الإثنين - الأربعاء
 }
     
-function filterData(type) {
-  setActiveNav(type);
-  document.getElementById("mainView").style.display = "block";
-  document.getElementById("statsView").style.display = "none";
+function filterByDate() {
+  const selectedDate = document.getElementById("datePicker").value;
+  if (!selectedDate) return;
 
-  const now = new Date();
   const seen = new Set();
   const legacyCutoff = new Date("2025-07-07");
 
-  allData.sort((a, b) => new Date(a["Timestamp"]) - new Date(b["Timestamp"]));
-
-  let filtered = allData.filter(row => {
+  const filtered = allData.filter(row => {
     const d = new Date(row["Timestamp"]);
-    const rowDateOnly = new Date(d.toDateString());
+    const rowDate = d.toISOString().split("T")[0];
+    if (rowDate !== selectedDate) return false;
 
-    let dateMatch = false;
-    if (type === 'day') dateMatch = d.toDateString() === now.toDateString();
-    else if (type === 'week') {
-      const start = new Date(now);
-      start.setDate(now.getDate() - 7);
-      dateMatch = d >= start && d <= now && isAllowedWeekDay(d);
-    } else if (type === 'month') {
-      dateMatch = d.getMonth() === now.getMonth();
-    } else {
-      dateMatch = true;
-    }
-
-    if (!dateMatch) return false;
-
-    // نتحقق من إذا نحسبه كحضور
     let attended = false;
-
     if (row["General"] === "✔️ حضر") {
       attended = true;
     } else if (!row["General"] || row["General"].trim() === "") {
       if (row["Activity"] && row["Activity"].trim() !== "") {
         attended = true;
-      } else if (rowDateOnly < legacyCutoff) {
+      } else if (new Date(d.toDateString()) < legacyCutoff) {
         attended = true;
       }
     }
@@ -619,6 +600,8 @@ function filterData(type) {
     return true;
   });
 
+  document.getElementById("mainView").style.display = "block";
+  document.getElementById("statsView").style.display = "none";
   renderTable(filtered);
 }
 
@@ -632,52 +615,33 @@ function showActivities() {
   allData.forEach(row => {
     const d = new Date(row["Timestamp"]);
     const key = `${row["ID"]}_${d.toDateString()}`;
-    if (row["General"] === "✔️ حضر") {
-      attended.add(key);
-    }
+    if (row["General"] === "✔️ حضر") attended.add(key);
   });
 
   const filtered = allData.filter(row => {
     const d = new Date(row["Timestamp"]);
     const key = `${row["ID"]}_${d.toDateString()}`;
     if (seen.has(key)) return false;
-    if (attended.has(key)) return false;
     seen.add(key);
-    return row["Activity"] && row["Activity"].trim() !== "";
+
+    return row["Activity"] && row["Activity"].trim() !== "" && !attended.has(key);
   });
 
   renderTable(filtered);
 }
     
-function filterByDate() {
-  const selectedDate = document.getElementById("datePicker").value;
-  if (!selectedDate) return;
-
-  const seen = new Set();
-  const filtered = allData.filter(row => {
-    const d = new Date(row["Timestamp"]);
-    const rowDate = d.toISOString().split("T")[0];
-    if (rowDate !== selectedDate) return false;
-
-    if (row["General"] === "" && (!row["Activity"] || row["Activity"].trim() === "")) return false;
-
-    const key = `${row["ID"]}_${d.toDateString()}`;
-    if (seen.has(key)) return false;
-    seen.add(key);
-    
-    return true;
-  });
-
-  document.getElementById("mainView").style.display = "block";
-  document.getElementById("statsView").style.display = "none";
-  renderTable(filtered);
-}
     function showStats() {
       if (pieStaffChart) pieStaffChart.destroy();
       if (earlyLateChart) earlyLateChart.destroy();
 
       document.getElementById("mainView").style.display = "none";
       document.getElementById("statsView").style.display = "block";
+
+        let dataToUse = allData;
+  const selectedDate = document.getElementById("datePicker").value;
+  if (selectedDate) {
+    dataToUse = allData.filter(row => row["Timestamp"].split("T")[0] === selectedDate);
+  }
       const staffCounts = {}, early = { early: 0, late: 0 };
 
       allData.forEach(row => {
@@ -801,8 +765,8 @@ function clearFilters() {
   document.getElementById("filter-id").value = "";
   document.getElementById("filter-staff").value = "";
   document.getElementById("filter-activity").value = "";
-  document.getElementById("datePicker").value = "";
-  filterTable();
+  document.getElementById("datePicker").value = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
+  filterData('day');
 }
     
     function exportToExcel() {
