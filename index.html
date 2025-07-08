@@ -561,17 +561,23 @@ footer p {
       if (view === 'stats') showStats();
     }
 
-    function filterData(type) {
-      const now = new Date();
-      let cutoff;
-      if (type === 'day') cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      if (type === 'week') cutoff = new Date(now.setDate(now.getDate() - now.getDay()));
-      if (type === 'month') cutoff = new Date(now.getFullYear(), now.getMonth(), 1);
-      filteredData = allData.filter(row => new Date(row.Timestamp) >= cutoff);
-      renderGeneralTable(filteredData);
-      document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
-      document.querySelector(`.filter-btn[onclick="filterData('${type}')"]`).classList.add("active");
-    }
+function filterData(type) {
+  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Dubai" }));
+  let cutoff;
+
+  if (type === 'day') cutoff = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  if (type === 'week') cutoff = new Date(now.setDate(now.getDate() - now.getDay()));
+  if (type === 'month') cutoff = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  filteredData = allData.filter(row => {
+    const localDate = new Date(new Date(row.Timestamp).toLocaleString("en-US", { timeZone: "Asia/Dubai" }));
+    return localDate >= cutoff;
+  });
+
+  renderGeneralTable(filteredData);
+  document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+  document.querySelector(`.filter-btn[onclick="filterData('${type}')"]`).classList.add("active");
+}
      
 function formatLocalTime(timestamp) {
   if (!timestamp) return "";
@@ -591,7 +597,7 @@ function formatLocalTime(timestamp) {
       data.forEach(entry => {
         const row = document.createElement("tr");
   row.innerHTML = `
-  <td>${entry["Timestamp"] || ""}</td>
+  <td>${new Date(entry["Timestamp"]).toLocaleString("en-US", { timeZone: "Asia/Dubai" })}</td>
   <td>${entry["Child Name"] || ""}${entry["Parent"] ? " " + entry["Parent"] : ""}</td>
   <td>${entry["ID"]}</td>
   <td>${entry["Scanned By"]}</td>
