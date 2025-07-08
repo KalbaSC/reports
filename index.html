@@ -694,7 +694,7 @@ function filterByDate() {
           <td>${row["Child Name"]} ${row["Parent"]}</td>
           <td>${row["ID"]}</td>
           <td>${row["Scanned By"]}</td>
-          <td>${row["Activity"] || ""}</td>`;
+          <td>${row["Activity"] ? row["Activity"] : ""}</td>
         tbody.appendChild(tr);
         const day = new Date(row["Timestamp"]).toLocaleDateString('ar-EG');
         perDay[day] = (perDay[day] || 0) + 1;
@@ -832,11 +832,20 @@ function exportToPDF() {
       });
     }
     
-    function showActivities() {
+function showActivities() {
   document.getElementById("mainView").style.display = "block";
   document.getElementById("statsView").style.display = "none";
 
-  const filtered = allData.filter(row => row["Activity"] && row["Activity"] !== "");
+  const seen = new Set();
+  const filtered = allData.filter(row => {
+    const d = new Date(row["Timestamp"]);
+    const key = `${row["ID"]}_${d.toDateString()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+
+    return row["Activity"] && row["Activity"].trim() !== "";
+  });
+
   renderTable(filtered);
 }
 
