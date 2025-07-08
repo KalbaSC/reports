@@ -596,7 +596,7 @@ function filterData(type) {
 
     if (!dateMatch) return false;
 
-    // ✅ نتحقق من إذا نحسبه كحضور
+    //  نتحقق من إذا نحسبه كحضور
     let attended = false;
     if (row["General"] === "✔️ حضر") attended = true;
     else if (row["Activity"] && row["Activity"].trim() !== "") attended = true;
@@ -604,7 +604,7 @@ function filterData(type) {
 
     if (!attended) return false;
 
-    // ✅ ما نكرر الطالب في نفس اليوم
+    //  ما نكرر الطالب في نفس اليوم
     const key = `${row["ID"]}_${d.toDateString()}`;
     if (seen.has(key)) return false;
     seen.add(key);
@@ -683,49 +683,54 @@ function filterByDate() {
 
     }
 
-    function renderTable(data) {
-      const tbody = document.querySelector("#attendanceTable tbody");
-      tbody.innerHTML = "";
-      const perDay = {};
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${new Date(row["Timestamp"]).toLocaleString('ar-EG')}</td>
-          <td>${row["Child Name"]} ${row["Parent"]}</td>
-          <td>${row["ID"]}</td>
-          <td>${row["Scanned By"]}</td>
-          <td>${row["Activity"] ? row["Activity"] : ""}</td>
-        tbody.appendChild(tr);
-        const day = new Date(row["Timestamp"]).toLocaleDateString('ar-EG');
-        perDay[day] = (perDay[day] || 0) + 1;
-      });
-      document.getElementById("summary").innerText = `إجمالي الحضور: ${data.length}`;
-      document.getElementById("filteredSummary").innerText = "";
-      updateChart(perDay);
+function renderTable(data) {
+  const tbody = document.querySelector("#attendanceTable tbody");
+  tbody.innerHTML = "";
+  const perDay = {};
 
-const staffToday = {};
-let early = 0, late = 0;
-data.forEach(row => {
-  const name = row["Scanned By"] || "غير معروف";
-  staffToday[name] = (staffToday[name] || 0) + 1;
+  data.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${new Date(row["Timestamp"]).toLocaleString('ar-EG')}</td>
+      <td>${row["Child Name"]} ${row["Parent"]}</td>
+      <td>${row["ID"]}</td>
+      <td>${row["Scanned By"]}</td>
+      <td>${row["Activity"] ? row["Activity"] : ""}</td>
+    `;
+    tbody.appendChild(tr);
 
-  const time = new Date(row["Timestamp"]);
-const hours = time.getHours();
-const minutes = time.getMinutes();
-const totalMinutes = hours * 60 + minutes;
+    const day = new Date(row["Timestamp"]).toLocaleDateString('ar-EG');
+    perDay[day] = (perDay[day] || 0) + 1;
+  });
 
-//  قبل 17:11
-if (totalMinutes < (17 * 60 + 11)) early++;
-else late++;
-});
+  document.getElementById("summary").innerText = `إجمالي الحضور: ${data.length}`;
+  document.getElementById("filteredSummary").innerText = "";
+  updateChart(perDay);
 
-const staffList = Object.entries(staffToday)
-  .map(([name, count]) => `${name}: ${count}`)
-  .join("<br>");
+  const staffToday = {};
+  let early = 0, late = 0;
 
-document.getElementById("staffToday").innerHTML = `<strong>حسب الموظف:</strong><br>${staffList}`;
-document.getElementById("timingToday").innerHTML = `<strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}`;
-    }
+  data.forEach(row => {
+    const name = row["Scanned By"] || "غير معروف";
+    staffToday[name] = (staffToday[name] || 0) + 1;
+
+    const time = new Date(row["Timestamp"]);
+    const hours = time.getHours();
+    const minutes = time.getMinutes();
+    const totalMinutes = hours * 60 + minutes;
+
+    //  قبل 17:11
+    if (totalMinutes < (17 * 60 + 11)) early++;
+    else late++;
+  });
+
+  const staffList = Object.entries(staffToday)
+    .map(([name, count]) => `${name}: ${count}`)
+    .join("<br>");
+
+  document.getElementById("staffToday").innerHTML = `<strong>حسب الموظف:</strong><br>${staffList}`;
+  document.getElementById("timingToday").innerHTML = `<strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}`;
+}      
 
 function filterTable() {
   const name = document.getElementById("filter-name").value.toLowerCase();
