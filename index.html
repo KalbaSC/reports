@@ -590,7 +590,13 @@ function formatLocalTime(timestamp) {
 }
       data.forEach(entry => {
         const row = document.createElement("tr");
-        row.innerHTML = `<td>${formatLocalTime(entry["Timestamp"])}</td><td>${entry["Child Name"] || ""} ${entry["Parent"] || ""}</td><td>${entry["ID"]}</td><td>${entry["Scanned By"]}</td><td>${entry["Activity"] || entry["General"]}</td>`;
+  row.innerHTML = `
+  <td>${entry["Timestamp"] || ""}</td>
+  <td>${entry["Child Name"] || ""}${entry["Parent"] ? " " + entry["Parent"] : ""}</td>
+  <td>${entry["ID"]}</td>
+  <td>${entry["Scanned By"]}</td>
+  <td>${entry["General"] || "" || entry["Activity"] || ""}</td>
+`;
         tbody.appendChild(row);
       });
   document.getElementById("summary").textContent = `إجمالي الحضور: ${data.length}`;
