@@ -572,13 +572,19 @@ footer p {
       document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
       document.querySelector(`.filter-btn[onclick="filterData('${type}')"]`).classList.add("active");
     }
+     
+function formatLocalTime(timestamp) {
+  if (!timestamp) return "";
+  const date = new Date(timestamp);
+  return date.toLocaleString("ar-EG", { timeZone: "Asia/Dubai", hour12: true });
+}
 
     function renderGeneralTable(data) {
       const tbody = document.querySelector("#attendanceTable tbody");
       tbody.innerHTML = "";
       data.forEach(entry => {
         const row = document.createElement("tr");
-        row.innerHTML = `<td>${entry["Timestamp"] || ""}</td><td>${entry["Child Name"] || ""} - ${entry["Parent"] || ""}</td><td>${entry["ID"]}</td><td>${entry["Scanned By"]}</td><td>${entry["Activity"] || entry["General"]}</td>`;
+        row.innerHTML = `<td>${formatLocalTime(entry["Timestamp"])}</td><td>${entry["Child Name"] || ""} - ${entry["Parent"] || ""}</td><td>${entry["ID"]}</td><td>${entry["Scanned By"]}</td><td>${entry["Activity"] || entry["General"]}</td>`;
         tbody.appendChild(row);
       });
     }
