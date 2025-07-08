@@ -570,8 +570,15 @@ async function fetchData() {
       if (firstActivity) uniqueFirstScan.push(firstActivity);
     }
   });
-
-  filteredData = [...uniqueFirstScan];
+  
+// Post-process to ensure no duplicates
+const seenIDs = new Set();
+filteredData = uniqueFirstScan.filter(entry => {
+  if (seenIDs.has(entry.ID)) return false;
+  seenIDs.add(entry.ID);
+  return true;
+});
+  
   renderGeneralTable(filteredData);
 }
 
