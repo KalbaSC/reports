@@ -576,7 +576,6 @@ idMap.forEach(entries => {
     if (firstActivity) uniqueFirstScan.push(firstActivity);
   }
 });
-  
 // Post-process to ensure no duplicates
 const seenIDs = new Set();
 filteredData = uniqueFirstScan.filter(entry => {
@@ -584,7 +583,7 @@ filteredData = uniqueFirstScan.filter(entry => {
   seenIDs.add(entry.ID);
   return true;
 });
-  
+
 renderGeneralTable(filteredData);
 }
 
