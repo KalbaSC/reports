@@ -435,12 +435,13 @@ footer p {
       <a onclick="filterData('month')">هذا الشهر</a>
     </div>
   </div>
-  <button onclick="showStats()">الإحصائيات</button>
-  <button onclick="showActivities()">الأنشطة</button>
+<button onclick="showView('general')">العام</button>
+<button onclick="showView('stats')">الإحصائيات</button>
+<button onclick="showView('activity')">الأنشطة</button>
 </nav>
 
 
-<div class="container" id="mainView">
+<div class="container" id="generalView">
   <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
     حضور صيف الشارقة الرياضي - عطلتنا غير
   </div>
@@ -504,7 +505,24 @@ footer p {
 
 </div>
 
-
+<div class="container" id="activityView" style="display: none;">
+  <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
+    الحضور حسب الأنشطة
+  </div>
+  <table id="activityTable">
+    <thead>
+      <tr>
+        <th>الوقت</th>
+        <th>الاسم وولي الأمر</th>
+        <th>المعرف</th>
+        <th>الموظف</th>
+        <th>النشاط</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+  
   <div class="container" id="statsView" style="display: none;">
     <h2 style="color:#f4e733; text-align:center">إحصائيات الحضور</h2>
     <canvas id="pieStaff" height="200"></canvas>
@@ -513,6 +531,22 @@ footer p {
   </div>
 
   <script>
+    function showView(view) {
+  document.getElementById("generalView").style.display = "none";
+  document.getElementById("statsView").style.display = "none";
+  document.getElementById("activityView").style.display = "none";
+
+  if (view === 'general') {
+    document.getElementById("generalView").style.display = "block";
+    filterData('day');
+  } else if (view === 'stats') {
+    document.getElementById("statsView").style.display = "block";
+    showStats();
+  } else if (view === 'activity') {
+    document.getElementById("activityView").style.display = "block";
+    renderActivityTable();
+  }
+}
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
     let allData = [], chart;
     let pieStaffChart = null, earlyLateChart = null;
@@ -629,106 +663,36 @@ function showActivities() {
   renderTable(filtered);
 }
     
-    function showStats() {
-      if (pieStaffChart) pieStaffChart.destroy();
-      if (earlyLateChart) earlyLateChart.destroy();
+function showStats() {
+  showView('stats');
+}
 
-      document.getElementById("mainView").style.display = "none";
-      document.getElementById("statsView").style.display = "block";
-
-        let dataToUse = allData;
-  const selectedDate = document.getElementById("datePicker").value;
-  if (selectedDate) {
-    dataToUse = allData.filter(row => row["Timestamp"].split("T")[0] === selectedDate);
-  }
-      const staffCounts = {}, early = { early: 0, late: 0 };
-
-      allData.forEach(row => {
-        const name = row["Scanned By"] || "غير معروف";
-        staffCounts[name] = (staffCounts[name] || 0) + 1;
-        const hour = new Date(row["Timestamp"]).getHours();
-        const min = new Date(row["Timestamp"]).getMinutes();
-        const time = hour * 60 + min;
-        if (time < (17 * 60 + 11)) early.early++;
-        else early.late++;
-      });
-      
-    pieStaffChart = new Chart(document.getElementById("pieStaff").getContext("2d"), {
-      type: 'pie',
-      data: {
-      labels: Object.keys(staffCounts),
-      datasets: [{
-      data: Object.values(staffCounts),
-      backgroundColor: ['#f4e733', '#ffbb00', '#ffaa00', '#ccaa00', '#999900']
-         }]
-       }
-    });
-
-     earlyLateChart = new Chart(document.getElementById("earlyLate").getContext("2d"), {
-          type: 'bar',
-          data: {
-          labels: ['حضور بالوقت', 'حضور متأخر'],
-          datasets: [{
-          data: [early.early, early.late],
-          backgroundColor: ['#66cc66', '#cc3333']
-       }]
-       },
-     options: {
-        plugins: { legend: { display: false } },
-        scales: { y: { beginAtZero: true } }
-         }
-     });
-
-    }
-
-function renderTable(data) {
-  const tbody = document.querySelector("#attendanceTable tbody");
+function renderActivityTable() {
+  const tbody = document.querySelector("#activityTable tbody");
   tbody.innerHTML = "";
-  const perDay = {};
 
-  data.forEach(row => {
+  const seen = new Set();
+  const filtered = allData.filter(row => {
+    const d = new Date(row["Timestamp"]);
+    const key = `${row["ID"]}_${d.toDateString()}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+
+    return row["Activity"] && row["Activity"].trim() !== "";
+  });
+
+  filtered.forEach(row => {
     const tr = document.createElement("tr");
     tr.innerHTML = `
       <td>${new Date(row["Timestamp"]).toLocaleString('ar-EG')}</td>
       <td>${row["Child Name"]} ${row["Parent"]}</td>
       <td>${row["ID"]}</td>
       <td>${row["Scanned By"]}</td>
-     <td>${row["Activity"] && row["Activity"].trim() !== "" ? row["Activity"] : ""}</td>
+      <td>${row["Activity"]}</td>
     `;
     tbody.appendChild(tr);
-
-    const day = new Date(row["Timestamp"]).toLocaleDateString('ar-EG');
-    perDay[day] = (perDay[day] || 0) + 1;
   });
-
-  document.getElementById("summary").innerText = `إجمالي الحضور: ${data.length}`;
-  document.getElementById("filteredSummary").innerText = "";
-  updateChart(perDay);
-
-  const staffToday = {};
-  let early = 0, late = 0;
-
-  data.forEach(row => {
-    const name = row["Scanned By"] || "غير معروف";
-    staffToday[name] = (staffToday[name] || 0) + 1;
-
-    const time = new Date(row["Timestamp"]);
-    const hours = time.getHours();
-    const minutes = time.getMinutes();
-    const totalMinutes = hours * 60 + minutes;
-
-    //  قبل 17:11
-    if (totalMinutes < (17 * 60 + 11)) early++;
-    else late++;
-  });
-
-  const staffList = Object.entries(staffToday)
-    .map(([name, count]) => `${name}: ${count}`)
-    .join("<br>");
-
-  document.getElementById("staffToday").innerHTML = `<strong>حسب الموظف:</strong><br>${staffList}`;
-  document.getElementById("timingToday").innerHTML = `<strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}`;
-}      
+}
 
 function filterTable() {
   const name = document.getElementById("filter-name").value.toLowerCase();
