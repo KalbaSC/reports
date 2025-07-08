@@ -577,11 +577,13 @@ function showView(view) {
 }
 
 function setActiveNav(type) {
-  const links = document.querySelectorAll(".dropdown-content a");
-  links.forEach(link => link.classList.remove("active"));
+  const filterButtons = document.querySelectorAll("#dateFilters .filter-btn");
+  filterButtons.forEach(btn => btn.classList.remove("active"));
 
   const map = { day: 0, week: 1, month: 2 };
-  if (map[type] !== undefined) links[map[type]].classList.add("active");
+  if (map[type] !== undefined && filterButtons[map[type]]) {
+    filterButtons[map[type]].classList.add("active");
+  }
 }
 
  document.querySelectorAll(".dropdown-content a").forEach(link => {
@@ -616,8 +618,6 @@ async function fetchData() {
 }
 
 function filterData(type) {
-  console.log("filterData called with:", type);
-  console.log("filterData called with:", type);
   setActiveNav(type);
   document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
   if (type === 'day') document.querySelector('.filter-btn:nth-child(1)').classList.add('active');
