@@ -582,11 +582,20 @@ function formatLocalTime(timestamp) {
     function renderGeneralTable(data) {
       const tbody = document.querySelector("#attendanceTable tbody");
       tbody.innerHTML = "";
+      
+  if (data.length === 0) {
+  const row = document.createElement("tr");
+  row.innerHTML = `<td colspan="5" style="color:#f4e733">لا يوجد حضور</td>`;
+  tbody.appendChild(row);
+}
       data.forEach(entry => {
         const row = document.createElement("tr");
-        row.innerHTML = `<td>${formatLocalTime(entry["Timestamp"])}</td><td>${entry["Child Name"] || ""} - ${entry["Parent"] || ""}</td><td>${entry["ID"]}</td><td>${entry["Scanned By"]}</td><td>${entry["Activity"] || entry["General"]}</td>`;
+        row.innerHTML = `<td>${formatLocalTime(entry["Timestamp"])}</td><td>${entry["Child Name"] || ""} ${entry["Parent"] || ""}</td><td>${entry["ID"]}</td><td>${entry["Scanned By"]}</td><td>${entry["Activity"] || entry["General"]}</td>`;
         tbody.appendChild(row);
       });
+  document.getElementById("summary").textContent = `إجمالي الحضور: ${data.length}`;
+  document.getElementById("todayStats").style.display = data.length ? "block" : "none";
+  document.getElementById("loading").style.display = "none";
     }
 
     function filterTable() {
