@@ -560,16 +560,22 @@ async function fetchData() {
 
   // Process logic for unique attendance per ID
   const uniqueFirstScan = [];
-  idMap.forEach(entries => {
-    const generalEntry = entries.find(e => (e.General || '').includes('✔️'));
-    if (generalEntry) {
-      uniqueFirstScan.push(generalEntry);
-    } else {
-      // no general? fallback to first activity
-      const firstActivity = entries.find(e => e.Activity && e.Activity.trim() !== '');
-      if (firstActivity) uniqueFirstScan.push(firstActivity);
-    }
-  });
+  
+idMap.forEach(entries => {
+  // Sort entries by timestamp
+  entries.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+
+  // Find first general entry
+  const firstGeneral = entries.find(e => (e.General || '').includes('✔️'));
+
+  if (firstGeneral) {
+    uniqueFirstScan.push(firstGeneral);
+  } else {
+    // Fallback to first activity entry
+    const firstActivity = entries.find(e => e.Activity && e.Activity.trim() !== '');
+    if (firstActivity) uniqueFirstScan.push(firstActivity);
+  }
+});
   
 // Post-process to ensure no duplicates
 const seenIDs = new Set();
