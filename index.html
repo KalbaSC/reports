@@ -633,6 +633,22 @@ footer p {
         }
       });
     }
+     
+function filterByDate() {
+  const selectedDate = document.getElementById("datePicker").value;
+  if (!selectedDate) return;
+
+  const dateOnly = new Date(selectedDate).toISOString().split("T")[0];
+
+  const results = allData.filter(row => {
+    const rowDate = new Date(row.Timestamp).toISOString().split("T")[0];
+    return rowDate === dateOnly;
+  });
+
+  filteredData = results;
+  renderGeneralTable(filteredData);
+  document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+}
 
 window.onload = () => fetchData().then(() => {
   filterData('day');
