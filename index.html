@@ -416,9 +416,9 @@ footer p {
 <body>
   <header class="header-container">
   <div class="header-right">
-    <img src="Picture3.png" alt="شعار الشارقة" class="logo">
+    <img src="Picture3.png" alt="شعار مجلس الشارقة الرياضي" class="logo">
     <div class="divider"></div>
-    <img src="logo.png" alt="شعار نادي كلباء" class="logo">
+    <img src="logo.png" alt="شعار نادي كلباء الرياضي الثقافي" class="logo">
     <div class="header-info">
       <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
       <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
@@ -494,6 +494,8 @@ footer p {
       <tbody></tbody>
     </table>
   
+  <div id="loading" style="text-align:center;color:#f4e733;">جاري التحميل...</div>
+
   <div id="todayStats" style="background:#222; padding:20px; border-radius:10px; margin-top:20px; color:#f4e733">
   <h3 style="margin-bottom:15px;">إحصاءات اليوم:</h3>
   <div id="staffToday"></div>
@@ -543,6 +545,12 @@ function populateDropdowns() {
   });
 }
     async function fetchData() {
+      
+    document.getElementById("loading").style.display = "block";
+    const res = await fetch(scriptURL);
+    allData = await res.json();
+    document.getElementById("loading").style.display = "none";
+      
       const res = await fetch(scriptURL);
       allData = await res.json();
 
@@ -559,9 +567,9 @@ function populateDropdowns() {
   if (map[type] !== undefined) buttons[map[type]].classList.add("active");
 }
     
-function isAllowedWeekDay(dateStr) {
-  const day = date.getDay(); 
-  return (day >= 1 && day <= 3); 
+function isAllowedWeekDay(date) {
+  const day = date.getDay();
+  return (day >= 1 && day <= 3); // الإثنين - الأربعاء
 }
     
 function filterData(type) {
@@ -734,11 +742,14 @@ function filterTable() {
 }
 
 function clearFilters() {
-  document.getElementById("searchName").value = "";
-  document.getElementById("searchGame").value = "";
-  document.getElementById("searchActivity").value = "";
-  filterTable(); 
+  document.getElementById("filter-name").value = "";
+  document.getElementById("filter-id").value = "";
+  document.getElementById("filter-staff").value = "";
+  document.getElementById("filter-activity").value = "";
+  document.getElementById("datePicker").value = "";
+  filterTable();
 }
+    
     function exportToExcel() {
       const wb = XLSX.utils.table_to_book(document.getElementById("attendanceTable"));
       XLSX.writeFile(wb, "attendance.xlsx");
