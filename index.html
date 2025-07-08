@@ -585,7 +585,8 @@ filteredData = uniqueFirstScan.filter(entry => {
   return true;
 });
   
-  renderGeneralTable(filteredData);
+filteredData = uniqueFirstScan;
+renderGeneralTable(filteredData);
 }
 
     function showView(view) {
