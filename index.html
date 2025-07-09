@@ -6,6 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#000000">
+  <link rel="icon" href="data:,">
   <title>لوحة حضور المخيم الصيفي - نادي كلباء</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -240,6 +241,11 @@
       border-radius: 10px;
       border: 1px solid #f4e733;
     }
+    #loading {
+      display: none;
+      text-align: center;
+      padding: 20px;
+    }
     @media (max-width: 768px) {
       .header-right {
         padding: 10px;
@@ -298,6 +304,11 @@
   </style>
 </head>
 <body>
+  <div id="loading">
+    <i class="fas fa-spinner fa-spin" style="font-size: 24px; color: #f4e733;"></i>
+    <p>جاري تحميل البيانات...</p>
+  </div>
+
   <header class="header-container">
     <div class="header-right">
       <img src="Picture3.png" alt="شعار الشارقة" class="logo">
@@ -437,38 +448,14 @@
       return date.toLocaleString('ar-EG', options);
     }
 
-    // Initialize the page
-    async function initialize() {
-      await fetchData();
-      setupEventListeners();
-    }
-
-    // Fetch data from Google Sheets
-    async function fetchData() {
-      try {
-        const res = await fetch(scriptURL);
-        const rawData = await res.json();
-        
-        // Process and deduplicate data
-        allData = processRawData(rawData);
-        filteredData = [...allData];
-        
-        // Update UI
-        updateSummary();
-        renderMainTable();
-        populateDropdowns();
-        updateTodayStats();
-      } catch (error) {
-        console.error("Error loading data:", error);
-        alert("حدث خطأ أثناء تحميل البيانات. يرجى المحاولة لاحقًا");
-      }
-    }
-
     // Process and deduplicate raw data
     function processRawData(rawData) {
+      if (!Array.isArray(rawData)) return [];
+      
       const uniqueEntries = new Map();
       
       rawData.forEach(item => {
+        if (!item || typeof item !== 'object') return;
         if (!item.ID || !item.Timestamp) return;
         
         const date = new Date(item.Timestamp).toISOString().split('T')[0];
@@ -485,6 +472,39 @@
       });
       
       return Array.from(uniqueEntries.values());
+    }
+
+    // Update today's statistics
+    function updateTodayStats(data = filteredData) {
+      const today = new Date().toDateString();
+      const todayData = data.filter(row => 
+        new Date(row.Timestamp).toDateString() === today
+      );
+
+      const staffToday = {};
+      let early = 0, late = 0;
+      
+      todayData.forEach(row => {
+        const name = row["Scanned By"] || "غير معروف";
+        staffToday[name] = (staffToday[name] || 0) + 1;
+
+        const time = new Date(row.Timestamp);
+        const totalMinutes = time.getHours() * 60 + time.getMinutes();
+        (totalMinutes < (17 * 60 + 11)) ? early++ : late++;
+      });
+
+      const staffList = Object.entries(staffToday)
+        .map(([name, count]) => `${name}: ${count}`)
+        .join("<br>");
+
+      const todayStatsElement = document.getElementById("todayStats");
+      if (todayStatsElement) {
+        todayStatsElement.innerHTML = `
+          <p><strong>حسب الموظف:</strong><br>${staffList || "لا يوجد بيانات"}</p>
+          <p><strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}</p>
+          <p><strong>إجمالي اليوم:</strong> ${todayData.length}</p>
+        `;
+      }
     }
 
     // Populate filter dropdowns
@@ -510,6 +530,36 @@
         opt.textContent = value;
         select.appendChild(opt);
       });
+    }
+
+    // Fetch data from Google Sheets
+    async function fetchData() {
+      try {
+        document.getElementById("loading").style.display = "block";
+        const res = await fetch(scriptURL);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        
+        const rawData = await res.json();
+        if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
+        
+        // Process and deduplicate data
+        allData = processRawData(rawData);
+        filteredData = [...allData];
+        
+        // Update UI
+        updateSummary();
+        renderMainTable();
+        populateDropdowns();
+        updateTodayStats();
+        
+        console.log("Data loaded successfully:", allData.length, "records");
+      } catch (error) {
+        console.error("Error loading data:", error);
+        alert("حدث خطأ أثناء تحميل البيانات. يرجى المحاولة لاحقًا");
+        document.getElementById("summary").textContent = "حدث خطأ في تحميل البيانات";
+      } finally {
+        document.getElementById("loading").style.display = "none";
+      }
     }
 
     // View management functions
@@ -626,6 +676,7 @@
     function updateFilteredView() {
       renderMainTable();
       updateSummary();
+      updateTodayStats();
       
       if (document.getElementById("activityView").style.display !== "none") {
         renderActivityTable();
@@ -842,12 +893,16 @@
       }));
     }
 
-    // Event listeners
+    // Initialize the page
+    function initialize() {
+      setupEventListeners();
+      fetchData();
+    }
+
     function setupEventListeners() {
       document.getElementById("datePicker").value = new Date().toISOString().split("T")[0];
     }
 
-    // Initialize the page
     window.onload = initialize;
   </script>
   <footer>
