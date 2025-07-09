@@ -2,16 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-    <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#000000">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#000000">
   <title>لوحة حضور المخيم الصيفي - نادي كلباء</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
   <style>
@@ -27,44 +25,43 @@
       margin: 0;
       padding: 0;
     }
-.header-container {
-  width: 100%;
-  background: #111;
-  border-bottom: 2px solid #f4e733;
-}
-.header-right {
-  width: 100%;
-  max-width: 1170px;
-  margin: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 20px;
-  padding: 20px 42px;
-  background-color: #111;
-  color: white;
-  box-sizing: border-box;
-}
-.header-right img.logo {
-  height: 70px;
-}
-.divider {
-  width: 1.5px;
-  height: 65px;
-  background-color: #f4e733;
-}
-.header-info {
-  text-align: center;
-}
-.arabic-name {
-  font-weight: bold;
-  font-size: 20px;
+    .header-container {
+      width: 100%;
+      background: #111;
+      border-bottom: 2px solid #f4e733;
+    }
+    .header-right {
+      width: 100%;
+      max-width: 1170px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px 42px;
+      background-color: #111;
+      color: white;
+      box-sizing: border-box;
+    }
+    .header-right img.logo {
+      height: 70px;
+    }
+    .divider {
+      width: 1.5px;
+      height: 65px;
+      background-color: #f4e733;
+    }
+    .header-info {
+      text-align: center;
+    }
+    .arabic-name {
       font-weight: bold;
-}
-.english-name {
-  font-size: 14px;
-  color: #f4e733;
-}
+      font-size: 20px;
+    }
+    .english-name {
+      font-size: 14px;
+      color: #f4e733;
+    }
     .container {
       display: grid;
       grid-template-columns: 1fr;
@@ -85,59 +82,37 @@
       padding: 15px;
       border-radius: 10px;
     }
-    .controls input {
-      padding: 10px;
-      border-radius: 5px;
-      margin: 5px;
-    }
- .summary-box {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-  color: #f4e733;
-  font-weight: bold;
-}    
-.filter-bar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.search-group {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-  flex: 1;
-}
-
-.search-group select,
-.search-group input,
-.search-group button.clear-btn {
-  height: 40px;
-  padding: 8px 12px;
-  font-size: 15px;
-  border-radius: 6px;
-  border: none;
-  box-sizing: border-box;
-  flex: 1;
-  min-width: 140px;
-}
-.export-buttons {
-  display: flex;
-  flex-direction: row;
-  gap: 10px;
-}
-    .controls .summary-box {
+    .filter-bar {
       display: flex;
+      flex-wrap: wrap;
       gap: 15px;
       align-items: center;
-      color: #f4e733;
-      font-weight: bold;
-      margin: 5px;
+      justify-content: space-between;
+      width: 100%;
+    }
+    .search-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+    }
+    .search-group select,
+    .search-group input,
+    .search-group button.clear-btn {
+      height: 40px;
+      padding: 8px 12px;
+      font-size: 15px;
+      border-radius: 6px;
+      border: none;
+      box-sizing: border-box;
+      flex: 1;
+      min-width: 140px;
+    }
+    .export-buttons {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
     }
     button.export {
       background: #f4e733;
@@ -147,6 +122,7 @@
       margin: 5px;
       font-weight: bold;
       cursor: pointer;
+      color: black;
     }
     table {
       width: 100%;
@@ -162,76 +138,77 @@
       background-color: #333;
       color: #f4e733;
     }
-nav {
-  display: flex;
-  justify-content: center; 
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-  width: 100%;
-  background-color: #111;
-  border-bottom: 3px solid #f4e733;
-  border-top: 1px solid #f4e733;
-}
-nav button,
-.dropdown > button {
-  font-size: 19px;
-  padding: 13px 25px;
-  margin: 0 15px;    
-  border-radius: 8px;
-  background-color: #111;
-  color: #f4e733;
-  border: none;
-  text-align: center;     
-  min-width: 100px;     
-}
+    nav {
+      display: flex;
+      justify-content: center; 
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      width: 100%;
+      background-color: #111;
+      border-bottom: 3px solid #f4e733;
+      border-top: 1px solid #f4e733;
+    }
+    nav button,
+    .dropdown > button {
+      font-size: 19px;
+      padding: 13px 25px;
+      margin: 0 15px;    
+      border-radius: 8px;
+      background-color: #111;
+      color: #f4e733;
+      border: none;
+      text-align: center;     
+      min-width: 100px;     
+      cursor: pointer;
+    }
     .dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #222;
-  min-width: 120px;
-  z-index: 1;
-  border: 1px solid #f4e733;
-}
-
-.dropdown-content a {
-  color: #f4e733;
-  padding: 10px 14px;
-  display: block;
-  text-align: right;
-  cursor: pointer;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-nav button.active {
-  background-color: #f4e733;
-  color: black !important;
-}
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #222;
+      min-width: 120px;
+      z-index: 1;
+      border: 1px solid #f4e733;
+    }
+    .dropdown-content a {
+      color: #f4e733;
+      padding: 10px 14px;
+      display: block;
+      text-align: right;
+      cursor: pointer;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+    nav button.active {
+      background-color: #f4e733;
+      color: black !important;
+    }
     .download-icon {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  background: black;
-  clip-path: polygon(50% 0%, 100% 50%, 75% 50%, 75% 100%, 25% 100%, 25% 50%, 0% 50%);
-  margin-left: 5px;
-  vertical-align: middle;
-}
+      display: inline-block;
+      width: 18px;
+      height: 18px;
+      background: black;
+      clip-path: polygon(50% 0%, 100% 50%, 75% 50%, 75% 100%, 25% 100%, 25% 50%, 0% 50%);
+      margin-left: 5px;
+      vertical-align: middle;
+    }
     .hidden {
-  display: none;
-}
+      display: none;
+    }
     .activity-group {
       background-color: #333;
       color: #f4e733;
       font-weight: bold;
     }
-           footer {
+    .general-attendance {
+      background-color: rgba(76, 175, 80, 0.2);
+    }
+    footer {
       background-color: #111;
       color: white;
       text-align: center;
@@ -239,223 +216,178 @@ nav button.active {
       border-top: 3px solid #f4e733;
       font-size: 14px;
     }
-
     .social-icons a {
       color: white;
       margin: 0 8px;
       font-size: 20px;
     }
     #datePicker {
-  background: white;
-  color: black;
-  border: none;
-  padding: 10px;
-  border-radius: 5px;
-}
+      background: white;
+      color: black;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .stats-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin-top: 20px;
+    }
+    .stat-card {
+      background: #222;
+      padding: 15px;
+      border-radius: 10px;
+      border: 1px solid #f4e733;
+    }
     @media (max-width: 768px) {
- .header-right {
-    padding: 10px 10px;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-    gap: 10px;
-  }
-
-  .header-info {
-    display: block;
-    text-align: center;
-  }
-
-  .header-info .arabic-name {
-    font-size: 16px;
-  }
-
-  .header-info .english-name {
-    font-size: 12px;
-  }
-
-  .header-right .divider {
-    height: 45px;
-    width: 1.5px;
-    background-color: #f4e733;
-  }
-
-  img.logo {
-    height: 50px !important;
-    max-height: 50px !important;
-  }
-  nav {
-    justify-content: center;
-    margin: 0 auto;
-    width: 100%;
-    max-width: 100%;
-  }
-
-  nav button, .dropdown > button {
-    flex: 1;
-    text-align: center;
-  }
-
-  .container {
-    padding: 12px;
-    margin: 10px auto;
-    width: 95%;
-  }
-
-  .title {
-    font-size: 18px;
-    margin-top: 15px;
-    margin-bottom: 17px;
-    line-height: 1.4;
-  }
-
-  .filter-bar {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-  }
-
-  .search-group {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 10px;
-    width: 100%;
-  }
-
-  .search-group select,
-  .search-group input,
-  .search-group button.clear-btn,
-  #datePicker {
-    width: 100%;
-    padding: 10px;
-    font-size: 15px;
-    border-radius: 6px;
-    box-sizing: border-box;
-  }
-
-  .export-buttons {
-    flex-direction: row;
-    justify-content: center;
-    gap: 15px;
-    margin-top: 10px;
-  }
-
-  .summary-box {
-    text-align: center;
-    font-size: 14px;
-  }
-      
-table {
-  display: block;
-  overflow-x: auto;
-  font-size: 13px;
-  width: 100%;
-}
-  th, td {
-    padding: 6px;
-  }
-
-  canvas {
-    width: 100% !important;
-    height: auto !important;
-  }
-      .hidden {
-  display: none;
-}
-  footer {
-  text-align: center;
-  padding: 15px 10px;
-}
-
-footer p {
-  margin-bottom: 10px;
-  font-size: 13px;
-}
-  .social-icons {
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .social-icons a {
-    font-size: 18px;
-    padding: 8px;
-  }
-}
+      .header-right {
+        padding: 10px;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        gap: 10px;
+      }
+      .header-info .arabic-name {
+        font-size: 16px;
+      }
+      .header-info .english-name {
+        font-size: 12px;
+      }
+      .header-right .divider {
+        height: 45px;
+      }
+      img.logo {
+        height: 50px !important;
+      }
+      nav {
+        justify-content: center;
+      }
+      nav button, .dropdown > button {
+        flex: 1;
+        font-size: 16px;
+        padding: 10px 15px;
+      }
+      .container {
+        padding: 12px;
+        margin: 10px auto;
+        width: 95%;
+      }
+      .filter-bar {
+        flex-direction: column;
+      }
+      .search-group {
+        flex-direction: column;
+      }
+      .search-group select,
+      .search-group input,
+      .search-group button.clear-btn,
+      #datePicker {
+        width: 100%;
+      }
+      table {
+        font-size: 13px;
+      }
+      th, td {
+        padding: 6px;
+      }
+      .stats-container {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 <body>
   <header class="header-container">
-  <div class="header-right">
-    <img src="Picture3.png" alt="شعار الشارقة" class="logo">
-    <div class="divider"></div>
-    <img src="logo.png" alt="شعار نادي كلباء" class="logo">
-    <div class="header-info">
-      <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
-      <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
+    <div class="header-right">
+      <img src="Picture3.png" alt="شعار الشارقة" class="logo">
+      <div class="divider"></div>
+      <img src="logo.png" alt="شعار نادي كلباء" class="logo">
+      <div class="header-info">
+        <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
+        <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
+      </div>
     </div>
-  </div>
-</header>
+  </header>
 
-<nav>
-  <div class="dropdown">
-    <button>العام ▼</button>
-    <div class="dropdown-content">
-      <a onclick="filterData('day')">اليوم</a>
-      <a onclick="filterData('week')">هذا الأسبوع</a>
-      <a onclick="filterData('month')">هذا الشهر</a>
+  <nav>
+    <button onclick="showMainView()" class="active">الحضور اليومي</button>
+    <button onclick="showActivitiesView()">الحضور حسب الأنشطة</button>
+    <button onclick="showStatsView()">الإحصائيات</button>
+    <div class="dropdown">
+      <button>الفترات الزمنية ▼</button>
+      <div class="dropdown-content">
+        <a onclick="filterByPeriod('today')">اليوم</a>
+        <a onclick="filterByPeriod('week')">هذا الأسبوع</a>
+        <a onclick="filterByPeriod('month')">هذا الشهر</a>
+        <a onclick="filterByPeriod('all')">الكل</a>
+      </div>
     </div>
-  </div>
-  <button onclick="showStats()">الإحصائيات</button>
-  <button onclick="showActivities()">الأنشطة</button>
-</nav>
+  </nav>
 
-
-<div class="container" id="mainView">
-  <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
-    حضور صيف الشارقة الرياضي - عطلتنا غير
-  </div>
-
-  <div class="controls">
-
-<div class="filter-bar">
-  <div class="search-group">
-    <select onchange="showFilterOptions(this.value)">
-      <option value="">🔍 بحث حسب...</option>
-      <option value="name">الاسم</option>
-      <option value="id">المعرّف</option>
-      <option value="staff">الموظف</option>
-      <option value="activity">النشاط</option>
-    </select>
-
-    <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." onkeyup="filterTable()">
-    <input id="filter-id" class="hidden" placeholder="أدخل المعرف..." onkeyup="filterTable()">
-    <select id="filter-staff" class="hidden" onchange="filterTable()"></select>
-    <select id="filter-activity" class="hidden" onchange="filterTable()"></select>
-
-    <input type="date" id="datePicker" onchange="filterByDate()" />
-    <button onclick="clearFilters()" class="clear-btn">مسح</button>
-  </div>
-
-  <div class="export-buttons">
-    <button class="export" onclick="exportToExcel()">
-      <span class="download-icon"></span> Excel
-    </button>
-    <button class="export" onclick="exportToPDF()">
-      <span class="download-icon"></span> PDF
-    </button>
-  </div>
-</div>
-
-    <div class="summary-box">
-      <span id="summary">إجمالي الحضور: 0</span>
-      <span id="filteredSummary"></span>
+  <div class="container" id="mainView">
+    <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
+      حضور صيف الشارقة الرياضي - عطلتنا غير
     </div>
-  </div>
+
+    <div class="controls">
+      <div class="filter-bar">
+        <div class="search-group">
+          <select id="filterType" onchange="showFilterOptions(this.value)">
+            <option value="">🔍 بحث حسب...</option>
+            <option value="name">الاسم</option>
+            <option value="id">المعرّف</option>
+            <option value="staff">الموظف</option>
+            <option value="activity">النشاط</option>
+          </select>
+
+          <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." onkeyup="filterTable()">
+          <input id="filter-id" class="hidden" placeholder="أدخل المعرف..." onkeyup="filterTable()">
+          <select id="filter-staff" class="hidden" onchange="filterTable()"></select>
+          <select id="filter-activity" class="hidden" onchange="filterTable()"></select>
+
+          <input type="date" id="datePicker" onchange="filterByDate()">
+          <button onclick="clearFilters()" class="clear-btn">مسح الفلاتر</button>
+        </div>
+
+        <div class="export-buttons">
+          <button class="export" onclick="exportToExcel()">
+            <span class="download-icon"></span> Excel
+          </button>
+          <button class="export" onclick="exportToPDF()">
+            <span class="download-icon"></span> PDF
+          </button>
+        </div>
+      </div>
+
+      <div class="summary-box">
+        <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
+        <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
+      </div>
+    </div>
+
     <table id="attendanceTable">
       <thead>
         <tr>
-          <th>الوقت</th>
+          <th>التاريخ والوقت</th>
           <th>الاسم وولي الأمر</th>
+          <th>المعرف</th>
+          <th>الموظف</th>
+          <th>النشاط</th>
+          <th>النوع</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <div class="container" id="activityView" style="display: none;">
+    <h2 style="color:#f4e733; text-align:center">الحضور حسب الأنشطة</h2>
+    <table id="activityTable">
+      <thead>
+        <tr>
+          <th>التاريخ والوقت</th>
+          <th>الاسم</th>
           <th>المعرف</th>
           <th>الموظف</th>
           <th>النشاط</th>
@@ -463,142 +395,283 @@ footer p {
       </thead>
       <tbody></tbody>
     </table>
-
-  <div id="todayStats" style="background:#222; padding:20px; border-radius:10px; margin-top:20px; color:#f4e733">
-  <h3 style="margin-bottom:15px;">إحصاءات اليوم:</h3>
-  <div id="staffToday"></div>
-  <div id="timingToday" style="margin-top:10px;"></div>
-</div>
-
-</div>
-
-<div class="container" id="activityView" style="display: none;">
-  <h2 style="color:#f4e733; text-align:center">الحضور حسب الأنشطة</h2>
-  <table id="activityTable">
-    <thead>
-      <tr>
-        <th>الوقت</th>
-        <th>الاسم</th>
-        <th>المعرف</th>
-        <th>الموظف</th>
-        <th>النشاط</th>
-      </tr>
-    </thead>
-    <tbody></tbody>
-  </table>
-</div>
+  </div>
 
   <div class="container" id="statsView" style="display: none;">
     <h2 style="color:#f4e733; text-align:center">إحصائيات الحضور</h2>
-    <canvas id="pieStaff" height="200"></canvas>
-    <canvas id="earlyLate" height="200"></canvas>
-    <canvas id="attendanceChart" height="200"></canvas>
+    
+    <div class="stats-container">
+      <div class="stat-card">
+        <h3 style="color:#f4e733;">توزيع الحضور حسب الموظفين</h3>
+        <canvas id="pieStaff" height="200"></canvas>
+      </div>
+      <div class="stat-card">
+        <h3 style="color:#f4e733;">حضور بالوقت مقابل متأخر</h3>
+        <canvas id="earlyLate" height="200"></canvas>
+      </div>
+      <div class="stat-card">
+        <h3 style="color:#f4e733;">الحضور حسب الأيام</h3>
+        <canvas id="attendanceChart" height="200"></canvas>
+      </div>
+      <div class="stat-card">
+        <h3 style="color:#f4e733;">إحصائيات اليوم</h3>
+        <div id="todayStats"></div>
+      </div>
+    </div>
   </div>
 
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
-    let allData = [], chart;
+    let allData = [];
+    let filteredData = [];
+    let charts = {};
 
+    // Format date in Arabic locale
     function formatDate(isoString) {
-      return new Date(isoString).toLocaleString('ar-EG', { 
-        timeZone: 'Asia/Dubai',
-        dateStyle: 'short',
-        timeStyle: 'short'
-      });
+      const date = new Date(isoString);
+      const options = {
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit',
+        timeZone: 'Asia/Dubai'
+      };
+      return date.toLocaleString('ar-EG', options);
     }
 
-    function populateDropdowns() {
-      const activities = new Set();
-      const staff = new Set();
-
-      allData.forEach(row => {
-        if (row["Activity"]) activities.add(row["Activity"]);
-        if (row["Scanned By"]) staff.add(row["Scanned By"]);
-      });
-
-      const activitySelect = document.getElementById("filter-activity");
-      activitySelect.innerHTML = '<option value="">اختر النشاط</option>';
-      [...activities].forEach(act => {
-        const opt = document.createElement("option");
-        opt.value = act;
-        opt.textContent = act;
-        activitySelect.appendChild(opt);
-      });
-
-      const staffSelect = document.getElementById("filter-staff");
-      staffSelect.innerHTML = '<option value="">اختر الموظف</option>';
-      [...staff].forEach(stf => {
-        const opt = document.createElement("option");
-        opt.value = stf;
-        opt.textContent = stf;
-        staffSelect.appendChild(opt);
-      });
+    // Initialize the page
+    async function initialize() {
+      await fetchData();
+      setupEventListeners();
     }
 
+    // Fetch data from Google Sheets
     async function fetchData() {
       try {
         const res = await fetch(scriptURL);
         const rawData = await res.json();
         
-        // Deduplicate - keep first entry per ID per day
-        allData = rawData.reduce((unique, item) => {
-          const date = item.Timestamp.split('T')[0]; // Date without time
-          const key = `${item.ID}_${date}`;
-          
-          if (!unique.some(entry => entry.key === key)) {
-            return [...unique, {...item, key}];
-          }
-          return unique;
-        }, []);
+        // Process and deduplicate data
+        allData = processRawData(rawData);
+        filteredData = [...allData];
         
-        document.getElementById("datePicker").value = new Date().toISOString().split("T")[0];
+        // Update UI
+        updateSummary();
+        renderMainTable();
         populateDropdowns();
-        renderGeneralView();
+        updateTodayStats();
       } catch (error) {
         console.error("Error loading data:", error);
         alert("حدث خطأ أثناء تحميل البيانات. يرجى المحاولة لاحقًا");
       }
     }
 
-    function renderGeneralView() {
+    // Process and deduplicate raw data
+    function processRawData(rawData) {
+      const uniqueEntries = new Map();
+      
+      rawData.forEach(item => {
+        if (!item.ID || !item.Timestamp) return;
+        
+        const date = new Date(item.Timestamp).toISOString().split('T')[0];
+        const key = `${item.ID}_${date}`;
+        
+        // Keep first entry per ID per day, prioritizing general attendance
+        if (!uniqueEntries.has(key) || item.General === "✔️ حضر") {
+          uniqueEntries.set(key, {
+            ...item,
+            isGeneral: item.General === "✔️ حضر",
+            dateKey: date
+          });
+        }
+      });
+      
+      return Array.from(uniqueEntries.values());
+    }
+
+    // Populate filter dropdowns
+    function populateDropdowns() {
+      const activities = new Set(['عام']);
+      const staff = new Set();
+
+      allData.forEach(row => {
+        if (row.Activity) activities.add(row.Activity);
+        if (row["Scanned By"]) staff.add(row["Scanned By"]);
+      });
+
+      populateDropdown('filter-activity', activities, 'اختر النشاط');
+      populateDropdown('filter-staff', staff, 'اختر الموظف');
+    }
+
+    function populateDropdown(id, values, defaultText) {
+      const select = document.getElementById(id);
+      select.innerHTML = `<option value="">${defaultText}</option>`;
+      Array.from(values).sort().forEach(value => {
+        const opt = document.createElement("option");
+        opt.value = value;
+        opt.textContent = value;
+        select.appendChild(opt);
+      });
+    }
+
+    // View management functions
+    function showMainView() {
+      setActiveNavButton(0);
+      document.getElementById("mainView").style.display = "block";
+      document.getElementById("activityView").style.display = "none";
+      document.getElementById("statsView").style.display = "none";
+    }
+
+    function showActivitiesView() {
+      setActiveNavButton(1);
+      document.getElementById("mainView").style.display = "none";
+      document.getElementById("activityView").style.display = "block";
+      document.getElementById("statsView").style.display = "none";
+      renderActivityTable();
+    }
+
+    function showStatsView() {
+      setActiveNavButton(2);
+      document.getElementById("mainView").style.display = "none";
+      document.getElementById("activityView").style.display = "none";
+      document.getElementById("statsView").style.display = "block";
+      renderCharts();
+    }
+
+    function setActiveNavButton(index) {
+      document.querySelectorAll('nav button').forEach((btn, i) => {
+        btn.classList.toggle('active', i === index);
+      });
+    }
+
+    // Filter functions
+    function filterByPeriod(period) {
+      const now = new Date();
+      filteredData = allData.filter(row => {
+        const rowDate = new Date(row.Timestamp);
+        
+        switch(period) {
+          case 'today':
+            return rowDate.toDateString() === now.toDateString();
+          case 'week':
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            return rowDate >= startOfWeek;
+          case 'month':
+            return rowDate.getMonth() === now.getMonth() && 
+                   rowDate.getFullYear() === now.getFullYear();
+          default:
+            return true;
+        }
+      });
+      
+      updateFilteredView();
+    }
+
+    function filterByDate() {
+      const selectedDate = document.getElementById("datePicker").value;
+      if (!selectedDate) return;
+      
+      filteredData = allData.filter(row => {
+        return row.dateKey === selectedDate;
+      });
+      
+      updateFilteredView();
+    }
+
+    function filterTable() {
+      const name = document.getElementById("filter-name").value.toLowerCase();
+      const id = document.getElementById("filter-id").value.toLowerCase();
+      const staff = document.getElementById("filter-staff").value;
+      const activity = document.getElementById("filter-activity").value;
+
+      filteredData = allData.filter(row => {
+        const rowName = (row["Child Name"] || "").toLowerCase();
+        const rowId = (row.ID || "").toLowerCase();
+        const rowStaff = row["Scanned By"] || "";
+        const rowActivity = row.isGeneral ? "عام" : (row.Activity || "");
+
+        return (!name || rowName.includes(name)) &&
+               (!id || rowId.includes(id)) &&
+               (!staff || rowStaff === staff) &&
+               (!activity || rowActivity === activity);
+      });
+
+      updateFilteredView();
+    }
+
+    function clearFilters() {
+      document.getElementById("filter-name").value = "";
+      document.getElementById("filter-id").value = "";
+      document.getElementById("filter-staff").value = "";
+      document.getElementById("filter-activity").value = "";
+      document.getElementById("filterType").value = "";
+      document.getElementById("datePicker").value = "";
+      
+      showFilterOptions("");
+      filteredData = [...allData];
+      updateFilteredView();
+    }
+
+    function showFilterOptions(value) {
+      document.getElementById("filter-name").classList.add("hidden");
+      document.getElementById("filter-id").classList.add("hidden");
+      document.getElementById("filter-staff").classList.add("hidden");
+      document.getElementById("filter-activity").classList.add("hidden");
+
+      if (value === "name") document.getElementById("filter-name").classList.remove("hidden");
+      else if (value === "id") document.getElementById("filter-id").classList.remove("hidden");
+      else if (value === "staff") document.getElementById("filter-staff").classList.remove("hidden");
+      else if (value === "activity") document.getElementById("filter-activity").classList.remove("hidden");
+    }
+
+    function updateFilteredView() {
+      renderMainTable();
+      updateSummary();
+      
+      if (document.getElementById("activityView").style.display !== "none") {
+        renderActivityTable();
+      }
+      
+      if (document.getElementById("statsView").style.display !== "none") {
+        renderCharts();
+      }
+    }
+
+    // Rendering functions
+    function renderMainTable() {
       const tbody = document.querySelector("#attendanceTable tbody");
       tbody.innerHTML = "";
       
-      allData
-        .sort((a,b) => new Date(a.Timestamp) - new Date(b.Timestamp))
-        .forEach(entry => {
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${formatDate(entry.Timestamp)}</td>
-            <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
-            <td>${entry.ID || ""}</td>
-            <td>${entry["Scanned By"] || ""}</td>
-            <td>${entry.General ? "عام ✔️" : entry.Activity || ""}</td>
+      filteredData.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp))
+        .forEach(row => {
+          const tr = document.createElement("tr");
+          if (row.isGeneral) tr.classList.add("general-attendance");
+          
+          tr.innerHTML = `
+            <td>${formatDate(row.Timestamp)}</td>
+            <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+            <td>${row.ID || ""}</td>
+            <td>${row["Scanned By"] || ""}</td>
+            <td>${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+            <td>${row.isGeneral ? "عام" : "نشاط"}</td>
           `;
-          tbody.appendChild(row);
+          tbody.appendChild(tr);
         });
-      
-      document.getElementById("summary").textContent = `إجمالي الحضور: ${allData.length}`;
-      updateTodayStats(allData);
     }
 
-    function showActivities() {
-      document.getElementById("mainView").style.display = "none";
-      document.getElementById("statsView").style.display = "none";
-      document.getElementById("activityView").style.display = "block";
-      
+    function renderActivityTable() {
       const tbody = document.querySelector("#activityTable tbody");
       tbody.innerHTML = "";
       
-      // Filter and group activities
+      // Group by activity
       const activities = {};
-      allData.forEach(item => {
-        if (!item.Activity || item.Activity.trim() === "") return;
+      filteredData.forEach(item => {
+        if (item.isGeneral) return;
         
-        if (!activities[item.Activity]) {
-          activities[item.Activity] = [];
+        const activity = item.Activity || "غير محدد";
+        if (!activities[activity]) {
+          activities[activity] = [];
         }
-        activities[item.Activity].push(item);
+        activities[activity].push(item);
       });
 
       // Render grouped
@@ -628,205 +701,113 @@ footer p {
       });
     }
 
-    function setActiveNav(type) {
-      const buttons = document.querySelectorAll("nav a"); 
-      buttons.forEach(btn => btn.classList.remove("active"));
-
-      const map = { day: 0, week: 1, month: 2 };
-      if (map[type] !== undefined) buttons[map[type]].classList.add("active");
+    function renderCharts() {
+      renderStaffChart();
+      renderTimingChart();
+      renderDailyStats();
     }
 
-    function filterData(type) {
-      setActiveNav(type);
-      document.getElementById("mainView").style.display = "block";
-      document.getElementById("statsView").style.display = "none";
-      document.getElementById("activityView").style.display = "none";
+    function renderStaffChart() {
+      const staffCounts = {};
+      filteredData.forEach(row => {
+        const name = row["Scanned By"] || "غير معروف";
+        staffCounts[name] = (staffCounts[name] || 0) + 1;
+      });
 
-      const now = new Date();
-      const seen = new Set(); 
-
-      let filtered = allData.filter(row => {
-        const d = new Date(row["Timestamp"]);
-
-        let dateMatch = false;
-        if (type === 'day') dateMatch = d.toDateString() === now.toDateString();
-        else if (type === 'week') {
-          const start = new Date(now); 
-          start.setDate(now.getDate() - now.getDay());
-          dateMatch = d >= start && d <= now;
+      if (charts.staff) charts.staff.destroy();
+      
+      const ctx = document.getElementById('pieStaff').getContext('2d');
+      charts.staff = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(staffCounts),
+          datasets: [{
+            data: Object.values(staffCounts),
+            backgroundColor: [
+              '#f4e733', '#ffbb00', '#ffaa00', '#ccaa00', '#999900'
+            ]
+          }]
+        },
+        options: {
+          plugins: {
+            legend: {
+              position: 'bottom',
+              rtl: true
+            }
+          }
         }
-        else if (type === 'month') dateMatch = d.getMonth() === now.getMonth();
-        else dateMatch = true;
-
-        if (!dateMatch) return false;
-
-        const key = `${row["ID"]}_${d.toDateString()}`;
-        if (seen.has(key)) return false;
-        seen.add(key);
-        return true;
       });
-
-      renderFilteredTable(filtered);
     }
 
-    function filterByDate() {
-      const selectedDate = document.getElementById("datePicker").value;
-      if (!selectedDate) return;
-
-      const filtered = allData.filter(row => {
-        const rowDate = new Date(row["Timestamp"]).toISOString().split("T")[0];
-        return rowDate === selectedDate;
-      });
-
-      document.getElementById("mainView").style.display = "block";
-      document.getElementById("statsView").style.display = "none";
-      document.getElementById("activityView").style.display = "none";
-      renderFilteredTable(filtered);
-    }
-
-    function renderFilteredTable(data) {
-      const tbody = document.querySelector("#attendanceTable tbody");
-      tbody.innerHTML = "";
-      
-      data.forEach(row => {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>${formatDate(row.Timestamp)}</td>
-          <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-          <td>${row.ID || ""}</td>
-          <td>${row["Scanned By"] || ""}</td>
-          <td>${row.General ? "عام ✔️" : row.Activity || ""}</td>
-        `;
-        tbody.appendChild(tr);
-      });
-      
-      document.getElementById("summary").textContent = `إجمالي الحضور: ${data.length}`;
-      updateTodayStats(data);
-    }
-
-    function updateTodayStats(data) {
-      const staffToday = {};
+    function renderTimingChart() {
       let early = 0, late = 0;
+      filteredData.forEach(row => {
+        const time = new Date(row.Timestamp);
+        const hours = time.getHours();
+        const minutes = time.getMinutes();
+        const totalMinutes = hours * 60 + minutes;
+        (totalMinutes < (17 * 60 + 11)) ? early++ : late++;
+      });
+
+      if (charts.timing) charts.timing.destroy();
       
+      const ctx = document.getElementById('earlyLate').getContext('2d');
+      charts.timing = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['حضور بالوقت', 'حضور متأخر'],
+          datasets: [{
+            data: [early, late],
+            backgroundColor: ['#66cc66', '#cc3333']
+          }]
+        },
+        options: {
+          plugins: { legend: { display: false } },
+          scales: { y: { beginAtZero: true } }
+        }
+      });
+    }
+
+    function renderDailyStats() {
       const today = new Date().toDateString();
-      const todayData = data.filter(row => 
+      const todayData = filteredData.filter(row => 
         new Date(row.Timestamp).toDateString() === today
       );
 
+      const staffToday = {};
+      let early = 0, late = 0;
+      
       todayData.forEach(row => {
         const name = row["Scanned By"] || "غير معروف";
         staffToday[name] = (staffToday[name] || 0) + 1;
 
-        const time = new Date(row["Timestamp"]);
-        const hours = time.getHours();
-        const minutes = time.getMinutes();
-        const totalMinutes = hours * 60 + minutes;
-
-        if (totalMinutes < (17 * 60 + 11)) early++;
-        else late++;
+        const time = new Date(row.Timestamp);
+        const totalMinutes = time.getHours() * 60 + time.getMinutes();
+        (totalMinutes < (17 * 60 + 11)) ? early++ : late++;
       });
 
       const staffList = Object.entries(staffToday)
         .map(([name, count]) => `${name}: ${count}`)
         .join("<br>");
 
-      document.getElementById("staffToday").innerHTML = `
-        <strong>حسب الموظف:</strong><br>${staffList}
+      document.getElementById("todayStats").innerHTML = `
+        <p><strong>حسب الموظف:</strong><br>${staffList || "لا يوجد بيانات"}</p>
+        <p><strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}</p>
+        <p><strong>إجمالي اليوم:</strong> ${todayData.length}</p>
       `;
-      document.getElementById("timingToday").innerHTML = `
-        <strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}
-      `;
     }
 
-    function showStats() {
-      document.getElementById("mainView").style.display = "none";
-      document.getElementById("activityView").style.display = "none";
-      document.getElementById("statsView").style.display = "block";
-      
-      const staffCounts = {}, early = { early: 0, late: 0 };
-
-      allData.forEach(row => {
-        const name = row["Scanned By"] || "غير معروف";
-        staffCounts[name] = (staffCounts[name] || 0) + 1;
-        
-        const hour = new Date(row["Timestamp"]).getHours();
-        const min = new Date(row["Timestamp"]).getMinutes();
-        const time = hour * 60 + min;
-        
-        if (time < (17 * 60 + 11)) early.early++;
-        else early.late++;
-      });
-
-      // Destroy existing charts if they exist
-      if (window.staffChart) window.staffChart.destroy();
-      if (window.timeChart) window.timeChart.destroy();
-
-      // Staff distribution chart
-      window.staffChart = new Chart(
-        document.getElementById("pieStaff").getContext("2d"), {
-          type: 'pie',
-          data: {
-            labels: Object.keys(staffCounts),
-            datasets: [{
-              data: Object.values(staffCounts),
-              backgroundColor: [
-                '#f4e733', '#ffbb00', '#ffaa00', '#ccaa00', '#999900'
-              ]
-            }]
-          }
-        }
-      );
-
-      // Early/Late chart
-      window.timeChart = new Chart(
-        document.getElementById("earlyLate").getContext("2d"), {
-          type: 'bar',
-          data: {
-            labels: ['حضور بالوقت', 'حضور متأخر'],
-            datasets: [{
-              data: [early.early, early.late],
-              backgroundColor: ['#66cc66', '#cc3333']
-            }]
-          },
-          options: {
-            plugins: { legend: { display: false } },
-            scales: { y: { beginAtZero: true } }
-          }
-        }
-      );
+    // Summary functions
+    function updateSummary() {
+      document.getElementById("totalCount").textContent = allData.length;
+      document.getElementById("filteredCount").textContent = filteredData.length;
     }
 
-    function filterTable() {
-      const name = document.getElementById("filter-name").value.toLowerCase();
-      const id = document.getElementById("filter-id").value.toLowerCase();
-      const staff = document.getElementById("filter-staff").value;
-      const activity = document.getElementById("filter-activity").value;
-
-      const filtered = allData.filter(row => {
-        const rowName = (row["Child Name"] || "").toLowerCase();
-        const rowId = (row.ID || "").toLowerCase();
-        const rowStaff = row["Scanned By"] || "";
-        const rowActivity = row.Activity || "";
-
-        return (!name || rowName.includes(name)) &&
-               (!id || rowId.includes(id)) &&
-               (!staff || rowStaff === staff) &&
-               (!activity || rowActivity === activity);
-      });
-
-      renderFilteredTable(filtered);
-    }
-
-    function clearFilters() {
-      document.getElementById("filter-name").value = "";
-      document.getElementById("filter-id").value = "";
-      document.getElementById("filter-staff").value = "";
-      document.getElementById("filter-activity").value = "";
-      renderGeneralView();
-    }
-
+    // Export functions
     function exportToExcel() {
-      const wb = XLSX.utils.table_to_book(document.getElementById("attendanceTable"));
+      const wb = XLSX.utils.book_new();
+      const ws = XLSX.utils.json_to_sheet(prepareExportData());
+      XLSX.utils.book_append_sheet(wb, ws, "الحضور");
       XLSX.writeFile(wb, "attendance.xlsx");
     }
 
@@ -837,8 +818,7 @@ footer p {
 
       html2canvas(table, {
         scale: 2,
-        backgroundColor: "#000000",
-        useCORS: true
+        backgroundColor: "#000000"
       }).then(canvas => {
         const imgData = canvas.toDataURL("image/png");
         const imgWidth = 190;
@@ -850,23 +830,25 @@ footer p {
       });
     }
 
-    function showFilterOptions(value) {
-      document.getElementById("filter-name").classList.add("hidden");
-      document.getElementById("filter-id").classList.add("hidden");
-      document.getElementById("filter-staff").classList.add("hidden");
-      document.getElementById("filter-activity").classList.add("hidden");
-
-      if (value === "name") document.getElementById("filter-name").classList.remove("hidden");
-      else if (value === "id") document.getElementById("filter-id").classList.remove("hidden");
-      else if (value === "staff") document.getElementById("filter-staff").classList.remove("hidden");
-      else if (value === "activity") document.getElementById("filter-activity").classList.remove("hidden");
+    function prepareExportData() {
+      return filteredData.map(row => ({
+        "التاريخ والوقت": formatDate(row.Timestamp),
+        "الاسم": row["Child Name"] || "",
+        "ولي الأمر": row.Parent || "",
+        "المعرف": row.ID || "",
+        "الموظف": row["Scanned By"] || "",
+        "النشاط": row.isGeneral ? "عام" : (row.Activity || ""),
+        "النوع": row.isGeneral ? "عام" : "نشاط"
+      }));
     }
 
-    window.onload = () => {
-      fetchData().then(() => {
-        document.querySelector('nav button').classList.add('active');
-      });
-    };
+    // Event listeners
+    function setupEventListeners() {
+      document.getElementById("datePicker").value = new Date().toISOString().split("T")[0];
+    }
+
+    // Initialize the page
+    window.onload = initialize;
   </script>
   <footer>
     <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
