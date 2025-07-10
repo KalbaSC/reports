@@ -795,7 +795,6 @@ function renderActivityTable() {
   const selectedDate = document.getElementById("datePicker").value || 
                       new Date().toISOString().split('T')[0];
 
-  // Get all records for the selected date
   const dateRecords = allData.filter(row => row.dateKey === selectedDate);
   
   if (dateRecords.length === 0) {
@@ -803,14 +802,12 @@ function renderActivityTable() {
     return;
   }
 
-  // Separate records
   const activityRecords = dateRecords.filter(row => 
     row.Activity && row.Activity.trim() !== "" && !row.isGeneral
   );
   
   const generalRecords = dateRecords.filter(row => row.isGeneral);
 
-  // Get unique player counts
   const allPlayers = new Set(dateRecords.map(r => r.ID));
   const activityPlayers = new Set(activityRecords.map(r => r.ID));
   const generalOnlyPlayers = new Set(
@@ -819,7 +816,6 @@ function renderActivityTable() {
       .map(r => r.ID)
   );
 
-  // Group activities with counts of unique players
   const activities = {};
   activityRecords.forEach(item => {
     const activity = item.Activity || "غير محدد";
@@ -835,14 +831,12 @@ function renderActivityTable() {
     activities[activity].items.push(item);
   });
 
-  // Build activity filter dropdown
   const activityOptions = Object.entries(activities)
     .sort((a, b) => b[1].players.size - a[1].players.size)
     .map(([activity, data]) => 
       `<option value="${activity}">${activity} (${data.players.size})</option>`
     ).join('');
 
-  // Update controls with accurate counts
   controls.innerHTML = `
     <div class="search-group">
       <select id="activityFilter" onchange="filterActivityTable()">
@@ -857,7 +851,6 @@ function renderActivityTable() {
     </div>
   `;
 
-  // Render general-only attendance first
   if (generalOnlyPlayers.size > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "no-activity";
@@ -883,14 +876,12 @@ function renderActivityTable() {
     });
   }
 
-  // Render players with activities
   if (activityPlayers.size > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "general-with-activities";
     headerRow.innerHTML = `<td colspan="5">لاعبون مع أنشطة (${activityPlayers.size} لاعب)</td>`;
     tbody.appendChild(headerRow);
 
-    // Group by player to show each player once with their activities
     const playersWithActivities = {};
     activityRecords.forEach(record => {
       if (!playersWithActivities[record.ID]) {
@@ -901,6 +892,7 @@ function renderActivityTable() {
       }
       playersWithActivities[record.ID].activities.add(record.Activity);
     });
+     }
 
     Object.values(playersWithActivities).forEach(player => {
       const row = document.createElement("tr");
