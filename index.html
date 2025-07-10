@@ -576,43 +576,36 @@
       });
     }
 
-    async function fetchData() {
-      try {
-        document.getElementById("loading").style.display = "block";
-        const res = await fetch(scriptURL);
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        
-        const rawData = await res.json();
-        if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
-        
-        allData = processRawData(rawData);
-        
-        // Set today's date and filter immediately
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById("datePicker").value = today;
-        filteredData = allData.filter(row => row.dateKey === today);
-        
-        // Add empty state if no data
-        const tbody = document.querySelector("#attendanceTable tbody");
-        if (filteredData.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد حضور اليوم</td></tr>`;
-        } else {
-          renderMainTable();
-        }
-        
-        updateSummary();
-        populateDropdowns();
-        updateTodayStats();
-        
-        console.log("Data loaded successfully:", allData.length, "records");
-      } catch (error) {
-        console.error("Error loading data:", error);
-        document.querySelector("#attendanceTable tbody").innerHTML = 
-          `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
-      } finally {
-        document.getElementById("loading").style.display = "none";
-      }
+async function fetchData() {
+  try {
+    const loadingElement = document.getElementById("loading");
+    if (loadingElement) {
+      loadingElement.style.display = "block";
     }
+    
+    const res = await fetch(scriptURL);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    
+    const rawData = await res.json();
+    if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
+    
+    allData = processRawData(rawData);
+    
+    // Rest of your data processing...
+    
+  } catch (error) {
+    console.error("Error loading data:", error);
+    const tbody = document.querySelector("#attendanceTable tbody");
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
+    }
+  } finally {
+    const loadingElement = document.getElementById("loading");
+    if (loadingElement) {
+      loadingElement.style.display = "none";
+    }
+  }
+}
 
     function showMainView() {
       setActiveNavButton(0);
