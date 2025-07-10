@@ -13,7 +13,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
- <style>
+  <style>
     @font-face {
       font-family: 'NotoKufiArabic';
       src: url('NotoKufiArabic.ttf') format('truetype');
@@ -24,17 +24,12 @@
       background-size: cover;
       color: white;
       margin: 0;
-      padding: 120px 0 100px;
-      min-height: 100vh;
-      box-sizing: border-box;
+      padding: 0;
     }
     .header-container {
       width: 100%;
       background: #111;
       border-bottom: 2px solid #f4e733;
-      position: fixed;
-      top: 0;
-      z-index: 100;
     }
     .header-right {
       width: 100%;
@@ -78,8 +73,6 @@
       background: rgba(0, 0, 0, 0.9);
       border-radius: 10px;
       margin-top: 30px;
-      max-height: calc(100vh - 220px);
-      overflow-y: auto;
     }
     .controls {
       display: flex;
@@ -156,9 +149,6 @@
       background-color: #111;
       border-bottom: 3px solid #f4e733;
       border-top: 1px solid #f4e733;
-      position: fixed;
-      top: 84px;
-      z-index: 99;
     }
     nav button,
     .dropdown > button {
@@ -219,9 +209,6 @@
     .general-attendance {
       background-color: rgba(76, 175, 80, 0.2);
     }
-    .no-activity {
-      background-color: rgba(255, 165, 0, 0.2);
-    }
     footer {
       background-color: #111;
       color: white;
@@ -229,9 +216,6 @@
       padding: 20px;
       border-top: 3px solid #f4e733;
       font-size: 14px;
-      position: fixed;
-      bottom: 0;
-      width: 100%;
     }
     .social-icons a {
       color: white;
@@ -262,19 +246,7 @@
       text-align: center;
       padding: 20px;
     }
-    .empty-state {
-      text-align: center;
-      padding: 20px;
-      color: #f4e733;
-      font-size: 18px;
-    }
     @media (max-width: 768px) {
-      body {
-        padding-top: 160px;
-      }
-      nav {
-        top: 120px;
-      }
       .header-right {
         padding: 10px;
         flex-direction: row;
