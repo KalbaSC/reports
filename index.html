@@ -837,10 +837,13 @@
       `;
     }
 
-    function updateSummary() {
-      document.getElementById("totalCount").textContent = allData.length;
-      document.getElementById("filteredCount").textContent = filteredData.length;
-    }
+function updateSummary() {
+  const today = new Date().toISOString().split('T')[0];
+  const todayCount = allData.filter(row => row.dateKey === today).length;
+  
+  document.getElementById("totalCount").textContent = todayCount;
+  document.getElementById("filteredCount").textContent = filteredData.length;
+}
 
     function exportToExcel() {
       const wb = XLSX.utils.book_new();
