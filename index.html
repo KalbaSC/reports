@@ -24,19 +24,14 @@
       background-size: cover;
       color: white;
       margin: 0;
-      display: flex;
-      padding: 120px 0 100px;
       min-height: 100vh;
-      box-sizing: border-box;
+      display: flex;
       flex-direction: column;
     }
     .header-container {
-  position: sticky;
-  top: 0;
-  width: 100%;
-  background: #111;
-  border-bottom: 2px solid #f4e733;
-  z-index: 100;
+      width: 100%;
+      background: #111;
+      border-bottom: 2px solid #f4e733;
     }
     .header-right {
       width: 100%;
@@ -71,17 +66,15 @@
       color: #f4e733;
     }
     .container {
+      flex: 1;
       display: grid;
       grid-template-columns: 1fr;
       gap: 20px;
       max-width: 1200px;
+      margin: 20px auto;
+      padding: 20px;
       background: rgba(0, 0, 0, 0.9);
       border-radius: 10px;
-      max-height: calc(100vh - 220px);
-      overflow-y: auto;
-  flex: 1;
-  margin: 20px auto;
-  padding: 20px;
     }
     .controls {
       display: flex;
@@ -149,13 +142,10 @@
       color: #f4e733;
     }
     nav {
-  position: sticky;
-  top: 84px; 
-  width: 100%;
-  background-color: #111;
-  border-bottom: 3px solid #f4e733;
-  border-top: 1px solid #f4e733;
-  z-index: 99;
+      width: 100%;
+      background-color: #111;
+      border-bottom: 3px solid #f4e733;
+      border-top: 1px solid #f4e733;
     }
     nav button,
     .dropdown > button {
@@ -220,11 +210,9 @@
       background-color: rgba(255, 165, 0, 0.2);
     }
     footer {
-  position: sticky;
-  bottom: 0;
-  width: 100%;
-  background-color: #111;
-  border-top: 3px solid #f4e733;
+      width: 100%;
+      background-color: #111;
+      border-top: 3px solid #f4e733;
     }
     .social-icons a {
       color: white;
@@ -270,22 +258,25 @@
       }
       .header-right {
         padding: 10px;
-        flex-direction: row;
-        justify-content: center;
-        align-items: center;
-        gap: 10px;
       }
-      .header-info .arabic-name {
+      .header-right img.logo {
+        height: 50px !important;
+      }
+      .arabic-name {
         font-size: 16px;
       }
-      .header-info .english-name {
+      
+      .english-name {
         font-size: 12px;
       }
-      .header-right .divider {
-        height: 45px;
+      
+      .container {
+        padding: 12px;
+        margin: 10px auto;
+        width: 95%;
       }
-      img.logo {
-        height: 50px !important;
+      .divider {
+        height: 45px;
       }
       nav {
         justify-content: center;
@@ -294,11 +285,6 @@
         flex: 1;
         font-size: 16px;
         padding: 10px 15px;
-      }
-      .container {
-        padding: 12px;
-        margin: 10px auto;
-        width: 95%;
       }
       .filter-bar {
         flex-direction: column;
