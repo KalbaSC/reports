@@ -209,6 +209,17 @@
     .general-attendance {
       background-color: rgba(76, 175, 80, 0.2);
     }
+.no-activity {
+  background-color: rgba(76, 175, 80, 0.2); 
+}
+.general-with-activities {
+  background-color: rgba(255, 193, 7, 0.2); 
+}
+.activity-group {
+  background-color: #333;
+  color: #f4e733;
+  font-weight: bold;
+}    
     footer {
       background-color: #111;
       color: white;
@@ -857,9 +868,11 @@ function renderActivityTable() {
     headerRow.innerHTML = `<td colspan="5">حضور عام مع أنشطة (${kidsWithBoth} لاعب)</td>`;
     tbody.appendChild(headerRow);
     
-    generalRecords.filter(genRec => 
+    const kidsWithBothRecords = generalRecords.filter(genRec => 
       activityRecords.some(actRec => actRec.ID === genRec.ID)
-    .forEach(entry => {
+    );
+    
+    kidsWithBothRecords.forEach(entry => {
       const row = document.createElement("tr");
       row.className = "general-with-activities";
       row.innerHTML = `
