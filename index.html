@@ -839,10 +839,19 @@
 
 function updateSummary() {
   const today = new Date().toISOString().split('T')[0];
-  const todayCount = allData.filter(row => row.dateKey === today).length;
   
-  document.getElementById("totalCount").textContent = todayCount;
-  document.getElementById("filteredCount").textContent = filteredData.length;
+  const todayTotal = allData.filter(row => row.dateKey === today).length;
+  
+  const todayFiltered = filteredData.filter(row => row.dateKey === today).length;
+  
+  document.getElementById("totalCount").textContent = todayTotal;
+  document.getElementById("filteredCount").textContent = todayFiltered;
+}
+
+function setupEventListeners() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById("datePicker").value = today;
+  filterByDate(); 
 }
 
     function exportToExcel() {
