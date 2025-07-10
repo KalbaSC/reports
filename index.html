@@ -472,7 +472,6 @@
 function processRawData(rawData) {
   if (!Array.isArray(rawData)) return [];
   
-  const uniqueEntries = new Map();
   const now = new Date();
   
   return rawData
@@ -480,30 +479,29 @@ function processRawData(rawData) {
       if (!item || typeof item !== 'object') return false;
       if (!item.ID || !item.Timestamp) return false;
       
-      // Basic data validation
       const timestamp = new Date(item.Timestamp);
       if (isNaN(timestamp.getTime())) return false;
       
-      // Filter out future dates (if any)
       return timestamp <= now;
     })
     .map(item => {
-      const timestamp = new Date(item.Timestamp);
-      const dateKey = timestamp.toISOString().split('T')[0];
-      const key = `${item.ID}-${dateKey}`; // Group by ID and date only
-      
-      if (!uniqueEntries.has(key)) {
-        uniqueEntries.set(key, true);
-        return {
-          ...item,
-          isGeneral: item.General === "✔️ حضر" || item.General === "حضر",
-          dateKey: dateKey,
-          isDuplicate: false
-        };
-      }
-      return null; // Mark duplicates as null
-    })
-    .filter(item => item !== null); // Remove null entries
+      return {
+        ...item,
+        isGeneral: !item.Activity && (item.General === "✔️ حضر" || item.General === "حضر"),
+        dateKey: new Date(item.Timestamp).toISOString().split('T')[0],
+        isDuplicate: false
+      };
+    });
+}
+
+function getActivityRecords(rawData) {
+  if (!Array.isArray(rawData)) return [];
+  
+  return rawData.filter(item => 
+    item && typeof item === 'object' && 
+    item.ID && item.Timestamp && 
+    item.Activity && item.Activity.trim() !== ""
+  );
 }
 
 function getActivityRecords(rawData) {
@@ -792,24 +790,20 @@ function renderActivityTable() {
   tbody.innerHTML = "";
   
   const selectedDate = document.getElementById("datePicker").value || 
-                      new Date().toISOString().split('T')[0];
+                     new Date().toISOString().split('T')[0];
 
-  // Get ALL records for the selected date
+  // Get all records for selected date
   const dateRecords = allData.filter(row => row.dateKey === selectedDate);
-  
   if (dateRecords.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5">لا يوجد حضور في هذا التاريخ</td></tr>`;
     return;
   }
 
   // Get activity records (non-general)
-  const activityRecords = getActivityRecords(allData)
-    .filter(row => row.dateKey === selectedDate);
+  const activityRecords = getActivityRecords(dateRecords);
   
   // Get general attendance records
-  const generalRecords = allData.filter(row => 
-    row.isGeneral && row.dateKey === selectedDate
-  );
+  const generalRecords = dateRecords.filter(row => row.isGeneral);
 
   // Get unique players
   const allPlayers = new Set(dateRecords.map(r => r.ID));
@@ -818,6 +812,11 @@ function renderActivityTable() {
     Array.from(new Set(generalRecords.map(r => r.ID)))
       .filter(id => !activityPlayers.has(id))
   );
+
+  // Debug log - remove after testing
+  console.log("Activity players:", activityPlayers);
+  console.log("General only players:", generalOnlyPlayers);
+  console.log("All activity records:", activityRecords);
 
   // Group activities
   const activities = {};
