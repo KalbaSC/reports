@@ -892,7 +892,6 @@ function renderActivityTable() {
       }
       playersWithActivities[record.ID].activities.add(record.Activity);
     });
-     }
 
     Object.values(playersWithActivities).forEach(player => {
       const row = document.createElement("tr");
@@ -929,7 +928,8 @@ function renderActivityTable() {
         `;
         tbody.appendChild(row);
       });
-    }
+    });
+}
     
     function filterActivityTable() {
       const activity = document.getElementById("activityFilter").value;
