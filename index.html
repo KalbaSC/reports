@@ -488,37 +488,22 @@ function processRawData(rawData) {
       return timestamp <= now;
     })
     .map(item => {
-      // Create a composite key to identify duplicates
       const timestamp = new Date(item.Timestamp);
-      const timeKey = timestamp.toISOString().slice(0, 16); // Group by minute
-      const key = `${item.ID}-${timeKey}`;
+      const dateKey = timestamp.toISOString().split('T')[0];
+      const key = `${item.ID}-${dateKey}`; // Group by ID and date only
       
-      // Only keep the first entry if duplicates exist
       if (!uniqueEntries.has(key)) {
         uniqueEntries.set(key, true);
-        
-        const isGeneral = item.General === "✔️ حضر" || 
-                         item.General === "حضر" || 
-                         !item.Activity || 
-                         item.Activity.trim() === "";
-        
         return {
           ...item,
-          isGeneral: isGeneral,
-          dateKey: timestamp.toISOString().split('T')[0],
-          timeKey: timeKey,
+          isGeneral: item.General === "✔️ حضر" || item.General === "حضر",
+          dateKey: dateKey,
           isDuplicate: false
         };
       }
-      return {
-        ...item,
-        isGeneral: false,
-        dateKey: new Date(item.Timestamp).toISOString().split('T')[0],
-        timeKey: timeKey,
-        isDuplicate: true
-      };
+      return null; // Mark duplicates as null
     })
-    .filter(item => !item.isDuplicate); // Remove marked duplicates
+    .filter(item => item !== null); // Remove null entries
 }
 
     // Get all activity records for a child (including duplicates)
@@ -940,25 +925,19 @@ function renderActivityTable() {
       headerRow.innerHTML = `<td colspan="5">${activity} (${data.players.size} لاعب)</td>`;
       tbody.appendChild(headerRow);
       
-      // Show unique players per activity
-      Array.from(data.players).forEach(playerId => {
-        const playerRecords = data.items.filter(r => r.ID === playerId);
-        const latestRecord = playerRecords.reduce((latest, current) => 
-          new Date(current.Timestamp) > new Date(latest.Timestamp) ? current : latest
-        );
-        
+      // Show ALL records for this activity, not just unique players
+      data.items.forEach(entry => {
         const row = document.createElement("tr");
         row.innerHTML = `
-          <td>${formatDate(latestRecord.Timestamp)}</td>
-          <td>${latestRecord["Child Name"] || ""}</td>
-          <td>${latestRecord.ID || ""}</td>
-          <td>${latestRecord["Scanned By"] || ""}</td>
+          <td>${formatDate(entry.Timestamp)}</td>
+          <td>${entry["Child Name"] || ""}</td>
+          <td>${entry.ID || ""}</td>
+          <td>${entry["Scanned By"] || ""}</td>
           <td>${activity}</td>
         `;
         tbody.appendChild(row);
       });
-    });
-}
+    }
     
     function filterActivityTable() {
       const activity = document.getElementById("activityFilter").value;
