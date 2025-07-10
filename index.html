@@ -472,22 +472,53 @@
 function processRawData(rawData) {
   if (!Array.isArray(rawData)) return [];
   
-  return rawData.map(item => {
-    if (!item || typeof item !== 'object') return null;
-    if (!item.ID || !item.Timestamp) return null;
-    
-    const date = new Date(item.Timestamp).toISOString().split('T')[0];
-    const isGeneral = item.General === "✔️ حضر" || 
-                     item.General === "حضر" || 
-                     !item.Activity || 
-                     item.Activity.trim() === "";
-    
-    return {
-      ...item,
-      isGeneral: isGeneral,
-      dateKey: date
-    };
-  }).filter(Boolean);
+  const uniqueEntries = new Map();
+  const now = new Date();
+  
+  return rawData
+    .filter(item => {
+      if (!item || typeof item !== 'object') return false;
+      if (!item.ID || !item.Timestamp) return false;
+      
+      // Basic data validation
+      const timestamp = new Date(item.Timestamp);
+      if (isNaN(timestamp.getTime())) return false;
+      
+      // Filter out future dates (if any)
+      return timestamp <= now;
+    })
+    .map(item => {
+      // Create a composite key to identify duplicates
+      const timestamp = new Date(item.Timestamp);
+      const timeKey = timestamp.toISOString().slice(0, 16); // Group by minute
+      const key = `${item.ID}-${timeKey}`;
+      
+      // Only keep the first entry if duplicates exist
+      if (!uniqueEntries.has(key)) {
+        uniqueEntries.set(key, true);
+        
+        const isGeneral = item.General === "✔️ حضر" || 
+                         item.General === "حضر" || 
+                         !item.Activity || 
+                         item.Activity.trim() === "";
+        
+        return {
+          ...item,
+          isGeneral: isGeneral,
+          dateKey: timestamp.toISOString().split('T')[0],
+          timeKey: timeKey,
+          isDuplicate: false
+        };
+      }
+      return {
+        ...item,
+        isGeneral: false,
+        dateKey: new Date(item.Timestamp).toISOString().split('T')[0],
+        timeKey: timeKey,
+        isDuplicate: true
+      };
+    })
+    .filter(item => !item.isDuplicate); // Remove marked duplicates
 }
 
     // Get all activity records for a child (including duplicates)
@@ -779,129 +810,154 @@ function renderActivityTable() {
   const selectedDate = document.getElementById("datePicker").value || 
                       new Date().toISOString().split('T')[0];
 
-  // Get all records for the date
+  // Get all records for the selected date
   const dateRecords = allData.filter(row => row.dateKey === selectedDate);
-
+  
   if (dateRecords.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5">لا يوجد حضور في هذا التاريخ</td></tr>`;
     return;
   }
 
-  // Separate records - activity records have non-empty Activity field
+  // Separate records
   const activityRecords = dateRecords.filter(row => 
     row.Activity && row.Activity.trim() !== "" && !row.isGeneral
   );
   
-  // General records are either marked as general or have empty activity
   const generalRecords = dateRecords.filter(row => row.isGeneral);
 
-  // Group activities
+  // Get unique player counts
+  const allPlayers = new Set(dateRecords.map(r => r.ID));
+  const activityPlayers = new Set(activityRecords.map(r => r.ID));
+  const generalOnlyPlayers = new Set(
+    generalRecords
+      .filter(genRec => !activityRecords.some(actRec => actRec.ID === genRec.ID))
+      .map(r => r.ID)
+  );
+
+  // Group activities with counts of unique players
   const activities = {};
   activityRecords.forEach(item => {
     const activity = item.Activity || "غير محدد";
-    activities[activity] = (activities[activity] || 0) + 1;
-    
-    if (!activities[`${activity}_items`]) {
-      activities[`${activity}_items`] = [];
+    if (!activities[activity]) {
+      activities[activity] = {
+        count: 0,
+        players: new Set(),
+        items: []
+      };
     }
-    activities[`${activity}_items`].push(item);
+    activities[activity].count++;
+    activities[activity].players.add(item.ID);
+    activities[activity].items.push(item);
   });
 
-  // Count general-only (no activity records)
-  const generalOnlyRecords = generalRecords.filter(genRec => 
-    !activityRecords.some(actRec => actRec.ID === genRec.ID)
-  );
+  // Build activity filter dropdown
+  const activityOptions = Object.entries(activities)
+    .sort((a, b) => b[1].players.size - a[1].players.size)
+    .map(([activity, data]) => 
+      `<option value="${activity}">${activity} (${data.players.size})</option>`
+    ).join('');
 
-  // Count kids with both general and activities
-  const kidsWithBoth = generalRecords.filter(genRec => 
-    activityRecords.some(actRec => actRec.ID === genRec.ID)
-  ).length;
-
-  // Update UI with correct counts
+  // Update controls with accurate counts
   controls.innerHTML = `
     <div class="search-group">
       <select id="activityFilter" onchange="filterActivityTable()">
         <option value="">جميع الأنشطة</option>
-        ${Object.keys(activities).filter(k => !k.includes('_items'))
-          .map(act => `<option value="${act}">${act}</option>`).join('')}
+        ${activityOptions}
       </select>
       <span class="summary-box">
-        <span>إجمالي الحضور: ${generalRecords.length}</span>
-        <span>| الأنشطة: ${activityRecords.length}</span>
-        <span>| بدون أنشطة: ${generalOnlyRecords.length}</span>
-        <span>| لديهم أنشطة: ${kidsWithBoth}</span>
+        <span>إجمالي اللاعبين: ${allPlayers.size}</span>
+        <span>| أنشطة: ${activityPlayers.size}</span>
+        <span>| عام فقط: ${generalOnlyPlayers.size}</span>
       </span>
     </div>
   `;
 
-  if (generalOnlyRecords.length > 0) {
+  // Render general-only attendance first
+  if (generalOnlyPlayers.size > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "no-activity";
-    headerRow.innerHTML = `<td colspan="5">حضور عام بدون أنشطة (${generalOnlyRecords.length} لاعب)</td>`;
+    headerRow.innerHTML = `<td colspan="5">حضور عام فقط (${generalOnlyPlayers.size} لاعب)</td>`;
     tbody.appendChild(headerRow);
     
-    generalOnlyRecords.forEach(entry => {
+    Array.from(generalOnlyPlayers).forEach(playerId => {
+      const playerRecords = generalRecords.filter(r => r.ID === playerId);
+      const latestRecord = playerRecords.reduce((latest, current) => 
+        new Date(current.Timestamp) > new Date(latest.Timestamp) ? current : latest
+      );
+      
       const row = document.createElement("tr");
       row.className = "no-activity";
       row.innerHTML = `
-        <td>${formatDate(entry.Timestamp)}</td>
-        <td>${entry["Child Name"] || ""}</td>
-        <td>${entry.ID || ""}</td>
-        <td>${entry["Scanned By"] || ""}</td>
+        <td>${formatDate(latestRecord.Timestamp)}</td>
+        <td>${latestRecord["Child Name"] || ""}</td>
+        <td>${latestRecord.ID || ""}</td>
+        <td>${latestRecord["Scanned By"] || ""}</td>
         <td>عام</td>
       `;
       tbody.appendChild(row);
     });
   }
 
-  if (kidsWithBoth > 0) {
+  // Render players with activities
+  if (activityPlayers.size > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "general-with-activities";
-    headerRow.innerHTML = `<td colspan="5">حضور عام مع أنشطة (${kidsWithBoth} لاعب)</td>`;
+    headerRow.innerHTML = `<td colspan="5">لاعبون مع أنشطة (${activityPlayers.size} لاعب)</td>`;
     tbody.appendChild(headerRow);
-    
-    const kidsWithBothRecords = generalRecords.filter(genRec => 
-      activityRecords.some(actRec => actRec.ID === genRec.ID)
-    );
-    
-    kidsWithBothRecords.forEach(entry => {
+
+    // Group by player to show each player once with their activities
+    const playersWithActivities = {};
+    activityRecords.forEach(record => {
+      if (!playersWithActivities[record.ID]) {
+        playersWithActivities[record.ID] = {
+          info: record,
+          activities: new Set()
+        };
+      }
+      playersWithActivities[record.ID].activities.add(record.Activity);
+    });
+
+    Object.values(playersWithActivities).forEach(player => {
       const row = document.createElement("tr");
       row.className = "general-with-activities";
       row.innerHTML = `
-        <td>${formatDate(entry.Timestamp)}</td>
-        <td>${entry["Child Name"] || ""}</td>
-        <td>${entry.ID || ""}</td>
-        <td>${entry["Scanned By"] || ""}</td>
-        <td>عام</td>
+        <td>${formatDate(player.info.Timestamp)}</td>
+        <td>${player.info["Child Name"] || ""}</td>
+        <td>${player.info.ID || ""}</td>
+        <td>${player.info["Scanned By"] || ""}</td>
+        <td>${Array.from(player.activities).join("، ")}</td>
       `;
       tbody.appendChild(row);
     });
   }
 
-  Object.entries(activities).forEach(([activity, count]) => {
-    if (activity.includes('_items')) return;
-    
-    const headerRow = document.createElement("tr");
-    headerRow.className = "activity-group";
-    headerRow.innerHTML = `<td colspan="5">${activity} (${count} حضور)</td>`;
-    tbody.appendChild(headerRow);
-    
-    activities[`${activity}_items`].forEach(entry => {
-      const row = document.createElement("tr");
-      row.innerHTML = `
-        <td>${formatDate(entry.Timestamp)}</td>
-        <td>${entry["Child Name"] || ""}</td>
-        <td>${entry.ID || ""}</td>
-        <td>${entry["Scanned By"] || ""}</td>
-        <td>${entry.Activity || ""}</td>
-      `;
-      tbody.appendChild(row);
+  // Render activity details grouped by activity
+  Object.entries(activities)
+    .sort((a, b) => b[1].players.size - a[1].players.size)
+    .forEach(([activity, data]) => {
+      const headerRow = document.createElement("tr");
+      headerRow.className = "activity-group";
+      headerRow.innerHTML = `<td colspan="5">${activity} (${data.players.size} لاعب)</td>`;
+      tbody.appendChild(headerRow);
+      
+      // Show unique players per activity
+      Array.from(data.players).forEach(playerId => {
+        const playerRecords = data.items.filter(r => r.ID === playerId);
+        const latestRecord = playerRecords.reduce((latest, current) => 
+          new Date(current.Timestamp) > new Date(latest.Timestamp) ? current : latest
+        );
+        
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${formatDate(latestRecord.Timestamp)}</td>
+          <td>${latestRecord["Child Name"] || ""}</td>
+          <td>${latestRecord.ID || ""}</td>
+          <td>${latestRecord["Scanned By"] || ""}</td>
+          <td>${activity}</td>
+        `;
+        tbody.appendChild(row);
+      });
     });
-  });
-
-  if (activityRecords.length === 0 && generalOnlyRecords.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5">لا يوجد حضور في هذا التاريخ</td></tr>`;
-  }
 }
     
     function filterActivityTable() {
