@@ -272,6 +272,11 @@
         align-items: center;
         gap: 10px;
       }
+ .divider {
+    width: 100%;
+    height: 1px;
+    margin: 5px 0;
+  }
       .header-info .arabic-name {
         font-size: 16px;
       }
@@ -292,23 +297,39 @@
         font-size: 16px;
         padding: 10px 15px;
       }
+  #mainView table, #activityView table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
       .container {
         padding: 12px;
         margin: 10px auto;
         width: 95%;
       }
+  .export-buttons {
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  button.export {
+    width: 100%;
+    margin: 2px 0;
+    padding: 8px;
+  }
       .filter-bar {
         flex-direction: column;
       }
       .search-group {
         flex-direction: column;
       }
-      .search-group select,
-      .search-group input,
-      .search-group button.clear-btn,
-      #datePicker {
-        width: 100%;
-      }
+  .search-group select,
+  .search-group input,
+  .search-group button.clear-btn,
+  #datePicker {
+    width: 100%;
+    min-width: unset;
+  }
       table {
         font-size: 13px;
       }
@@ -318,6 +339,12 @@
       .stats-container {
         grid-template-columns: 1fr;
       }
+  .stat-card {
+    padding: 10px;
+  }
+  .hidden-column {
+    display: none !important;
+  }
     }
   </style>
 </head>
@@ -394,16 +421,16 @@
     </div>
 
     <table id="attendanceTable">
-      <thead>
-        <tr>
-          <th>التاريخ والوقت</th>
-          <th>الاسم</th>
-          <th>المعرف</th>
-          <th>الموظف</th>
-          <th>النشاط</th>
-          <th>النوع</th>
-        </tr>
-      </thead>
+<thead>
+  <tr>
+    <th>التاريخ والوقت</th>
+    <th>الاسم</th>
+    <th>المعرف</th>
+    <th>الموظف</th>
+    <th class="hidden-column">النشاط</th>
+    <th class="hidden-column">النوع</th>
+  </tr>
+</thead>
       <tbody>
         <tr id="loading">
           <td colspan="6" style="text-align:center">
@@ -1004,10 +1031,19 @@ function renderMainTable() {
       });
     }
 
-    function toggleHiddenColumns() {
-    const columns = document.querySelectorAll('.hidden-column');
-    columns.forEach(col => col.style.display = col.style.display === 'none' ? '' : 'none');
+  function toggleHiddenColumns() {
+    const columns = document.querySelectorAll('#mainView td.hidden-column, #mainView th.hidden-column');
+    const isHidden = columns[0]?.style.display === 'none';
+    
+    columns.forEach(col => {
+      col.style.display = isHidden ? 'table-cell' : 'none';
+    });
+    
+    const btn = document.querySelector('button[onclick="toggleHiddenColumns()"]');
+    if (btn) {
+      btn.innerHTML = `<i class="fas fa-eye"></i> ${isHidden ? 'إخفاء' : 'عرض'} الأعمدة`;
     }
+  }
 
     function renderTimingChart() {
       let early = 0, late = 0;
