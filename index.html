@@ -474,7 +474,6 @@
       return Array.from(uniqueEntries.values());
     }
 
-    // Update today's statistics
     function updateTodayStats(data = filteredData) {
       const today = new Date().toDateString();
       const todayData = data.filter(row => 
@@ -507,7 +506,6 @@
       }
     }
 
-    // Populate filter dropdowns
     function populateDropdowns() {
       const activities = new Set(['عام']);
       const staff = new Set();
@@ -532,7 +530,6 @@
       });
     }
 
-    // Fetch data from Google Sheets
     async function fetchData() {
       try {
         document.getElementById("loading").style.display = "block";
@@ -542,11 +539,9 @@
         const rawData = await res.json();
         if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
         
-        // Process and deduplicate data
         allData = processRawData(rawData);
         filteredData = [...allData];
         
-        // Update UI
         updateSummary();
         renderMainTable();
         populateDropdowns();
@@ -562,7 +557,6 @@
       }
     }
 
-    // View management functions
     function showMainView() {
       setActiveNavButton(0);
       document.getElementById("mainView").style.display = "block";
@@ -592,7 +586,6 @@
       });
     }
 
-    // Filter functions
     function filterByPeriod(period) {
       const now = new Date();
       filteredData = allData.filter(row => {
@@ -687,7 +680,6 @@
       }
     }
 
-    // Rendering functions
     function renderMainTable() {
       const tbody = document.querySelector("#attendanceTable tbody");
       tbody.innerHTML = "";
@@ -713,7 +705,6 @@
       const tbody = document.querySelector("#activityTable tbody");
       tbody.innerHTML = "";
       
-      // Group by activity
       const activities = {};
       filteredData.forEach(item => {
         if (item.isGeneral) return;
@@ -725,9 +716,8 @@
         activities[activity].push(item);
       });
 
-      // Render grouped
       Object.entries(activities).forEach(([activity, entries]) => {
-        // Activity header
+
         const headerRow = document.createElement("tr");
         headerRow.className = "activity-group";
         headerRow.innerHTML = `
@@ -737,7 +727,6 @@
         `;
         tbody.appendChild(headerRow);
         
-        // Entries
         entries.forEach(entry => {
           const row = document.createElement("tr");
           row.innerHTML = `
@@ -848,13 +837,11 @@
       `;
     }
 
-    // Summary functions
     function updateSummary() {
       document.getElementById("totalCount").textContent = allData.length;
       document.getElementById("filteredCount").textContent = filteredData.length;
     }
 
-    // Export functions
     function exportToExcel() {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(prepareExportData());
@@ -893,15 +880,25 @@
       }));
     }
 
-    // Initialize the page
     function initialize() {
       setupEventListeners();
       fetchData();
     }
 
-    function setupEventListeners() {
-      document.getElementById("datePicker").value = new Date().toISOString().split("T")[0];
-    }
+function setupEventListeners() {
+  const today = new Date();
+  const formattedDate = formatDateForInput(today);
+  document.getElementById("datePicker").value = formattedDate;
+  
+  filterByDate();
+}
+
+function formatDateForInput(date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
 
     window.onload = initialize;
   </script>
