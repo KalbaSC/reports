@@ -24,12 +24,17 @@
       background-size: cover;
       color: white;
       margin: 0;
-      padding: 0;
+      padding: 120px 0 100px;
+      min-height: 100vh;
+      box-sizing: border-box;
     }
     .header-container {
       width: 100%;
       background: #111;
       border-bottom: 2px solid #f4e733;
+      position: fixed;
+      top: 0;
+      z-index: 100;
     }
     .header-right {
       width: 100%;
@@ -73,6 +78,8 @@
       background: rgba(0, 0, 0, 0.9);
       border-radius: 10px;
       margin-top: 30px;
+      max-height: calc(100vh - 220px);
+      overflow-y: auto;
     }
     .controls {
       display: flex;
@@ -149,6 +156,9 @@
       background-color: #111;
       border-bottom: 3px solid #f4e733;
       border-top: 1px solid #f4e733;
+      position: fixed;
+      top: 84px;
+      z-index: 99;
     }
     nav button,
     .dropdown > button {
@@ -209,6 +219,9 @@
     .general-attendance {
       background-color: rgba(76, 175, 80, 0.2);
     }
+    .no-activity {
+      background-color: rgba(255, 165, 0, 0.2);
+    }
     footer {
       background-color: #111;
       color: white;
@@ -216,6 +229,9 @@
       padding: 20px;
       border-top: 3px solid #f4e733;
       font-size: 14px;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
     }
     .social-icons a {
       color: white;
@@ -246,7 +262,19 @@
       text-align: center;
       padding: 20px;
     }
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: #f4e733;
+      font-size: 18px;
+    }
     @media (max-width: 768px) {
+      body {
+        padding-top: 160px;
+      }
+      nav {
+        top: 120px;
+      }
       .header-right {
         padding: 10px;
         flex-direction: row;
@@ -304,11 +332,6 @@
   </style>
 </head>
 <body>
-  <div id="loading">
-    <i class="fas fa-spinner fa-spin" style="font-size: 24px; color: #f4e733;"></i>
-    <p>جاري تحميل البيانات...</p>
-  </div>
-
   <header class="header-container">
     <div class="header-right">
       <img src="Picture3.png" alt="شعار الشارقة" class="logo">
@@ -388,12 +411,21 @@
           <th>النوع</th>
         </tr>
       </thead>
-      <tbody></tbody>
+      <tbody>
+        <tr id="loading">
+          <td colspan="6" style="text-align:center">
+            <i class="fas fa-spinner fa-spin"></i> جاري تحميل البيانات...
+          </td>
+        </tr>
+      </tbody>
     </table>
   </div>
 
   <div class="container" id="activityView" style="display: none;">
     <h2 style="color:#f4e733; text-align:center">الحضور حسب الأنشطة</h2>
+    <div id="activityControls" class="controls" style="margin-bottom:20px">
+      <!-- Dynamically added filters will appear here -->
+    </div>
     <table id="activityTable">
       <thead>
         <tr>
@@ -441,11 +473,17 @@
     function formatDate(isoString) {
       const date = new Date(isoString);
       const options = {
-        year: 'numeric', month: '2-digit', day: '2-digit',
-        hour: '2-digit', minute: '2-digit',
+        year: 'numeric', 
+        month: '2-digit', 
+        day: '2-digit',
+        hour: '2-digit', 
+        minute: '2-digit',
+        hour12: true,
         timeZone: 'Asia/Dubai'
       };
-      return date.toLocaleString('ar-EG', options);
+      let formatted = date.toLocaleString('ar-EG', options);
+      formatted = formatted.replace("AM", "ص").replace("PM", "م");
+      return formatted;
     }
 
     // Process and deduplicate raw data
@@ -474,6 +512,17 @@
       return Array.from(uniqueEntries.values());
     }
 
+    // Get all activity records for a child (including duplicates)
+    function getActivityRecords(rawData) {
+      if (!Array.isArray(rawData)) return [];
+      
+      return rawData.filter(item => 
+        item && typeof item === 'object' && 
+        item.ID && item.Timestamp && 
+        !item.General
+      );
+    }
+
     function updateTodayStats(data = filteredData) {
       const today = new Date().toDateString();
       const todayData = data.filter(row => 
@@ -496,14 +545,11 @@
         .map(([name, count]) => `${name}: ${count}`)
         .join("<br>");
 
-      const todayStatsElement = document.getElementById("todayStats");
-      if (todayStatsElement) {
-        todayStatsElement.innerHTML = `
-          <p><strong>حسب الموظف:</strong><br>${staffList || "لا يوجد بيانات"}</p>
-          <p><strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}</p>
-          <p><strong>إجمالي اليوم:</strong> ${todayData.length}</p>
-        `;
-      }
+      document.getElementById("todayStats").innerHTML = `
+        <p><strong>حسب الموظف:</strong><br>${staffList || "لا يوجد بيانات"}</p>
+        <p><strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}</p>
+        <p><strong>إجمالي اليوم:</strong> ${todayData.length}</p>
+      `;
     }
 
     function populateDropdowns() {
@@ -540,18 +586,29 @@
         if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
         
         allData = processRawData(rawData);
-        filteredData = [...allData];
+        
+        // Set today's date and filter immediately
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById("datePicker").value = today;
+        filteredData = allData.filter(row => row.dateKey === today);
+        
+        // Add empty state if no data
+        const tbody = document.querySelector("#attendanceTable tbody");
+        if (filteredData.length === 0) {
+          tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد حضور اليوم</td></tr>`;
+        } else {
+          renderMainTable();
+        }
         
         updateSummary();
-        renderMainTable();
         populateDropdowns();
         updateTodayStats();
         
         console.log("Data loaded successfully:", allData.length, "records");
       } catch (error) {
         console.error("Error loading data:", error);
-        alert("حدث خطأ أثناء تحميل البيانات. يرجى المحاولة لاحقًا");
-        document.getElementById("summary").textContent = "حدث خطأ في تحميل البيانات";
+        document.querySelector("#attendanceTable tbody").innerHTML = 
+          `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
       } finally {
         document.getElementById("loading").style.display = "none";
       }
@@ -613,11 +670,22 @@
       const selectedDate = document.getElementById("datePicker").value;
       if (!selectedDate) return;
       
-      filteredData = allData.filter(row => {
-        return row.dateKey === selectedDate;
-      });
+      filteredData = allData.filter(row => row.dateKey === selectedDate);
+      
+      // Add empty state
+      const tbody = document.querySelector("#attendanceTable tbody");
+      if (filteredData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
+      } else {
+        renderMainTable();
+      }
       
       updateFilteredView();
+      
+      // Update activities view if active
+      if (document.getElementById("activityView").style.display === "block") {
+        renderActivityTable();
+      }
     }
 
     function filterTable() {
@@ -635,7 +703,7 @@
         return (!name || rowName.includes(name)) &&
                (!id || rowId.includes(id)) &&
                (!staff || rowStaff === staff) &&
-               (!activity || rowActivity === activity);
+               (!activity || (activity === "عام" ? row.isGeneral : row.Activity === activity));
       });
 
       updateFilteredView();
@@ -647,10 +715,12 @@
       document.getElementById("filter-staff").value = "";
       document.getElementById("filter-activity").value = "";
       document.getElementById("filterType").value = "";
-      document.getElementById("datePicker").value = "";
+      
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById("datePicker").value = today;
       
       showFilterOptions("");
-      filteredData = [...allData];
+      filteredData = allData.filter(row => row.dateKey === today);
       updateFilteredView();
     }
 
@@ -682,6 +752,11 @@
 
     function renderMainTable() {
       const tbody = document.querySelector("#attendanceTable tbody");
+      if (filteredData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
+        return;
+      }
+      
       tbody.innerHTML = "";
       
       filteredData.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp))
@@ -703,31 +778,93 @@
 
     function renderActivityTable() {
       const tbody = document.querySelector("#activityTable tbody");
+      const controls = document.getElementById("activityControls");
       tbody.innerHTML = "";
       
+      // Get selected date or use today
+      const selectedDate = document.getElementById("datePicker").value || 
+                          new Date().toISOString().split('T')[0];
+      
+      // Get all activity records (including duplicates)
+      const activityRecords = getActivityRecords(allData)
+        .filter(row => row.dateKey === selectedDate);
+      
+      // Get general attendance without activities
+      const generalOnlyRecords = allData.filter(row => 
+        row.isGeneral && 
+        row.dateKey === selectedDate &&
+        !activityRecords.some(act => act.ID === row.ID)
+      );
+      
+      // Group by activity and count
       const activities = {};
-      filteredData.forEach(item => {
-        if (item.isGeneral) return;
-        
+      activityRecords.forEach(item => {
         const activity = item.Activity || "غير محدد";
-        if (!activities[activity]) {
-          activities[activity] = [];
+        activities[activity] = (activities[activity] || 0) + 1;
+        
+        if (!activities[`${activity}_items`]) {
+          activities[`${activity}_items`] = [];
         }
-        activities[activity].push(item);
+        activities[`${activity}_items`].push(item);
       });
 
-      Object.entries(activities).forEach(([activity, entries]) => {
+      // Add filter controls
+      controls.innerHTML = `
+        <div class="search-group">
+          <select id="activityFilter" onchange="filterActivityTable()">
+            <option value="">جميع الأنشطة</option>
+            ${Object.keys(activities)
+              .filter(k => !k.includes('_items'))
+              .map(act => `<option value="${act}">${act}</option>`)
+              .join('')}
+          </select>
+          <span class="summary-box">
+            <span>إجمالي الحضور: ${activityRecords.length + generalOnlyRecords.length}</span>
+            <span>| الأنشطة: ${activityRecords.length}</span>
+            <span>| بدون أنشطة: ${generalOnlyRecords.length}</span>
+          </span>
+        </div>
+      `;
 
+      // Show general attendance without activities first
+      if (generalOnlyRecords.length > 0) {
         const headerRow = document.createElement("tr");
-        headerRow.className = "activity-group";
+        headerRow.className = "no-activity";
         headerRow.innerHTML = `
           <td colspan="5">
-            ${activity} (${entries.length} لاعب)
+            حضور عام بدون أنشطة (${generalOnlyRecords.length} لاعب)
           </td>
         `;
         tbody.appendChild(headerRow);
         
-        entries.forEach(entry => {
+        generalOnlyRecords.forEach(entry => {
+          const row = document.createElement("tr");
+          row.className = "no-activity";
+          row.innerHTML = `
+            <td>${formatDate(entry.Timestamp)}</td>
+            <td>${entry["Child Name"] || ""}</td>
+            <td>${entry.ID || ""}</td>
+            <td>${entry["Scanned By"] || ""}</td>
+            <td>عام</td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+
+      // Render grouped activities
+      Object.entries(activities).forEach(([activity, count]) => {
+        if (activity.includes('_items')) return;
+        
+        const headerRow = document.createElement("tr");
+        headerRow.className = "activity-group";
+        headerRow.innerHTML = `
+          <td colspan="5">
+            ${activity} (${count} لاعب)
+          </td>
+        `;
+        tbody.appendChild(headerRow);
+        
+        activities[`${activity}_items`].forEach(entry => {
           const row = document.createElement("tr");
           row.innerHTML = `
             <td>${formatDate(entry.Timestamp)}</td>
@@ -738,6 +875,67 @@
           `;
           tbody.appendChild(row);
         });
+      });
+
+      // Add empty state if no records
+      if (activityRecords.length === 0 && generalOnlyRecords.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
+      }
+    }
+
+    function filterActivityTable() {
+      const activity = document.getElementById("activityFilter").value;
+      const selectedDate = document.getElementById("datePicker").value || 
+                          new Date().toISOString().split('T')[0];
+      
+      const tbody = document.querySelector("#activityTable tbody");
+      tbody.innerHTML = "";
+      
+      // Get all activity records
+      const activityRecords = getActivityRecords(allData)
+        .filter(row => row.dateKey === selectedDate);
+      
+      // Get general attendance without activities
+      const generalOnlyRecords = allData.filter(row => 
+        row.isGeneral && 
+        row.dateKey === selectedDate &&
+        !activityRecords.some(act => act.ID === row.ID)
+      );
+      
+      // Show filtered results
+      if (!activity) {
+        // Show all
+        renderActivityTable();
+        return;
+      }
+      
+      // Filter by selected activity
+      const filtered = activityRecords.filter(row => row.Activity === activity);
+      
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور لنشاط ${activity}</td></tr>`;
+        return;
+      }
+      
+      const headerRow = document.createElement("tr");
+      headerRow.className = "activity-group";
+      headerRow.innerHTML = `
+        <td colspan="5">
+          ${activity} (${filtered.length} لاعب)
+        </td>
+      `;
+      tbody.appendChild(headerRow);
+      
+      filtered.forEach(entry => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${formatDate(entry.Timestamp)}</td>
+          <td>${entry["Child Name"] || ""}</td>
+          <td>${entry.ID || ""}</td>
+          <td>${entry["Scanned By"] || ""}</td>
+          <td>${entry.Activity || ""}</td>
+        `;
+        tbody.appendChild(row);
       });
     }
 
@@ -837,22 +1035,16 @@
       `;
     }
 
-function updateSummary() {
-  const today = new Date().toISOString().split('T')[0];
-  
-  const todayTotal = allData.filter(row => row.dateKey === today).length;
-  
-  const todayFiltered = filteredData.filter(row => row.dateKey === today).length;
-  
-  document.getElementById("totalCount").textContent = todayTotal;
-  document.getElementById("filteredCount").textContent = todayFiltered;
-}
-
-function setupEventListeners() {
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById("datePicker").value = today;
-  filterByDate(); 
-}
+    function updateSummary() {
+      const selectedDate = document.getElementById("datePicker").value;
+      
+      const totalForDate = allData.filter(row => 
+        selectedDate ? row.dateKey === selectedDate : true
+      ).length;
+      
+      document.getElementById("totalCount").textContent = totalForDate;
+      document.getElementById("filteredCount").textContent = filteredData.length;
+    }
 
     function exportToExcel() {
       const wb = XLSX.utils.book_new();
@@ -893,24 +1085,10 @@ function setupEventListeners() {
     }
 
     function initialize() {
-      setupEventListeners();
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById("datePicker").value = today;
       fetchData();
     }
-
-function setupEventListeners() {
-  const today = new Date();
-  const formattedDate = formatDateForInput(today);
-  document.getElementById("datePicker").value = formattedDate;
-  
-  filterByDate();
-}
-
-function formatDateForInput(date) {
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  return `${year}-${month}-${day}`;
-}
 
     window.onload = initialize;
   </script>
