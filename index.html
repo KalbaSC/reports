@@ -472,19 +472,22 @@
 function processRawData(rawData) {
   if (!Array.isArray(rawData)) return [];
   
-  // First pass: Process all records
   return rawData.map(item => {
     if (!item || typeof item !== 'object') return null;
     if (!item.ID || !item.Timestamp) return null;
     
     const date = new Date(item.Timestamp).toISOString().split('T')[0];
+    const isGeneral = item.General === "✔️ حضر" || 
+                     item.General === "حضر" || 
+                     !item.Activity || 
+                     item.Activity.trim() === "";
     
     return {
       ...item,
-      isGeneral: item.General === "✔️ حضر" || item.General === "حضر",
+      isGeneral: isGeneral,
       dateKey: date
     };
-  }).filter(Boolean); // Remove null entries
+  }).filter(Boolean);
 }
 
     // Get all activity records for a child (including duplicates)
@@ -769,38 +772,29 @@ async function fetchData() {
     }
 
 function renderActivityTable() {
-  console.log("---Rendering Activity Table---");
   const tbody = document.querySelector("#activityTable tbody");
   const controls = document.getElementById("activityControls");
   tbody.innerHTML = "";
   
   const selectedDate = document.getElementById("datePicker").value || 
                       new Date().toISOString().split('T')[0];
-  console.log("Processing date:", selectedDate);
 
   // Get all records for the date
-  const dateRecords = allData.filter(row => {
-    const rowDate = row.dateKey || new Date(row.Timestamp).toISOString().split('T')[0];
-    return rowDate === selectedDate;
-  });
-  console.log("Records for date:", dateRecords);
+  const dateRecords = allData.filter(row => row.dateKey === selectedDate);
 
   if (dateRecords.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5">لا يوجد حضور في هذا التاريخ</td></tr>`;
     return;
   }
 
-  // Separate records
+  // Separate records - activity records have non-empty Activity field
   const activityRecords = dateRecords.filter(row => 
-    row.Activity && row.Activity.trim() !== "" && row.Activity !== "✅"
+    row.Activity && row.Activity.trim() !== "" && !row.isGeneral
   );
   
-  const generalRecords = dateRecords.filter(row => 
-    row.isGeneral || 
-    row.General === "حضر" || 
-    row.General === "✔️ حضر"
-  );
-  
+  // General records are either marked as general or have empty activity
+  const generalRecords = dateRecords.filter(row => row.isGeneral);
+
   // Group activities
   const activities = {};
   activityRecords.forEach(item => {
@@ -823,7 +817,7 @@ function renderActivityTable() {
     activityRecords.some(actRec => actRec.ID === genRec.ID)
   ).length;
 
-  // Update UI
+  // Update UI with correct counts
   controls.innerHTML = `
     <div class="search-group">
       <select id="activityFilter" onchange="filterActivityTable()">
@@ -840,7 +834,6 @@ function renderActivityTable() {
     </div>
   `;
 
-  // Show general-only first
   if (generalOnlyRecords.length > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "no-activity";
@@ -861,7 +854,6 @@ function renderActivityTable() {
     });
   }
 
-  // Show kids with both general and activities
   if (kidsWithBoth > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "general-with-activities";
@@ -886,7 +878,6 @@ function renderActivityTable() {
     });
   }
 
-  // Show activities
   Object.entries(activities).forEach(([activity, count]) => {
     if (activity.includes('_items')) return;
     
