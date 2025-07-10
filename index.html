@@ -215,11 +215,6 @@
     .general-with-activities {
       background-color: rgba(255, 193, 7, 0.2); 
     }
-    .empty-state {
-      text-align: center;
-      padding: 20px;
-      color: #aaa;
-    }
     footer {
       background-color: #111;
       color: white;
@@ -256,6 +251,11 @@
       display: none;
       text-align: center;
       padding: 20px;
+    }
+    .empty-state {
+      text-align: center;
+      padding: 20px;
+      color: #aaa;
     }
     @media (max-width: 768px) {
       .header-right {
@@ -387,7 +387,7 @@
       <thead>
         <tr>
           <th>التاريخ والوقت</th>
-          <th>الاسم وولي الأمر</th>
+          <th>الاسم</th>
           <th>المعرف</th>
           <th>الموظف</th>
           <th>النشاط</th>
@@ -452,7 +452,6 @@
     let filteredData = [];
     let charts = {};
 
-    // Format date in Arabic locale
     function formatDate(isoString) {
       const date = new Date(isoString);
       const options = {
@@ -485,8 +484,7 @@
           return timestamp <= now;
         })
         .map(item => {
-          const isGeneral = (!item.Activity || item.Activity.trim() === "") && 
-                           (item.General === "✔️ حضر" || item.General === "حضر");
+          const isGeneral = item.General === "✔️ حضر" || item.General === "حضر";
           return {
             ...item,
             isGeneral: isGeneral,
@@ -502,7 +500,8 @@
       return rawData.filter(item => 
         item && typeof item === 'object' && 
         item.ID && item.Timestamp && 
-        item.Activity && item.Activity.trim() !== ""
+        item.Activity && item.Activity.trim() !== "" &&
+        item.Activity !== "عام"
       );
     }
 
@@ -731,7 +730,6 @@
       
       tbody.innerHTML = "";
       
-      // Group by ID to find unique players
       const players = {};
       filteredData.forEach(row => {
         if (!row.ID) return;
@@ -742,22 +740,19 @@
         players[row.ID].push(row);
       });
       
-      // For each player, find their most relevant record
-      const playerRecords = Object.values(players).map(playerRows => {
-        // Sort by timestamp (newest first)
+        const playerRecords = Object.values(players).map(playerRows => {
+          
         playerRows.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
         
-        // Find the first general attendance if exists
         const generalRecord = playerRows.find(row => row.isGeneral);
         
-        // Otherwise use the first record (which is the newest)
         return generalRecord || playerRows[0];
       });
       
-      // Sort all records by timestamp (newest first)
       playerRecords.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
       
-      // Render the table
+      document.getElementById("filteredCount").textContent = playerRecords.length;
+      
       playerRecords.forEach(row => {
         const tr = document.createElement("tr");
         if (row.isGeneral) tr.classList.add("general-attendance");
@@ -782,29 +777,24 @@
       const selectedDate = document.getElementById("datePicker").value || 
                           new Date().toISOString().split('T')[0];
 
-      // Get all records for selected date
       const dateRecords = allData.filter(row => row.dateKey === selectedDate);
       
       if (dateRecords.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="5">لا يوجد حضور في هذا التاريخ</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
         return;
       }
 
-      // Get activity records (non-general, with actual activities)
       const activityRecords = getActivityRecords(dateRecords);
       
-      // Get general attendance records (excluding any that have activities)
       const generalRecords = dateRecords.filter(row => 
         row.isGeneral && 
         !activityRecords.some(act => act.ID === row.ID)
       );
 
-      // Get unique players
       const allPlayers = new Set(dateRecords.map(r => r.ID));
       const activityPlayers = new Set(activityRecords.map(r => r.ID));
       const generalOnlyPlayers = new Set(generalRecords.map(r => r.ID));
 
-      // Group activities
       const activities = {};
       activityRecords.forEach(item => {
         const activity = item.Activity || "غير محدد";
@@ -820,7 +810,6 @@
         activities[activity].items.push(item);
       });
 
-      // Build activity filter options
       const activityOptions = Object.entries(activities)
         .sort((a, b) => b[1].players.size - a[1].players.size)
         .map(([activity, data]) => 
@@ -841,11 +830,10 @@
         </div>
       `;
 
-      // Show general-only players first
       if (generalOnlyPlayers.size > 0) {
         const headerRow = document.createElement("tr");
         headerRow.className = "no-activity";
-        headerRow.innerHTML = `<td colspan="5">حضور عام فقط (${generalOnlyPlayers.size} لاعب)</td>`;
+        headerRow.innerHTML = `<td colspan="5">لاعبون بلا أنشطة (${generalOnlyPlayers.size} لاعب)</td>`;
         tbody.appendChild(headerRow);
         
         generalOnlyPlayers.forEach(playerId => {
@@ -867,14 +855,12 @@
         });
       }
 
-      // Show players with activities
       if (activityPlayers.size > 0) {
         const headerRow = document.createElement("tr");
         headerRow.className = "general-with-activities";
         headerRow.innerHTML = `<td colspan="5">لاعبون مع أنشطة (${activityPlayers.size} لاعب)</td>`;
         tbody.appendChild(headerRow);
 
-        // Group players with their activities
         const playersWithActivities = {};
         activityRecords.forEach(record => {
           if (!playersWithActivities[record.ID]) {
@@ -886,7 +872,6 @@
           playersWithActivities[record.ID].activities.add(record.Activity);
         });
 
-        // Add players with activities
         Object.values(playersWithActivities).forEach(player => {
           const row = document.createElement("tr");
           row.className = "general-with-activities";
@@ -900,7 +885,6 @@
           tbody.appendChild(row);
         });
 
-        // Show detailed activity records grouped by activity
         Object.entries(activities)
           .sort((a, b) => b[1].players.size - a[1].players.size)
           .forEach(([activity, data]) => {
@@ -909,7 +893,6 @@
             headerRow.innerHTML = `<td colspan="5">${activity} (${data.players.size} لاعب)</td>`;
             tbody.appendChild(headerRow);
             
-            // Show ALL records for this activity
             data.items.forEach(entry => {
               const row = document.createElement("tr");
               row.innerHTML = `
@@ -933,25 +916,20 @@
       const tbody = document.querySelector("#activityTable tbody");
       tbody.innerHTML = "";
       
-      // Get all activity records
       const activityRecords = getActivityRecords(allData)
         .filter(row => row.dateKey === selectedDate);
       
-      // Get general attendance without activities
       const generalOnlyRecords = allData.filter(row => 
         row.isGeneral && 
         row.dateKey === selectedDate &&
         !activityRecords.some(act => act.ID === row.ID)
       );
       
-      // Show filtered results
       if (!activity) {
-        // Show all
         renderActivityTable();
         return;
       }
       
-      // Filter by selected activity
       const filtered = activityRecords.filter(row => row.Activity === activity);
       
       if (filtered.length === 0) {
@@ -1133,6 +1111,7 @@
     }
 
     window.onload = initialize;
+    
   </script>
   <footer>
     <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
