@@ -721,53 +721,51 @@
       }
     }
 
-    function renderMainTable() {
-      const tbody = document.querySelector("#attendanceTable tbody");
-      if (filteredData.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
-        return;
-      }
-      
-      tbody.innerHTML = "";
-      
-      const players = {};
-      filteredData.forEach(row => {
-        if (!row.ID) return;
-        
-        if (!players[row.ID]) {
-          players[row.ID] = [];
-        }
-        players[row.ID].push(row);
-      });
-      
-        const playerRecords = Object.values(players).map(playerRows => {
-          
-        playerRows.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
-        
-        const generalRecord = playerRows.find(row => row.isGeneral);
-        
-        return generalRecord || playerRows[0];
-      });
-      
-      playerRecords.sort((a, b) => new Date(b.Timestamp) - new Date(a.Timestamp));
-      
-      document.getElementById("filteredCount").textContent = playerRecords.length;
-      
-      playerRecords.forEach(row => {
-        const tr = document.createElement("tr");
-        if (row.isGeneral) tr.classList.add("general-attendance");
-        
-        tr.innerHTML = `
-          <td>${formatDate(row.Timestamp)}</td>
-          <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-          <td>${row.ID || ""}</td>
-          <td>${row["Scanned By"] || ""}</td>
-          <td>${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-          <td>${row.isGeneral ? "عام" : "نشاط"}</td>
-        `;
-        tbody.appendChild(tr);
-      });
+function renderMainTable() {
+  const tbody = document.querySelector("#attendanceTable tbody");
+  if (filteredData.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
+    return;
+  }
+  
+  tbody.innerHTML = "";
+  
+  const players = {};
+  filteredData.forEach(row => {
+    if (!row.ID) return;
+    
+    if (!players[row.ID]) {
+      players[row.ID] = [];
     }
+    players[row.ID].push(row);
+  });
+  
+    const playerRecords = Object.values(players).map(playerRows => {
+    playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+    
+    const generalRecord = playerRows.find(row => row.isGeneral);
+    return generalRecord || playerRows[0]; // Pick the oldest record
+  });
+  
+  playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+  
+  document.getElementById("filteredCount").textContent = playerRecords.length;
+  
+  playerRecords.forEach(row => {
+    const tr = document.createElement("tr");
+    if (row.isGeneral) tr.classList.add("general-attendance");
+    
+    tr.innerHTML = `
+      <td>${formatDate(row.Timestamp)}</td>
+      <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+      <td>${row.ID || ""}</td>
+      <td>${row["Scanned By"] || ""}</td>
+      <td>${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+      <td>${row.isGeneral ? "عام" : "نشاط"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
 
     function renderActivityTable() {
       const tbody = document.querySelector("#activityTable tbody");
