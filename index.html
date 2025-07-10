@@ -265,28 +265,46 @@
   display: table-cell;
 }
     @media (max-width: 768px) {
-      .header-right {
-        padding: 5px;
-        flex-direction: column;
-        gap: 5px;
-      }
-      
-      .header-info {
-        order: -1; 
-      }
-      
-      .divider {
-        width: 80%;
-        height: 1px;
-        margin: 3px auto;
-      }
-      
-      .header-right img.logo {
-        height: 40px !important;
-        margin: 0 5px;
-      }
-      
-      /* Improved navigation */
+ .header-right {
+    padding: 10px 10px;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .header-info {
+    display: block;
+    text-align: center;
+  }
+
+  .header-info .arabic-name {
+    font-size: 16px;
+  }
+
+  .header-info .english-name {
+    font-size: 12px;
+  }
+
+  .header-right .divider {
+    height: 45px;
+    width: 1.5px;
+    background-color: #f4e733;
+  }
+
+  img.logo {
+    height: 50px !important;
+    max-height: 50px !important;
+  }
+
+.container {
+  width: 90%;
+  margin: 20px auto;
+  padding: 20px 20px; 
+  box-sizing: border-box;
+  font-size: 14px;
+}
+ 
       nav {
         flex-direction: row;
         flex-wrap: wrap;
