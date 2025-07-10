@@ -768,7 +768,10 @@ function renderActivityTable() {
   console.log("Processing date:", selectedDate);
 
   // Get all records for the date
-  const dateRecords = allData.filter(row => row.dateKey === selectedDate);
+  const dateRecords = allData.filter(row => {
+    const rowDate = row.dateKey || new Date(row.Timestamp).toISOString().split('T')[0];
+    return rowDate === selectedDate;
+  });
   console.log("Records for date:", dateRecords);
 
   if (dateRecords.length === 0) {
@@ -778,10 +781,14 @@ function renderActivityTable() {
 
   // Separate records
   const activityRecords = dateRecords.filter(row => 
-    row.Activity && row.Activity !== "✅" && !row.isGeneral
+    row.Activity && row.Activity.trim() !== "" && row.Activity !== "✅"
   );
   
-  const generalRecords = dateRecords.filter(row => row.isGeneral);
+  const generalRecords = dateRecords.filter(row => 
+    row.isGeneral || 
+    row.General === "حضر" || 
+    row.General === "✔️ حضر"
+  );
   
   // Group activities
   const activities = {};
@@ -800,8 +807,10 @@ function renderActivityTable() {
     !activityRecords.some(actRec => actRec.ID === genRec.ID)
   );
 
-  // Count kids with activities
-  const kidsWithActivities = [...new Set(activityRecords.map(r => r.ID))].length;
+  // Count kids with both general and activities
+  const kidsWithBoth = generalRecords.filter(genRec => 
+    activityRecords.some(actRec => actRec.ID === genRec.ID)
+  ).length;
 
   // Update UI
   controls.innerHTML = `
@@ -815,7 +824,7 @@ function renderActivityTable() {
         <span>إجمالي الحضور: ${generalRecords.length}</span>
         <span>| الأنشطة: ${activityRecords.length}</span>
         <span>| بدون أنشطة: ${generalOnlyRecords.length}</span>
-        <span>| لاعبين بأنشطة: ${kidsWithActivities}</span>
+        <span>| لديهم أنشطة: ${kidsWithBoth}</span>
       </span>
     </div>
   `;
@@ -830,6 +839,29 @@ function renderActivityTable() {
     generalOnlyRecords.forEach(entry => {
       const row = document.createElement("tr");
       row.className = "no-activity";
+      row.innerHTML = `
+        <td>${formatDate(entry.Timestamp)}</td>
+        <td>${entry["Child Name"] || ""}</td>
+        <td>${entry.ID || ""}</td>
+        <td>${entry["Scanned By"] || ""}</td>
+        <td>عام</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
+
+  // Show kids with both general and activities
+  if (kidsWithBoth > 0) {
+    const headerRow = document.createElement("tr");
+    headerRow.className = "general-with-activities";
+    headerRow.innerHTML = `<td colspan="5">حضور عام مع أنشطة (${kidsWithBoth} لاعب)</td>`;
+    tbody.appendChild(headerRow);
+    
+    generalRecords.filter(genRec => 
+      activityRecords.some(actRec => actRec.ID === genRec.ID)
+    .forEach(entry => {
+      const row = document.createElement("tr");
+      row.className = "general-with-activities";
       row.innerHTML = `
         <td>${formatDate(entry.Timestamp)}</td>
         <td>${entry["Child Name"] || ""}</td>
