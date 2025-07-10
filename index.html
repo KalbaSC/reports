@@ -766,26 +766,35 @@ async function fetchData() {
     }
 
 function renderActivityTable() {
+  console.log("---Rendering Activity Table---");
   const tbody = document.querySelector("#activityTable tbody");
   const controls = document.getElementById("activityControls");
   tbody.innerHTML = "";
   
   const selectedDate = document.getElementById("datePicker").value || 
                       new Date().toISOString().split('T')[0];
-  
-  // Get ALL activity records for the selected date
-  const activityRecords = allData.filter(row => 
-    row.dateKey === selectedDate && 
-    row.Activity && !row.isGeneral
+  console.log("Processing date:", selectedDate);
+
+  // Get all records for the date
+  const dateRecords = allData.filter(row => {
+    const rowDate = row.dateKey || new Date(row.Timestamp).toISOString().split('T')[0];
+    return rowDate === selectedDate;
+  });
+  console.log("Records for date:", dateRecords);
+
+  if (dateRecords.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5">لا يوجد حضور في هذا التاريخ</td></tr>`;
+    return;
+  }
+
+  // Separate records
+  const activityRecords = dateRecords.filter(row => 
+    row.Activity && row.Activity !== "✅" && !row.isGeneral
   );
   
-  // Get general attendance records
-  const generalRecords = allData.filter(row => 
-    row.dateKey === selectedDate && 
-    row.isGeneral
-  );
+  const generalRecords = dateRecords.filter(row => row.isGeneral || row.General === "حضر");
   
-  // Group by activity
+  // Group activities
   const activities = {};
   activityRecords.forEach(item => {
     const activity = item.Activity || "غير محدد";
@@ -797,42 +806,32 @@ function renderActivityTable() {
     activities[`${activity}_items`].push(item);
   });
 
-  // Count general-only attendees (no activity records)
+  // Count general-only
   const generalOnlyRecords = generalRecords.filter(genRec => 
     !activityRecords.some(actRec => actRec.ID === genRec.ID)
   );
 
-  // Count kids with both general and activities
-  const kidsWithActivities = [...new Set(activityRecords.map(r => r.ID))].length;
-
-  // Update controls
+  // Update UI
   controls.innerHTML = `
     <div class="search-group">
       <select id="activityFilter" onchange="filterActivityTable()">
         <option value="">جميع الأنشطة</option>
-        ${Object.keys(activities)
-          .filter(k => !k.includes('_items'))
-          .map(act => `<option value="${act}">${act}</option>`)
-          .join('')}
+        ${Object.keys(activities).filter(k => !k.includes('_items'))
+          .map(act => `<option value="${act}">${act}</option>`).join('')}
       </select>
       <span class="summary-box">
         <span>إجمالي الحضور: ${generalRecords.length}</span>
         <span>| الأنشطة: ${activityRecords.length}</span>
         <span>| بدون أنشطة: ${generalOnlyRecords.length}</span>
-        <span>| لاعبين بأنشطة: ${kidsWithActivities}</span>
       </span>
     </div>
   `;
 
-  // Show general-only first
+  // Render general attendance first
   if (generalOnlyRecords.length > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "no-activity";
-    headerRow.innerHTML = `
-      <td colspan="5">
-        حضور عام بدون أنشطة (${generalOnlyRecords.length} لاعب)
-      </td>
-    `;
+    headerRow.innerHTML = `<td colspan="5">حضور عام بدون أنشطة (${generalOnlyRecords.length} لاعب)</td>`;
     tbody.appendChild(headerRow);
     
     generalOnlyRecords.forEach(entry => {
@@ -849,17 +848,13 @@ function renderActivityTable() {
     });
   }
 
-  // Show activities
+  // Render activities
   Object.entries(activities).forEach(([activity, count]) => {
     if (activity.includes('_items')) return;
     
     const headerRow = document.createElement("tr");
     headerRow.className = "activity-group";
-    headerRow.innerHTML = `
-      <td colspan="5">
-        ${activity} (${count} حضور)
-      </td>
-    `;
+    headerRow.innerHTML = `<td colspan="5">${activity} (${count} حضور)</td>`;
     tbody.appendChild(headerRow);
     
     activities[`${activity}_items`].forEach(entry => {
