@@ -458,31 +458,23 @@
       return formatted;
     }
 
-    // Process and deduplicate raw data
-    function processRawData(rawData) {
-      if (!Array.isArray(rawData)) return [];
-      
-      const uniqueEntries = new Map();
-      
-      rawData.forEach(item => {
-        if (!item || typeof item !== 'object') return;
-        if (!item.ID || !item.Timestamp) return;
-        
-        const date = new Date(item.Timestamp).toISOString().split('T')[0];
-        const key = `${item.ID}_${date}`;
-        
-        // Keep first entry per ID per day, prioritizing general attendance
-        if (!uniqueEntries.has(key) || item.General === "✔️ حضر") {
-          uniqueEntries.set(key, {
-            ...item,
-            isGeneral: item.General === "✔️ حضر",
-            dateKey: date
-          });
-        }
-      });
-      
-      return Array.from(uniqueEntries.values());
-    }
+function processRawData(rawData) {
+  if (!Array.isArray(rawData)) return [];
+  
+  // First pass: Process all records
+  return rawData.map(item => {
+    if (!item || typeof item !== 'object') return null;
+    if (!item.ID || !item.Timestamp) return null;
+    
+    const date = new Date(item.Timestamp).toISOString().split('T')[0];
+    
+    return {
+      ...item,
+      isGeneral: item.General === "✔️ حضر" || item.General === "حضر",
+      dateKey: date
+    };
+  }).filter(Boolean); // Remove null entries
+}
 
     // Get all activity records for a child (including duplicates)
     function getActivityRecords(rawData) {
@@ -776,10 +768,7 @@ function renderActivityTable() {
   console.log("Processing date:", selectedDate);
 
   // Get all records for the date
-  const dateRecords = allData.filter(row => {
-    const rowDate = row.dateKey || new Date(row.Timestamp).toISOString().split('T')[0];
-    return rowDate === selectedDate;
-  });
+  const dateRecords = allData.filter(row => row.dateKey === selectedDate);
   console.log("Records for date:", dateRecords);
 
   if (dateRecords.length === 0) {
@@ -792,7 +781,7 @@ function renderActivityTable() {
     row.Activity && row.Activity !== "✅" && !row.isGeneral
   );
   
-  const generalRecords = dateRecords.filter(row => row.isGeneral || row.General === "حضر");
+  const generalRecords = dateRecords.filter(row => row.isGeneral);
   
   // Group activities
   const activities = {};
@@ -806,10 +795,13 @@ function renderActivityTable() {
     activities[`${activity}_items`].push(item);
   });
 
-  // Count general-only
+  // Count general-only (no activity records)
   const generalOnlyRecords = generalRecords.filter(genRec => 
     !activityRecords.some(actRec => actRec.ID === genRec.ID)
   );
+
+  // Count kids with activities
+  const kidsWithActivities = [...new Set(activityRecords.map(r => r.ID))].length;
 
   // Update UI
   controls.innerHTML = `
@@ -823,11 +815,12 @@ function renderActivityTable() {
         <span>إجمالي الحضور: ${generalRecords.length}</span>
         <span>| الأنشطة: ${activityRecords.length}</span>
         <span>| بدون أنشطة: ${generalOnlyRecords.length}</span>
+        <span>| لاعبين بأنشطة: ${kidsWithActivities}</span>
       </span>
     </div>
   `;
 
-  // Render general attendance first
+  // Show general-only first
   if (generalOnlyRecords.length > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "no-activity";
@@ -848,7 +841,7 @@ function renderActivityTable() {
     });
   }
 
-  // Render activities
+  // Show activities
   Object.entries(activities).forEach(([activity, count]) => {
     if (activity.includes('_items')) return;
     
