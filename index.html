@@ -257,12 +257,12 @@
       padding: 20px;
       color: #aaa;
     }
-  #mainView table th:nth-last-child(-n+2),
-  #mainView table td:nth-last-child(-n+2) {
-    display: none;
-  }
-.hidden-column {
-  display: none !important;
+#mainView .hidden-column {
+  display: none;
+}
+
+#mainView.show-hidden-columns .hidden-column {
+  display: table-cell;
 }
     @media (max-width: 768px) {
       .header-right {
@@ -344,6 +344,16 @@
   }
   .hidden-column {
     display: none !important;
+  }
+  #mainView table {
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  
+  /* Ensure columns don't wrap */
+  #mainView table td, #mainView table th {
+    white-space: nowrap;
   }
     }
   </style>
@@ -1031,19 +1041,16 @@ function renderMainTable() {
       });
     }
 
-  function toggleHiddenColumns() {
-    const columns = document.querySelectorAll('#mainView td.hidden-column, #mainView th.hidden-column');
-    const isHidden = columns[0]?.style.display === 'none';
-    
-    columns.forEach(col => {
-      col.style.display = isHidden ? 'table-cell' : 'none';
-    });
-    
-    const btn = document.querySelector('button[onclick="toggleHiddenColumns()"]');
-    if (btn) {
-      btn.innerHTML = `<i class="fas fa-eye"></i> ${isHidden ? 'إخفاء' : 'عرض'} الأعمدة`;
-    }
+function toggleHiddenColumns() {
+  const mainView = document.getElementById("mainView");
+  mainView.classList.toggle("show-hidden-columns");
+  
+  const btn = document.querySelector('button[onclick="toggleHiddenColumns()"]');
+  if (btn) {
+    const isShowing = mainView.classList.contains("show-hidden-columns");
+    btn.innerHTML = `<i class="fas fa-eye"></i> ${isShowing ? 'إخفاء' : 'عرض'} الأعمدة`;
   }
+}
 
     function renderTimingChart() {
       let early = 0, late = 0;
