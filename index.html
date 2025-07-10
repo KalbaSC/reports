@@ -790,33 +790,29 @@ function renderActivityTable() {
   tbody.innerHTML = "";
   
   const selectedDate = document.getElementById("datePicker").value || 
-                     new Date().toISOString().split('T')[0];
+                      new Date().toISOString().split('T')[0];
 
   // Get all records for selected date
   const dateRecords = allData.filter(row => row.dateKey === selectedDate);
+  
   if (dateRecords.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5">لا يوجد حضور في هذا التاريخ</td></tr>`;
     return;
   }
 
-  // Get activity records (non-general)
+  // Get activity records (non-general, with actual activities)
   const activityRecords = getActivityRecords(dateRecords);
   
-  // Get general attendance records
-  const generalRecords = dateRecords.filter(row => row.isGeneral);
+  // Get general attendance records (excluding any that have activities)
+  const generalRecords = dateRecords.filter(row => 
+    row.isGeneral && 
+    !activityRecords.some(act => act.ID === row.ID)
+  );
 
   // Get unique players
   const allPlayers = new Set(dateRecords.map(r => r.ID));
   const activityPlayers = new Set(activityRecords.map(r => r.ID));
-  const generalOnlyPlayers = new Set(
-    Array.from(new Set(generalRecords.map(r => r.ID)))
-      .filter(id => !activityPlayers.has(id))
-  );
-
-  // Debug log - remove after testing
-  console.log("Activity players:", activityPlayers);
-  console.log("General only players:", generalOnlyPlayers);
-  console.log("All activity records:", activityRecords);
+  const generalOnlyPlayers = new Set(generalRecords.map(r => r.ID));
 
   // Group activities
   const activities = {};
