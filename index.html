@@ -457,7 +457,10 @@
       <button>الفترات الزمنية ▼</button>
       <div class="dropdown-content">
         <a onclick="filterByPeriod('today')">اليوم</a>
-<div class="dropdown">
+        <a onclick="filterByPeriod('month')">هذا الشهر</a>
+        <a onclick="filterByPeriod('all')">الكل</a>
+      </div>
+      
   <button onclick="showDateRangePicker()">هذا الأسبوع ▼</button>
   <div class="dropdown-content" id="dateRangePicker" style="padding: 10px; width: 250px;">
     <div style="display: flex; gap: 10px; margin-bottom: 10px;">
@@ -475,12 +478,13 @@
       تطبيق
     </button>
   </div>
-</div>
-        <a onclick="filterByPeriod('month')">هذا الشهر</a>
-        <a onclick="filterByPeriod('all')">الكل</a>
-      </div>
+
     </div>
   </nav>
+  
+<div class="container" id="advancedStatsContainer" style="display: none;">
+  <div id="advancedStats"></div>
+</div>
 
   <div class="container" id="mainView">
     <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
