@@ -321,17 +321,24 @@
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
 }
- 
-      nav {
-        flex-direction: row;
-        flex-wrap: wrap;
-        padding: 5px;
-      }
+      
+  nav {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 5px;
+  }
+  
+  #dateRangePicker {
+    width: 220px;
+    right: 0;
+  }
       
       nav button, .dropdown > button {
         font-size: 11px;
         padding: 8px 10px;
         margin: 2px;
+        min-width: auto;
         min-width: auto;
         flex: 1;
       }
@@ -345,7 +352,7 @@
         padding: 10px;
         margin: 10px auto;
         width: 100%;
-    overflow-x: auto;
+        overflow-x: auto;
       }
       
       .controls {
@@ -460,38 +467,40 @@
     </div>
   </header>
 
-  <nav>
-    <button onclick="showMainView()" class="active">الحضور اليومي</button>
-    <button onclick="showActivitiesView()">الحضور حسب الأنشطة</button>
-    <button onclick="showStatsView()">الإحصائيات</button>
-    <div class="dropdown">
-      <button>الفترات الزمنية ▼</button>
-      <div class="dropdown-content">
-        <a onclick="filterByPeriod('today')">اليوم</a>
-        <a onclick="filterByPeriod('month')">هذا الشهر</a>
-        <a onclick="filterByPeriod('all')">الكل</a>
-      </div>
-      
-  <button onclick="showDateRangePicker()">هذا الأسبوع ▼</button>
-  <div class="dropdown-content" id="dateRangePicker" style="padding: 10px; width: 250px;">
-    <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-      <div>
-        <label style="color: #f4e733;">من</label>
-        <input type="date" id="startDate" style="width: 100%;">
-      </div>
-      <div>
-        <label style="color: #f4e733;">إلى</label>
-        <input type="date" id="endDate" style="width: 100%;">
-      </div>
+<nav>
+  <button onclick="showMainView()" class="active">الحضور اليومي</button>
+  <button onclick="showActivitiesView()">الحضور حسب الأنشطة</button>
+  <button onclick="showStatsView()">الإحصائيات</button>
+  
+  <div class="dropdown">
+    <button>الفترات الزمنية ▼</button>
+    <div class="dropdown-content">
+      <a onclick="filterByPeriod('today')">اليوم</a>
+      <a onclick="filterByPeriod('month')">هذا الشهر</a>
+      <a onclick="filterByPeriod('all')">الكل</a>
     </div>
-    <button onclick="applyDateRange()" 
-            style="background: #f4e733; color: black; border: none; padding: 5px 10px; width: 100%;">
-      تطبيق
-    </button>
   </div>
-
+  
+  <div class="dropdown">
+    <button onclick="showDateRangePicker()">هذا الأسبوع ▼</button>
+    <div class="dropdown-content" id="dateRangePicker" style="padding: 10px; width: 250px;">
+      <div style="display: flex; gap: 10px; margin-bottom: 10px;">
+        <div>
+          <label style="color: #f4e733;">من</label>
+          <input type="date" id="startDate" style="width: 100%;">
+        </div>
+        <div>
+          <label style="color: #f4e733;">إلى</label>
+          <input type="date" id="endDate" style="width: 100%;">
+        </div>
+      </div>
+      <button onclick="applyDateRange()" 
+              style="background: #f4e733; color: black; border: none; padding: 5px 10px; width: 100%;">
+        تطبيق
+      </button>
     </div>
-  </nav>
+  </div>
+</nav>
   
 <div class="container" id="advancedStatsContainer" style="display: none;">
   <div id="advancedStats"></div>
