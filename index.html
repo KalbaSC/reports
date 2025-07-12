@@ -476,13 +476,14 @@
     <button>الفترات الزمنية ▼</button>
     <div class="dropdown-content">
       <a onclick="filterByPeriod('today')">اليوم</a>
+      <a onclick="applyMondayThursdayRange()">هذا الأسبوع (إثنين-خميس)</a>
       <a onclick="filterByPeriod('month')">هذا الشهر</a>
       <a onclick="filterByPeriod('all')">الكل</a>
     </div>
   </div>
   
   <div class="dropdown">
-    <button onclick="showDateRangePicker()">هذا الأسبوع ▼</button>
+    <button>نطاق مخصص ▼</button>
     <div class="dropdown-content" id="dateRangePicker" style="padding: 10px; width: 250px;">
       <div style="display: flex; gap: 10px; margin-bottom: 10px;">
         <div>
@@ -1256,18 +1257,15 @@ function toggleHiddenColumns() {
       `;
     }
     
-// Show date picker and auto-set Monday-Thursday if empty
 function showDateRangePicker() {
   const picker = document.getElementById('dateRangePicker');
   picker.classList.toggle('show');
   
-  // Only auto-set if inputs are empty
   if (!document.getElementById('startDate').value) {
     applyMondayThursdayRange();
   }
 }
 
-// Apply custom date range filter
 function applyDateRange() {
   const start = document.getElementById('startDate').value;
   const end = document.getElementById('endDate').value;
@@ -1278,52 +1276,45 @@ function applyDateRange() {
   }
 
   filteredData = allData.filter(row => {
-    const rowDate = row.dateKey; // Already in YYYY-MM-DD format from processRawData()
-    return rowDate >= start && rowDate <= end;
+    return row.dateKey >= start && row.dateKey <= end;
   });
 
   updateFilteredView();
   updateAdvancedStats(start, end);
 }
 
-// Set filter to current Monday-Thursday
 function applyMondayThursdayRange() {
   const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}));
-  const day = now.getDay(); // 0=Sun, 1=Mon...6=Sat
-  
-  // Calculate Monday
+  const day = now.getDay(); 
   const start = new Date(now);
-  const diff = day === 0 ? 6 : day - 1; // Days since Monday
+  
+  const diff = day === 0 ? 6 : day - 1;
   start.setDate(now.getDate() - diff);
   start.setHours(0, 0, 0, 0);
   
-  // Calculate Thursday (Monday + 3 days)
   const end = new Date(start);
   end.setDate(start.getDate() + 3);
   end.setHours(23, 59, 59, 999);
   
-  // Format as YYYY-MM-DD for input fields
   const startStr = start.toISOString().split('T')[0];
   const endStr = end.toISOString().split('T')[0];
   
   document.getElementById('startDate').value = startStr;
   document.getElementById('endDate').value = endStr;
   
-  // Apply filter
   filteredData = allData.filter(row => {
-    return row.dateKey >= startStr && row.dateKey <= endStr;
+    const rowDate = row.dateKey;
+    return rowDate >= startStr && rowDate <= endStr;
   });
   
   updateFilteredView();
   updateAdvancedStats(startStr, endStr);
 }
 
-// Show detailed statistics
 function updateAdvancedStats(start, end) {
-  // Get unique IDs for entire period
+
   const uniqueAllPeriod = new Set(filteredData.map(r => r.ID)).size;
   
-  // Get daily unique counts
   const daysInRange = getDatesBetween(start, end);
   const dailyUniques = {};
   
@@ -1332,7 +1323,6 @@ function updateAdvancedStats(start, end) {
     dailyUniques[date] = new Set(dayData.map(r => r.ID)).size;
   });
 
-  // Generate stats HTML
   const statsHTML = `
     <div class="stat-card">
       <h3 style="color:#f4e733;">إحصائيات متقدمة</h3>
@@ -1350,7 +1340,6 @@ function updateAdvancedStats(start, end) {
   document.getElementById('advancedStats').innerHTML = statsHTML;
 }
 
-// Get all dates between two dates (inclusive)
 function getDatesBetween(start, end) {
   const dates = [];
   let current = new Date(start);
