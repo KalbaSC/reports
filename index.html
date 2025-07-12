@@ -538,10 +538,6 @@
 <div class="container" id="advancedStatsContainer" style="display: none;">
   <div id="advancedStats"></div>
 </div>
-  
-<div class="container" id="advancedStatsContainer" style="display: none;">
-  <div id="advancedStats"></div>
-</div>
 
   <div class="container" id="mainView">
     <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
@@ -843,29 +839,37 @@ function filterByPeriod(period) {
         return rowDate.toDateString() === now.toDateString();
         
       case 'week':
-
-        const startOfWeek = new Date(now);
-        const day = now.getDay(); 
-        const diff = day === 0 ? 6 : day - 1; 
-        startOfWeek.setDate(now.getDate() - diff);
-        startOfWeek.setHours(0, 0, 0, 0); 
-        
-        const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 3);
-        endOfWeek.setHours(23, 59, 59, 999);
-        
+        const {startOfWeek, endOfWeek} = getCurrentWeekRange();
         return rowDate >= startOfWeek && rowDate <= endOfWeek;
         
       case 'month':
         return rowDate.getMonth() === now.getMonth() && 
                rowDate.getFullYear() === now.getFullYear();
                
-      default:
+      default: // 'all'
         return true;
     }
   });
   
   updateFilteredView();
+}
+    
+function getCurrentWeekRange() {
+  const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}));
+  const day = now.getDay(); // 0=Sunday, 1=Monday, etc.
+  
+  // Calculate Monday of this week
+  const startOfWeek = new Date(now);
+  const diff = day === 0 ? 6 : day - 1; // Days since Monday
+  startOfWeek.setDate(now.getDate() - diff);
+  startOfWeek.setHours(0, 0, 0, 0);
+  
+  // Calculate Thursday of this week (3 days after Monday)
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 3);
+  endOfWeek.setHours(23, 59, 59, 999);
+  
+  return {startOfWeek, endOfWeek};
 }
 
     function filterByDate() {
@@ -1312,35 +1316,6 @@ function applyDateRange() {
   });
 
   updateFilteredView();
-  updateAdvancedStats(start, end);
-}
-
-function applyMondayThursdayRange() {
-  const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}));
-  const day = now.getDay(); 
-  const start = new Date(now);
-  
-  const diff = day === 0 ? 6 : day - 1;
-  start.setDate(now.getDate() - diff);
-  start.setHours(0, 0, 0, 0);
-  
-  const end = new Date(start);
-  end.setDate(start.getDate() + 3);
-  end.setHours(23, 59, 59, 999);
-  
-  const startStr = start.toISOString().split('T')[0];
-  const endStr = end.toISOString().split('T')[0];
-  
-  document.getElementById('startDate').value = startStr;
-  document.getElementById('endDate').value = endStr;
-  
-  filteredData = allData.filter(row => {
-    const rowDate = row.dateKey;
-    return rowDate >= startStr && rowDate <= endStr;
-  });
-  
-  updateFilteredView();
-  updateAdvancedStats(startStr, endStr);
 }
 
 function updateAdvancedStats(start, end) {
