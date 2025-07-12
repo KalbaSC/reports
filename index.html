@@ -754,11 +754,9 @@
     }
 
 function filterByPeriod(period) {
-  // Get current time in UAE (Asia/Dubai) timezone
   const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}));
   
   filteredData = allData.filter(row => {
-    // Convert record timestamp to UAE timezone
     const rowDate = new Date(new Date(row.Timestamp).toLocaleString("en-US", {timeZone: "Asia/Dubai"}));
     
     switch(period) {
@@ -766,14 +764,15 @@ function filterByPeriod(period) {
         return rowDate.toDateString() === now.toDateString();
         
       case 'week':
+
         const startOfWeek = new Date(now);
         const day = now.getDay(); 
-        const diff = day === 0 ? 4 : day - 1; 
+        const diff = day === 0 ? 6 : day - 1; 
         startOfWeek.setDate(now.getDate() - diff);
-        startOfWeek.setHours(0, 0, 0, 0); // Start Mon
+        startOfWeek.setHours(0, 0, 0, 0); 
         
         const endOfWeek = new Date(startOfWeek);
-        endOfWeek.setDate(startOfWeek.getDate() + 4); // End Thur
+        endOfWeek.setDate(startOfWeek.getDate() + 3);
         endOfWeek.setHours(23, 59, 59, 999);
         
         return rowDate >= startOfWeek && rowDate <= endOfWeek;
