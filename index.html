@@ -307,6 +307,8 @@
   padding: 20px 20px; 
   box-sizing: border-box;
   font-size: 14px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
  
       nav {
@@ -320,7 +322,7 @@
         padding: 8px 10px;
         margin: 2px;
         min-width: auto;
-        flex: 1 1 45%;
+        flex: 1;
       }
       
       .dropdown-content {
@@ -329,17 +331,19 @@
       }
       
       .container {
-        padding: 8px;
-        margin: 5px auto;
-        width: 98%;
+        padding: 10px;
+        margin: 10px auto;
+        width: 100%;
+    overflow-x: auto;
       }
       
       .controls {
-        padding: 8px;
+        padding: 10px;
       }
       
       .filter-bar {
-        gap: 8px;
+    flex-direction: column;
+    gap: 8px;
       }
       
       .search-group {
@@ -350,26 +354,33 @@
       .search-group input,
       .search-group button.clear-btn,
       #datePicker {
-        font-size: 14px;
-        height: 36px;
-        padding: 6px 8px;
+        font-size: 12px;
+        height: 32px;
+        padding: 5px 7px;
+        width: 100% !important;
+        margin-bottom: 5px;
       }
       
       #attendanceTable, #activityTable {
         font-size: 12px;
       }
-      
+        table {
+    font-size: 12px;
+  }
       th, td {
-        padding: 4px;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
         max-width: 100px;
+        padding: 4px 6px;
+        font-size: 12px;
       }
-      
+       button[onclick="toggleHiddenColumns()"] {
+       display: none !important;
+      }
       .export-buttons {
-        flex-direction: row;
-        flex-wrap: wrap;
+        flex-direction: row !important;
+        flex-wrap: nowrap !important;
         justify-content: center;
       }
       
@@ -378,8 +389,15 @@
         font-size: 13px;
         margin: 2px;
         flex: 1 1 45%;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    gap: 5px !important;
       }
-      
+
+     #activityTable th:nth-child(4),
+     #activityTable td:nth-child(4) {
+     display: none;
+     }
       .stats-container {
         grid-template-columns: 1fr;
         gap: 10px;
@@ -955,6 +973,15 @@ function renderMainTable() {
             <td>${latestRecord["Scanned By"] || ""}</td>
             <td>عام</td>
           `;
+  const isMobile = window.innerWidth <= 768;
+  
+  row.innerHTML = `
+    <td>${formatDate(entry.Timestamp)}</td>
+    <td>${entry["Child Name"] || ""}</td>
+    ${!isMobile ? `<td>${entry.ID || ""}</td>` : ''}
+    ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ''}
+    <td>${entry.Activity || ""}</td>
+  `;
           tbody.appendChild(row);
         });
       }
@@ -1228,8 +1255,23 @@ function updateSummary() {
       document.getElementById("datePicker").value = today;
       fetchData();
     }
+    
+function checkMobileView() {
+  const isMobile = window.innerWidth <= 768;
+  if (isMobile) {
+    document.querySelector('button[onclick="toggleHiddenColumns()"]').style.display = 'none';
+    
+    const exportButtons = document.querySelector('.export-buttons');
+    if (exportButtons) {
+      exportButtons.style.flexDirection = 'row';
+      exportButtons.style.flexWrap = 'nowrap';
+    }
+  }
+}
 
     window.onload = initialize;
+    window.addEventListener('load', checkMobileView);
+    window.addEventListener('resize', checkMobileView);
     
   </script>
   <footer>
