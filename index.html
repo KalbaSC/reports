@@ -247,6 +247,17 @@
       border-radius: 10px;
       border: 1px solid #f4e733;
     }
+.dropdown-content.show {
+  display: block !important;
+}
+
+#dateRangePicker input[type="date"] {
+  background: white;
+  color: black;
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #f4e733;
+}
     #loading {
       display: none;
       text-align: center;
@@ -1235,7 +1246,75 @@ function toggleHiddenColumns() {
         <p><strong>إجمالي اليوم:</strong> ${todayData.length}</p>
       `;
     }
+    
+function showDateRangePicker() {
+  document.getElementById('dateRangePicker').classList.toggle('show');
+}
 
+function applyDateRange() {
+  const start = document.getElementById('startDate').value;
+  const end = document.getElementById('endDate').value;
+  
+  if (!start || !end) {
+    alert("الرجاء تحديد تاريخ البداية والنهاية");
+    return;
+  }
+
+  filteredData = allData.filter(row => {
+    const rowDate = new Date(row.Timestamp).toISOString().split('T')[0];
+    return rowDate >= start && rowDate <= end;
+  });
+
+  updateFilteredView();
+  updateAdvancedStats(start, end); 
+}
+
+function updateAdvancedStats(start, end) {
+  const uniqueAllPeriod = new Set(filteredData.map(r => r.ID)).size;
+
+  const daysInRange = getDatesBetween(start, end);
+  const dailyUniques = {};
+  
+  daysInRange.forEach(date => {
+    const dayData = filteredData.filter(r => r.dateKey === date);
+    dailyUniques[date] = new Set(dayData.map(r => r.ID)).size;
+  });
+
+  const statsHTML = `
+    <div class="stat-card">
+      <h3 style="color:#f4e733;">إحصائيات متقدمة</h3>
+      <p><strong>المجموع الكلي (جميع الأيام):</strong> ${filteredData.length} تسجيل</p>
+      <p><strong>اللاعبون المميزون (جميع الأيام):</strong> ${uniqueAllPeriod}</p>
+      <p><strong>اللاعبون المميزون حسب اليوم:</strong></p>
+      <ul>
+        ${Object.entries(dailyUniques).map(([date, count]) => 
+          `<li>${formatArabicDate(date)}: ${count} لاعب</li>`
+        ).join('')}
+      </ul>
+    </div>
+  `;
+
+  document.getElementById('advancedStats').innerHTML = statsHTML;
+}
+
+function getDatesBetween(start, end) {
+  const dates = [];
+  let current = new Date(start);
+  const endDate = new Date(end);
+
+  while (current <= endDate) {
+    dates.push(current.toISOString().split('T')[0]);
+    current.setDate(current.getDate() + 1);
+  }
+
+  return dates;
+}
+
+function formatArabicDate(isoDate) {
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  return new Date(isoDate).toLocaleDateString('ar-EG', options);
+}
+    
 function updateSummary() {
   const selectedDate = document.getElementById("datePicker").value;
   
