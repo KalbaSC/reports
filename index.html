@@ -191,8 +191,8 @@
     }
     .download-icon {
       display: inline-block;
-      width: 18px;
-      height: 18px;
+      width: 15px;
+      height: 15px;
       background: black;
       clip-path: polygon(50% 0%, 100% 50%, 75% 50%, 75% 100%, 25% 100%, 25% 50%, 0% 50%);
       margin-left: 5px;
@@ -215,6 +215,38 @@
     .general-with-activities {
       background-color: rgba(255, 193, 7, 0.2); 
     }
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: #222;
+  min-width: 120px;
+  z-index: 1;
+  border: 1px solid #f4e733;
+  right: 0;
+}
+
+.dropdown:hover .dropdown-content {
+  display: block;
+}
+
+#dateRangePicker {
+  width: 250px;
+  padding: 10px;
+}
+
+#dateRangePicker input[type="date"] {
+  background: white;
+  color: black;
+  padding: 5px;
+  border-radius: 4px;
+  border: 1px solid #f4e733;
+  width: 100%;
+}
     footer {
       background-color: #111;
       color: white;
