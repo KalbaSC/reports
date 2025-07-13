@@ -851,7 +851,7 @@ function setCurrentWeekDates() {
   monday.setDate(today.getDate() - diffToMonday);
   
   const thursday = new Date(monday);
-  thursday.setDate(monday.getDate() + 3); // Monday + 3 days = Thursday
+  thursday.setDate(monday.getDate() + 3); 
   
   document.getElementById('weekStartDate').value = monday.toISOString().split('T')[0];
   document.getElementById('weekEndDate').value = thursday.toISOString().split('T')[0];
@@ -868,11 +868,49 @@ function applyWeekFilter() {
     return rowDate >= startDate && rowDate <= endDate;
   });
   
-  updateFilteredView();
+  renderWeeklySummaryTable();
   updateWeekSummary(startDate, endDate);
   closeWeekRangePicker();
 }
+    
+function renderWeeklySummaryTable() {
+  const tbody = document.querySelector("#attendanceTable tbody");
+  tbody.innerHTML = "";
+  
+  if (filteredData.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
+    return;
+  }
 
+  const uniquePerDay = {};
+  filteredData.forEach(row => {
+    const key = `${row.ID}_${row.dateKey}`;
+    if (!uniquePerDay[key]) {
+      uniquePerDay[key] = row;
+    }
+  });
+
+  const summaryData = Object.values(uniquePerDay);
+  summaryData.sort((a, b) => {
+    const dateA = new Date(a.Timestamp);
+    const dateB = new Date(b.Timestamp);
+    return dateA - dateB;
+  });
+
+  summaryData.forEach(row => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${formatDate(row.Timestamp)}</td>
+      <td>${row["Child Name"] || ""}</td>
+      <td>${row.ID || ""}</td>
+      <td>${row["Scanned By"] || ""}</td>
+      <td>${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+      <td>${row.isGeneral ? "عام" : "نشاط"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+    
 function updateSummary(isWeek = false) {
   if (isWeek) return;
 
@@ -950,14 +988,15 @@ function clearFilters() {
   
   showFilterOptions("");
   filteredData = allData.filter(row => row.dateKey === today);
-  updateFilteredView();
+  
+  renderMainTable();
+  updateSummary();
   
   const summaryElement = document.querySelector('.summary-box');
   summaryElement.innerHTML = `
     <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
     <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
   `;
-  updateSummary();
 }
 
     function showFilterOptions(value) {
