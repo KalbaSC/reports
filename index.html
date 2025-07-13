@@ -758,28 +758,24 @@
       });
     }
 
-    function filterByPeriod(period) {
-      const now = new Date();
-      filteredData = allData.filter(row => {
-        const rowDate = new Date(row.Timestamp);
-        
-        switch(period) {
-          case 'today':
-            return rowDate.toDateString() === now.toDateString();
-          case 'week':
-            const startOfWeek = new Date(now);
-            startOfWeek.setDate(now.getDate() - now.getDay());
-            return rowDate >= startOfWeek;
-          case 'month':
-            return rowDate.getMonth() === now.getMonth() && 
-                   rowDate.getFullYear() === now.getFullYear();
-          default:
-            return true;
-        }
-      });
-      
-      updateFilteredView();
-    }
+function filterByPeriod(period) {
+  if (period === 'today') {
+    filterByDate(); 
+    return;
+  }
+    filteredData = getFilteredDataByPeriod(period);
+  updatePeriodSummary(period);
+  renderPeriodTable(period);
+  updateTodayStats();
+  
+  if (document.getElementById("activityView").style.display !== "none") {
+    renderActivityTable();
+  }
+  
+  if (document.getElementById("statsView").style.display !== "none") {
+    renderCharts();
+  }
+}
 
     function filterByDate() {
       const selectedDate = document.getElementById("datePicker").value;
@@ -1035,7 +1031,7 @@ function renderMainTable() {
   row.innerHTML = `
     <td>${formatDate(entry.Timestamp)}</td>
     <td>${entry["Child Name"] || ""}</td>
-    ${!isMobile ? `<td>${entry.ID || ""}</td>` : ''}
+    <td>${entry.ID || ""}</td>
     ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ''}
     <td>${entry.Activity || ""}</td>
   `;
@@ -1216,6 +1212,104 @@ function updateSummary() {
   const filteredUniquePlayers = new Set();
   filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
   document.getElementById("filteredCount").textContent = filteredUniquePlayers.size;
+}
+
+function countUniqueDailyAttendances(data) {
+  const uniqueAttendances = new Set();
+  data.forEach(row => {
+    if (row.ID) {
+      uniqueAttendances.add(`${row.ID}_${row.dateKey}`);
+    }
+  });
+  return uniqueAttendances.size;
+}
+
+
+function getFilteredDataByPeriod(period) {
+  const now = new Date();
+  return allData.filter(row => {
+    const rowDate = new Date(row.Timestamp);
+    
+    switch(period) {
+      case 'week':
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        return rowDate >= startOfWeek && rowDate <= now;
+      case 'month':
+        return rowDate.getMonth() === now.getMonth() && 
+               rowDate.getFullYear() === now.getFullYear() &&
+               rowDate <= now;
+      default:
+        return true;
+    }
+  });
+}
+
+
+function updatePeriodSummary(period) {
+  if (period === 'today') {
+    // Use existing daily counting logic
+    updateSummary();
+    return;
+  }
+  
+  const periodData = getFilteredDataByPeriod(period);
+  const uniqueCount = countUniqueDailyAttendances(periodData);
+  
+  document.getElementById("totalCount").textContent = uniqueCount;
+  document.getElementById("filteredCount").textContent = uniqueCount;
+}
+
+
+function renderPeriodTable(period) {
+  const tbody = document.querySelector("#attendanceTable tbody");
+  tbody.innerHTML = "";
+  
+  const periodData = getFilteredDataByPeriod(period);
+  
+  if (periodData.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
+    return;
+  }
+
+  // Group by ID and date to show one record per ID per day
+  const dailyAttendances = {};
+  periodData.forEach(row => {
+    if (!row.ID) return;
+    const idDateKey = `${row.ID}_${row.dateKey}`;
+    
+    if (!dailyAttendances[idDateKey]) {
+      dailyAttendances[idDateKey] = row;
+    } else {
+      // Keep earliest record for each ID+date
+      const existingTime = new Date(dailyAttendances[idDateKey].Timestamp);
+      const newTime = new Date(row.Timestamp);
+      if (newTime < existingTime) {
+        dailyAttendances[idDateKey] = row;
+      }
+    }
+  });
+
+  // Convert to array and sort by timestamp
+  const records = Object.values(dailyAttendances);
+  records.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+
+  // Render the records
+  records.forEach(row => {
+    const tr = document.createElement("tr");
+    if (row.isGeneral) tr.classList.add("general-attendance");
+    
+    tr.innerHTML = `
+      <td>${formatDate(row.Timestamp)}</td>
+      <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+      <td>${row.ID || ""}</td>
+      <td>${row["Scanned By"] || ""}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
     function exportToExcel() {
