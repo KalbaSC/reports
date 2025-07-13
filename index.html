@@ -1337,13 +1337,8 @@ function toggleHiddenColumns() {
       `;
     }
 
-function updateSummary(isWeek = false) {
-  const selectedDate = document.getElementById("datePicker").value;
-
-  const uniquePlayers = new Set();
-  allData
-    .filter(row => selectedDate ? row.dateKey === selectedDate : true)
-    .forEach(row => uniquePlayers.add(row.ID));
+function updateWeekSummary(startDate, endDate) {
+  const uniqueCount = countUniqueWeeklyAttendances(filteredData);
 
   const filteredUniquePlayers = new Set();
   filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
@@ -1351,8 +1346,12 @@ function updateSummary(isWeek = false) {
   const summaryElement = document.querySelector('.summary-box');
   if (summaryElement) {
     summaryElement.innerHTML = `
-      <span id="summary">إجمالي الحضور: <span id="totalCount">${uniquePlayers.size}</span></span>
-      <span id="filteredSummary" style="${isWeek ? 'display:none;' : 'display:inline;'}">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
+      <span>إجمالي الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}: 
+      <span id="totalCount">${uniqueCount}</span></span>
+      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
+      <button onclick="clearWeekFilter()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
+        <i class="fas fa-times"></i>
+      </button>
     `;
   }
 }
