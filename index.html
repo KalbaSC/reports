@@ -624,6 +624,26 @@
         });
     }
 
+function formatDisplayDate(dateString) {
+  const date = typeof dateString === 'string' ? new Date(dateString) : dateString;
+  const options = { 
+    year: 'numeric', 
+    month: '2-digit', 
+    day: '2-digit',
+    timeZone: 'Asia/Dubai'
+  };
+  
+  // Handle Arabic locale formatting
+  let formatted = date.toLocaleDateString('ar-EG', options);
+  
+  // Clean up the Arabic date format (removes Arabic text for month names)
+  formatted = formatted.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
+                      .replace(/\s+/g, ' ')
+                      .trim();
+  
+  return formatted;
+}
+
     function getActivityRecords(rawData) {
       if (!Array.isArray(rawData)) return [];
       
