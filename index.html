@@ -1338,7 +1338,7 @@ function toggleHiddenColumns() {
     }
 
 function updateSummary(isWeek = false) {
-  const selectedDate = document.getElementById("datePicker").value;
+  const dateKeySet = new Set(filteredData.map(row => row.ID));
 
   const uniquePlayers = new Set();
   allData
@@ -1348,13 +1348,13 @@ function updateSummary(isWeek = false) {
   const filteredUniquePlayers = new Set();
   filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
 
-  const summaryElement = document.querySelector('.summary-box');
-  if (summaryElement) {
-    summaryElement.innerHTML = `
-      <span id="summary">إجمالي الحضور: <span id="totalCount">${uniquePlayers.size}</span></span>
-      <span id="filteredSummary" style="${isWeek ? 'display:none;' : 'display:inline;'}">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
-    `;
-  }
+const summaryElement = document.querySelector('.summary-box');
+if (summaryElement) {
+  summaryElement.innerHTML = `
+    <span id="summary">إجمالي الحضور: <span id="totalCount">${dateKeySet.size}</span></span>
+    <span id="filteredSummary" style="${isWeek ? 'display:none;' : 'display:inline;'}">| النتائج المصفاة: <span id="filteredCount">${dateKeySet.size}</span></span>
+  `;
+}
 }
 
 function countUniqueDailyAttendances(data) {
