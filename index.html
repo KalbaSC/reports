@@ -867,15 +867,10 @@ function setCurrentWeekDates() {
 function applyWeekFilter() {
   const startDate = document.getElementById('weekStartDate').value;
   const endDate = document.getElementById('weekEndDate').value;
-  
+
   if (!startDate || !endDate) return;
-  
-  filteredData = allData.filter(row => {
-    const rowDate = row.dateKey;
-    return rowDate >= startDate && rowDate <= endDate;
-  });
-  
-  renderPeriodTable('week');
+
+  renderCustomWeekTable(startDate, endDate);
   updateWeekSummary(startDate, endDate);
   updateTodayStats();
   closeWeekRangePicker();
@@ -1605,6 +1600,47 @@ function exportUniqueToExcel() {
   const ws = XLSX.utils.json_to_sheet(data);
   XLSX.utils.book_append_sheet(wb, ws, "بيانات المنتسبين خلال هذا الاسبوع");
   XLSX.writeFile(wb, "weekly-attendance.xlsx");
+}
+
+    function renderCustomWeekTable(startDate, endDate) {
+  const tbody = document.querySelector("#attendanceTable tbody");
+  tbody.innerHTML = "";
+
+  const weekData = allData.filter(row => {
+    const rowDate = row.dateKey;
+    return rowDate >= startDate && rowDate <= endDate;
+  });
+
+  if (weekData.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
+    return;
+  }
+
+  // Unique players per day
+  const dailyAttendances = {};
+  weekData.forEach(row => {
+    const key = `${row.ID}_${row.dateKey}`;
+    if (!dailyAttendances[key]) {
+      dailyAttendances[key] = row;
+    }
+  });
+
+  const records = Object.values(dailyAttendances);
+  records.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+
+  records.forEach(row => {
+    const tr = document.createElement("tr");
+    if (row.isGeneral) tr.classList.add("general-attendance");
+    tr.innerHTML = `
+      <td>${formatDate(row.Timestamp)}</td>
+      <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+      <td>${row.ID || ""}</td>
+      <td>${row["Scanned By"] || ""}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
     function exportToExcel() {
