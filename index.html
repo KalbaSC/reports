@@ -518,7 +518,7 @@
         <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
       </div>
     </div>
-
+<h3 id="tableTitle" style="text-align:center; color:#f4e733; margin-top: 20px;"></h3>
     <table id="attendanceTable">
 <thead>
   <tr>
@@ -1587,15 +1587,19 @@ function renderPeriodTable(period) {
 function toggleView() {
   showWeeklySummary = !showWeeklySummary;
   const toggleBtn = document.getElementById('viewToggle');
-  
+  const tableTitle = document.getElementById('tableTitle');
+
   if (showWeeklySummary) {
     toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> عرض السجلات اليومية';
+    tableTitle.textContent = 'الملخص الأسبوعي';
     renderWeeklySummaryTable();
   } else {
     toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> عرض الملخص الأسبوعي';
+    tableTitle.textContent = 'السجلات اليومية';
     renderMainTable();
   }
 }
+
 
 function applyWeekFilter() {
   const startDate = document.getElementById('weekStartDate').value;
