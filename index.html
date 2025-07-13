@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta charset="UTF-8">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,16 +13,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
   <style>
-@font-face {
-  font-family: 'Noto Kufi Arabic';
-  src: url('https://fonts.gstatic.com/s/notokufiarabic/v20/CSR44zlGmvQHdW7BQjwY0t7dwxQ6q8QZMFsQ.woff2') format('woff2');
-}
-    * {
-  direction: rtl;
-  text-align: right;
-}
+    @font-face {
+      font-family: 'NotoKufiArabic';
+      src: url('NotoKufiArabic.ttf') format('truetype');
+    }
     body {
       font-family: 'NotoKufiArabic', sans-serif;
       background: url('black_and_yellow_grunge_background.jpg') no-repeat center center fixed;
@@ -31,8 +25,6 @@
       color: white;
       margin: 0;
       padding: 0;
-      direction: rtl;
-      unicode-bidi: embed;
     }
     .header-container {
       width: 100%;
@@ -137,7 +129,6 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
-      direction: rtl;
     }
     th, td {
       border: 1px solid #f4e733;
@@ -607,42 +598,31 @@
       return formatted;
     }
 
-function processRawData(rawData) {
-  if (!Array.isArray(rawData)) return [];
-  
-  const now = new Date();
-  
-  return rawData
-    .filter(item => {
-      // First filter: Basic validation
-      if (!item || typeof item !== 'object') return false;
-      if (!item.ID || !item.Timestamp) return false;
+    function processRawData(rawData) {
+      if (!Array.isArray(rawData)) return [];
       
-      // Check for corrupted IDs
-      if (item.ID.includes('/-v/')) return false;
+      const now = new Date();
       
-      // Validate timestamp
-      const timestamp = new Date(item.Timestamp);
-      if (isNaN(timestamp.getTime())) return false;
-      
-      return timestamp <= now;
-    })
-    .map(item => {
-      // Clean up ID
-      const cleanID = item.ID.replace(/[^a-zA-Z0-9\-_]/g, '');
-      
-      // Determine if general attendance
-      const isGeneral = item.General === "✔️ حضر" || item.General === "حضر";
-      
-      return {
-        ...item,
-        ID: cleanID, // Use the cleaned ID
-        isGeneral: isGeneral,
-        dateKey: new Date(item.Timestamp).toISOString().split('T')[0],
-        isDuplicate: false
-      };
-    });
-}
+      return rawData
+        .filter(item => {
+          if (!item || typeof item !== 'object') return false;
+          if (!item.ID || !item.Timestamp) return false;
+          
+          const timestamp = new Date(item.Timestamp);
+          if (isNaN(timestamp.getTime())) return false;
+          
+          return timestamp <= now;
+        })
+        .map(item => {
+          const isGeneral = item.General === "✔️ حضر" || item.General === "حضر";
+          return {
+            ...item,
+            isGeneral: isGeneral,
+            dateKey: new Date(item.Timestamp).toISOString().split('T')[0],
+            isDuplicate: false
+          };
+        });
+    }
 
     function getActivityRecords(rawData) {
       if (!Array.isArray(rawData)) return [];
@@ -708,34 +688,46 @@ function processRawData(rawData) {
       });
     }
 
-async function fetchData() {
-  try {
-    // Show loading
-    document.getElementById("loading").style.display = "block";
-    
-    const res = await fetch(scriptURL);
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-    
-    const rawData = await res.json();
-    console.log("Raw data received:", rawData);
-    
-    if (!Array.isArray(rawData)) {
-      throw new Error("Invalid data format - expected array");
+    async function fetchData() {
+      try {
+        const loadingElement = document.getElementById("loading");
+        if (loadingElement) {
+          loadingElement.style.display = "block";
+        }
+        
+        const res = await fetch(scriptURL);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        
+        const rawData = await res.json();
+        if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
+        
+        allData = processRawData(rawData);
+        
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById("datePicker").value = today;
+        filteredData = allData.filter(row => row.dateKey === today);
+        
+        renderMainTable();
+        updateSummary();
+        populateDropdowns();
+        updateTodayStats();
+        
+        console.log("Data loaded successfully:", allData.length, "records");
+        
+      } catch (error) {
+        console.error("Error loading data:", error);
+        const tbody = document.querySelector("#attendanceTable tbody");
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
+        }
+        
+      } finally {
+        const loadingElement = document.getElementById("loading");
+        if (loadingElement) {
+          loadingElement.style.display = "none";
+        }
+      }
     }
-    
-    // Process data
-    allData = processRawData(rawData);
-    
-    // Rest of your code...
-  } catch (error) {
-    console.error("Data loading failed:", error);
-    document.querySelector("#attendanceTable tbody").innerHTML = `
-      <tr><td colspan="6" style="color:red">خطأ في تحميل البيانات: ${error.message}</td></tr>
-    `;
-  } finally {
-    document.getElementById("loading").style.display = "none";
-  }
-}
 
     function showMainView() {
       setActiveNavButton(0);
@@ -863,15 +855,17 @@ function applyWeekFilter() {
 }
 
 function updateWeekSummary(startDate, endDate) {
-  const uniqueCount = countUniqueWeeklyAttendances(filteredData);
+  const uniquePlayers = new Set();
+  filteredData.forEach(row => uniquePlayers.add(row.ID));
   
-  document.getElementById("totalCount").textContent = uniqueCount;
-  document.getElementById("filteredCount").textContent = uniqueCount;
+  document.getElementById("totalCount").textContent = uniquePlayers.size;
+  document.getElementById("filteredCount").textContent = uniquePlayers.size;
   
+  // Update the summary text
   const summaryElement = document.querySelector('.summary-box');
   summaryElement.innerHTML = `
     <span>إجمالي الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}: 
-    <span id="totalCount">${uniqueCount}</span></span>
+    <span id="totalCount">${uniquePlayers.size}</span></span>
     <button onclick="clearWeekFilter()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
       <i class="fas fa-times"></i>
     </button>
@@ -922,26 +916,26 @@ function closeWeekRangePicker() {
       updateFilteredView();
     }
 
-function clearFilters() {
-  document.getElementById("filter-name").value = "";
-  document.getElementById("filter-id").value = "";
-  document.getElementById("filter-staff").value = "";
-  document.getElementById("filter-activity").value = "";
-  document.getElementById("filterType").value = "";
-  
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById("datePicker").value = today;
-  
-  showFilterOptions("");
-  filteredData = allData.filter(row => row.dateKey === today);
-  updateFilteredView();
-  
+    function clearFilters() {
+      document.getElementById("filter-name").value = "";
+      document.getElementById("filter-id").value = "";
+      document.getElementById("filter-staff").value = "";
+      document.getElementById("filter-activity").value = "";
+      document.getElementById("filterType").value = "";
+      
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById("datePicker").value = today;
+      
+      showFilterOptions("");
+      filteredData = allData.filter(row => row.dateKey === today);
+      updateFilteredView();
+      
   const summaryElement = document.querySelector('.summary-box');
   summaryElement.innerHTML = `
     <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
     <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
   `;
-}
+    }
 
     function showFilterOptions(value) {
       document.getElementById("filter-name").classList.add("hidden");
@@ -1322,31 +1316,18 @@ function toggleHiddenColumns() {
     }
 
 function updateSummary() {
-  const selectedDate = document.getElementById("datePicker")?.value; // Optional chaining
+  const selectedDate = document.getElementById("datePicker").value;
   
   const uniquePlayers = new Set();
   allData
     .filter(row => selectedDate ? row.dateKey === selectedDate : true)
     .forEach(row => uniquePlayers.add(row.ID));
-
-  // Safely update totalCount
-  const totalCountElement = document.getElementById("totalCount");
-  if (totalCountElement) {
-    totalCountElement.textContent = uniquePlayers.size;
-  } else {
-    console.error("Element 'totalCount' not found!");
-  }
-
-  // Safely update filteredCount
-  const filteredCountElement = document.getElementById("filteredCount");
+  
+  document.getElementById("totalCount").textContent = uniquePlayers.size;
+  
   const filteredUniquePlayers = new Set();
   filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
-
-  if (filteredCountElement) {
-    filteredCountElement.textContent = filteredUniquePlayers.size;
-  } else {
-    console.error("Element 'filteredCount' not found!");
-  }
+  document.getElementById("filteredCount").textContent = filteredUniquePlayers.size;
 }
 
 function countUniqueDailyAttendances(data) {
@@ -1380,7 +1361,7 @@ function countUniqueWeeklyAttendances(data) {
     });
     
     uniqueForDay.forEach(id => {
-      weeklyUniqueAttendees.add(`${id}_${date}`); 
+      weeklyUniqueAttendees.add(`${id}_${date}`);
     });
   });
   
@@ -1499,11 +1480,6 @@ function renderPeriodTable(period) {
   });
 }
 
-function formatDisplayDate(dateString) {
-  const date = new Date(dateString);
-  const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
-  return date.toLocaleDateString('ar-EG', options);
-}
     function exportToExcel() {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(prepareExportData());
@@ -1564,12 +1540,11 @@ window.addEventListener('resize', checkMobileView);
       fetchData();
     }
 
-    document.addEventListener('DOMContentLoaded', function() {
-  initialize();
-});
     window.onload = initialize;
     
   </script>
+  
+<div class="footer-container">
   <footer>
     <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
     <p style="font-size: 14px; color: #aaa; margin-top: -10px;">تم التطوير بواسطة روند أحمد الضمور</p>
@@ -1581,5 +1556,8 @@ window.addEventListener('resize', checkMobileView);
       <a href="https://tiktok.com/@kalbasc" target="_blank"><i class="fab fa-tiktok"></i></a>
     </div>
   </footer>
+</div>
+
+  
 </body>
 </html>
