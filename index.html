@@ -495,17 +495,21 @@
           <button onclick="clearFilters()" class="clear-btn">مسح الفلاتر</button>
         </div>
 
-        <div class="export-buttons">
-          <button class="export" onclick="exportToExcel()">
-            <span class="download-icon"></span> Excel
-          </button>
-          <button class="export" onclick="exportToPDF()">
-            <span class="download-icon"></span> PDF
-          </button>
-        </div>
+<div class="export-buttons">
+  <button class="export" onclick="exportToExcel()">
+    <span class="download-icon"></span> Excel
+  </button>
+  <button class="export" onclick="exportToPDF()">
+    <span class="download-icon"></span> PDF
+  </button>
+</div>
+<button id="viewToggle" class="export" style="background: #555; display: none;">
+  <i class="fas fa-exchange-alt"></i> عرض السجلات اليومية
+</button>
 <button onclick="toggleHiddenColumns()" class="export" style="background: #555;">
   <i class="fas fa-eye"></i> عرض الأعمدة المخفية
 </button>
+        
       </div>
 
       <div class="summary-box">
@@ -803,7 +807,6 @@ function filterByPeriod(period) {
 }
 
 function showWeekRangePicker() {
-  // Create or show the range picker UI
   let rangePicker = document.getElementById('weekRangePicker');
   
   if (!rangePicker) {
@@ -834,7 +837,6 @@ function showWeekRangePicker() {
     
     document.body.appendChild(rangePicker);
     
-    // Auto-set current week dates
     setCurrentWeekDates();
   } else {
     rangePicker.style.display = 'block';
@@ -855,22 +857,6 @@ function setCurrentWeekDates() {
   
   document.getElementById('weekStartDate').value = monday.toISOString().split('T')[0];
   document.getElementById('weekEndDate').value = thursday.toISOString().split('T')[0];
-}
-
-function applyWeekFilter() {
-  const startDate = document.getElementById('weekStartDate').value;
-  const endDate = document.getElementById('weekEndDate').value;
-  
-  if (!startDate || !endDate) return;
-  
-  filteredData = allData.filter(row => {
-    const rowDate = row.dateKey;
-    return rowDate >= startDate && rowDate <= endDate;
-  });
-  
-  renderWeeklySummaryTable();
-  updateWeekSummary(startDate, endDate);
-  closeWeekRangePicker();
 }
     
 function renderWeeklySummaryTable() {
@@ -903,7 +889,7 @@ function renderWeeklySummaryTable() {
     
     tr.innerHTML = `
       <td>${formatDate(row.Timestamp)}</td>
-      <td>${row["Child Name"] || ""} ${row.Parent || ""}</td> <!-- Added Parent name -->
+      <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
       <td>${row.ID || ""}</td>
       <td>${row["Scanned By"] || ""}</td>
       <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
@@ -912,6 +898,7 @@ function renderWeeklySummaryTable() {
     tbody.appendChild(tr);
   });
 
+  // Make sure table headers are correct
   const thead = document.querySelector("#attendanceTable thead");
   thead.innerHTML = `
     <tr>
@@ -923,10 +910,6 @@ function renderWeeklySummaryTable() {
       <th class="hidden-column">النوع</th>
     </tr>
   `;
-
-  document.querySelector('.controls').style.display = 'block';
-  document.querySelector('.export-buttons').style.display = 'flex';
-  document.querySelector('button[onclick="toggleHiddenColumns()"]').style.display = 'inline-block';
 }
     
 function updateSummary(isWeek = false) {
@@ -1007,6 +990,9 @@ function clearFilters() {
   showFilterOptions("");
   filteredData = allData.filter(row => row.dateKey === today);
   
+  document.getElementById('viewToggle').style.display = 'none';
+  showWeeklySummary = false;
+  
   renderMainTable();
   updateSummary();
   
@@ -1052,40 +1038,67 @@ function renderMainTable() {
 
   tbody.innerHTML = "";
 
-  const players = {};
-  filteredData.forEach(row => {
-    if (!row.ID) return;
-    if (!players[row.ID]) players[row.ID] = [];
-    players[row.ID].push(row);
-  });
+  if (showWeeklySummary) {
+    const players = {};
+    filteredData.forEach(row => {
+      if (!row.ID) return;
+      if (!players[row.ID]) players[row.ID] = [];
+      players[row.ID].push(row);
+    });
 
-  const playerRecords = Object.values(players).map(playerRows => {
+    const playerRecords = Object.values(players).map(playerRows => {
+      playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+      const generalRecord = playerRows.find(row => row.isGeneral);
+      return generalRecord || playerRows[0];
+    });
 
-    playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+    playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
 
-    const generalRecord = playerRows.find(row => row.isGeneral);
-    if (generalRecord) return generalRecord;
+    playerRecords.forEach(row => {
+      const tr = document.createElement("tr");
+      if (row.isGeneral) tr.classList.add("general-attendance");
+      
+      tr.innerHTML = `
+        <td>${formatDate(row.Timestamp)}</td>
+        <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+        <td>${row.ID || ""}</td>
+        <td>${row["Scanned By"] || ""}</td>
+        <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+        <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } else {
+    const players = {};
+    filteredData.forEach(row => {
+      if (!row.ID) return;
+      if (!players[row.ID]) players[row.ID] = [];
+      players[row.ID].push(row);
+    });
 
-    return playerRows[0];
-  });
+    const playerRecords = Object.values(players).map(playerRows => {
+      playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+      const generalRecord = playerRows.find(row => row.isGeneral);
+      return generalRecord || playerRows[0];
+    });
 
-  playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+    playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
 
-  playerRecords.forEach(row => {
-    const tr = document.createElement("tr");
-    if (row.isGeneral) tr.classList.add("general-attendance");
-    
-    tr.innerHTML = `
-      <td>${formatDate(row.Timestamp)}</td>
-      <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-      <td>${row.ID || ""}</td>
-      <td>${row["Scanned By"] || ""}</td>
-      <!-- Hidden columns (keep for logic but hide via CSS) -->
-      <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-      <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+    playerRecords.forEach(row => {
+      const tr = document.createElement("tr");
+      if (row.isGeneral) tr.classList.add("general-attendance");
+      
+      tr.innerHTML = `
+        <td>${formatDate(row.Timestamp)}</td>
+        <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+        <td>${row.ID || ""}</td>
+        <td>${row["Scanned By"] || ""}</td>
+        <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+        <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
 }
 
     function renderActivityTable() {
@@ -1568,6 +1581,40 @@ function renderPeriodTable(period) {
   });
 }
 
+    let showWeeklySummary = false;
+
+function toggleView() {
+  showWeeklySummary = !showWeeklySummary;
+  const toggleBtn = document.getElementById('viewToggle');
+  
+  if (showWeeklySummary) {
+    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> عرض السجلات اليومية';
+    renderWeeklySummaryTable();
+  } else {
+    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> عرض الملخص الأسبوعي';
+    renderMainTable();
+  }
+}
+
+function applyWeekFilter() {
+  const startDate = document.getElementById('weekStartDate').value;
+  const endDate = document.getElementById('weekEndDate').value;
+  
+  if (!startDate || !endDate) return;
+  
+  filteredData = allData.filter(row => {
+    const rowDate = row.dateKey;
+    return rowDate >= startDate && rowDate <= endDate;
+  });
+  
+  document.getElementById('viewToggle').style.display = 'inline-block';
+  showWeeklySummary = true;
+  document.getElementById('viewToggle').innerHTML = '<i class="fas fa-exchange-alt"></i> عرض السجلات اليومية';
+  
+  renderWeeklySummaryTable();
+  updateWeekSummary(startDate, endDate);
+  closeWeekRangePicker();
+}
     function exportToExcel() {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(prepareExportData());
