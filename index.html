@@ -797,8 +797,8 @@ function filterByPeriod(period) {
   renderPeriodTable(period);
   updateTodayStats();
   if (period === 'week') {
-  renderWeeklySummaryTable();
-}
+  renderWeeklyAttendance();
+  }
   
   if (document.getElementById("activityView").style.display !== "none") {
     renderActivityTable();
@@ -1581,7 +1581,7 @@ function renderWeeklyAttendance() {
 
   fullTableHTML += `</tbody></table>`;
 
-  document.getElementById("uniqueTableContainer").innerHTML = fullTableHTML;
+document.getElementById("weeklySummaryContainer").innerHTML = fullTableHTML;
 }
     
 function exportUniqueToExcel() {
