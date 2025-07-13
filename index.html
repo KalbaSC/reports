@@ -751,40 +751,6 @@ async function fetchData() {
   }
 }
         
-        const res = await fetch(scriptURL);
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        
-        const rawData = await res.json();
-        if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
-        
-        allData = processRawData(rawData);
-        
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById("datePicker").value = today;
-        filteredData = allData.filter(row => row.dateKey === today);
-        
-        renderMainTable();
-        updateSummary();
-        populateDropdowns();
-        updateTodayStats();
-        
-        console.log("Data loaded successfully:", allData.length, "records");
-        
-      } catch (error) {
-        console.error("Error loading data:", error);
-        const tbody = document.querySelector("#attendanceTable tbody");
-        if (tbody) {
-          tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
-        }
-        
-      } finally {
-        const loadingElement = document.getElementById("loading");
-        if (loadingElement) {
-          loadingElement.style.display = "none";
-        }
-      }
-    }
-
     function showMainView() {
       setActiveNavButton(0);
       document.getElementById("mainView").style.display = "block";
