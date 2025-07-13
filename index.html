@@ -875,8 +875,9 @@ function applyWeekFilter() {
     return rowDate >= startDate && rowDate <= endDate;
   });
   
-  updateFilteredView();
+  renderPeriodTable('week');
   updateWeekSummary(startDate, endDate);
+  updateTodayStats();
   closeWeekRangePicker();
 }
 
