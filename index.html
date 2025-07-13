@@ -1335,15 +1335,15 @@ function toggleHiddenColumns() {
 function updateSummary() {
   const selectedDate = document.getElementById("datePicker").value;
   
-  const uniquePlayers = new Set();
+  const totalUniquePlayers = new Set();
   allData
     .filter(row => selectedDate ? row.dateKey === selectedDate : true)
-    .forEach(row => uniquePlayers.add(row.ID));
+    .forEach(row => totalUniquePlayers.add(row.ID));
   
-  document.getElementById("totalCount").textContent = uniquePlayers.size;
+  document.getElementById("totalCount").textContent = totalUniquePlayers.size;
   
-const uniqueFilteredCount = new Set(filteredData.map(row => row.ID)).size;
-document.getElementById("filteredCount").textContent = uniqueCount;
+  const filteredUniquePlayers = new Set(filteredData.map(row => row.ID));
+  document.getElementById("filteredCount").textContent = filteredUniquePlayers.size;
 }
 
 function countUniqueDailyAttendances(data) {
