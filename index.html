@@ -1739,28 +1739,29 @@ function sendWeeklySummary() {
 
   const summary = generateWeeklyAttendanceSummary(startDate, endDate);
 
-  console.log('Generated Weekly Summary:', summary);
-
   summary.forEach(record => {
-    if (!record.parentEmail) {
-      console.log(`No email for ${record.name}`);
-      return;
-    }
-
     const payload = {
-      email: record.parentEmail,
+      email: 'rawand@ksc.shj.ae',  
       name: record.name,
       days: record.daysAttended,
       total: record.totalDays,
-      message: record.message,
-      test: true  
+      message: record.message
     };
 
-    console.log(`Simulating send to ${record.name} (${record.parentEmail}):`, payload);
+    fetch('https://script.google.com/macros/s/AKfycbysWX_UMRpmi_wv316IUcihXjjDVE-bTNsXagOWCDF2EjM33VaFP5Ru9YZkhcdcyFhIZQ/exec', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then(res => console.log(`Summary sent for ${record.name}`))
+    .catch(err => console.error(`Failed to send summary for ${record.name}`, err));
   });
 
-  alert('Simulation complete. Check console logs for details.');
+  alert('تم إرسال ملخصات الحضور جميعها إلى rawand@ksc.shj.ae للمراجعة.');
 }
+
 
 window.addEventListener('load', checkMobileView);
 window.addEventListener('resize', checkMobileView);
