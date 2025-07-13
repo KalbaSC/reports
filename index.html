@@ -875,18 +875,21 @@ function applyWeekFilter() {
 
 function updateWeekSummary(startDate, endDate) {
   const uniqueCount = countUniqueWeeklyAttendances(filteredData);
-  
-  document.getElementById("totalCount").textContent = uniqueCount;
-  document.getElementById("filteredCount").textContent = uniqueCount;
-  
+
+  const filteredUniquePlayers = new Set();
+  filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
+
   const summaryElement = document.querySelector('.summary-box');
-  summaryElement.innerHTML = `
-    <span>إجمالي الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}: 
-    <span id="totalCount">${uniqueCount}</span></span>
-    <button onclick="clearWeekFilter()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
-      <i class="fas fa-times"></i>
-    </button>
-  `;
+  if (summaryElement) {
+    summaryElement.innerHTML = `
+      <span>إجمالي الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}: 
+      <span id="totalCount">${uniqueCount}</span></span>
+      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
+      <button onclick="clearWeekFilter()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+  }
 }
 
 function clearWeekFilter() {
@@ -1341,17 +1344,17 @@ function updateSummary() {
     .filter(row => selectedDate ? row.dateKey === selectedDate : true)
     .forEach(row => uniquePlayers.add(row.ID));
   
-  document.getElementById("totalCount").textContent = uniquePlayers.size;
-  
   const filteredUniquePlayers = new Set();
   filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
-  document.getElementById("filteredCount").textContent = filteredUniquePlayers.size;
 
-const filteredCountEl = document.getElementById("filteredCount");
-if (filteredCountEl) {
-  filteredCountEl.textContent = filteredUniquePlayers.size;
-}
-
+  // Always rebuild the summary-box with both counts
+  const summaryElement = document.querySelector('.summary-box');
+  if (summaryElement) {
+    summaryElement.innerHTML = `
+      <span id="summary">إجمالي الحضور: <span id="totalCount">${uniquePlayers.size}</span></span>
+      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
+    `;
+  }
 }
 
 function countUniqueDailyAttendances(data) {
