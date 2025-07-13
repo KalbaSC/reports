@@ -191,8 +191,8 @@
     }
     .download-icon {
       display: inline-block;
-      width: 15px;
-      height: 15px;
+      width: 18px;
+      height: 18px;
       background: black;
       clip-path: polygon(50% 0%, 100% 50%, 75% 50%, 75% 100%, 25% 100%, 25% 50%, 0% 50%);
       margin-left: 5px;
@@ -215,38 +215,6 @@
     .general-with-activities {
       background-color: rgba(255, 193, 7, 0.2); 
     }
-.dropdown {
-  position: relative;
-  display: inline-block;
-}
-
-.dropdown-content {
-  display: none;
-  position: absolute;
-  background-color: #222;
-  min-width: 120px;
-  z-index: 1;
-  border: 1px solid #f4e733;
-  right: 0;
-}
-
-.dropdown:hover .dropdown-content {
-  display: block;
-}
-
-#dateRangePicker {
-  width: 250px;
-  padding: 10px;
-}
-
-#dateRangePicker input[type="date"] {
-  background: white;
-  color: black;
-  padding: 5px;
-  border-radius: 4px;
-  border: 1px solid #f4e733;
-  width: 100%;
-}
     footer {
       background-color: #111;
       color: white;
@@ -279,17 +247,6 @@
       border-radius: 10px;
       border: 1px solid #f4e733;
     }
-.dropdown-content.show {
-  display: block !important;
-}
-
-#dateRangePicker input[type="date"] {
-  background: white;
-  color: black;
-  padding: 5px;
-  border-radius: 4px;
-  border: 1px solid #f4e733;
-}
     #loading {
       display: none;
       text-align: center;
@@ -349,28 +306,21 @@
   margin: 20px auto;
   padding: 20px 20px; 
   box-sizing: border-box;
-  font-size: 14px;
+  font-size: 12px;
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+ -webkit-overflow-scrolling: touch;
 }
-      
-  nav {
-    flex-direction: row;
-    flex-wrap: wrap;
-    gap: 5px;
-    padding: 5px;
-  }
-  
-  #dateRangePicker {
-    width: 220px;
-    right: 0;
-  }
+ 
+      nav {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 5px;
+      }
       
       nav button, .dropdown > button {
-        font-size: 11px;
-        padding: 8px 10px;
+        font-size: 10px;
+        padding: 6px 8px;
         margin: 2px;
-        min-width: auto;
         min-width: auto;
         flex: 1;
       }
@@ -381,9 +331,9 @@
       }
       
       .container {
+        width: 100%;
         padding: 10px;
         margin: 10px auto;
-        width: 100%;
         overflow-x: auto;
       }
       
@@ -392,8 +342,8 @@
       }
       
       .filter-bar {
-    flex-direction: column;
-    gap: 8px;
+       flex-direction: column;
+       gap: 8px;
       }
       
       .search-group {
@@ -404,19 +354,19 @@
       .search-group input,
       .search-group button.clear-btn,
       #datePicker {
-        font-size: 12px;
-        height: 32px;
-        padding: 5px 7px;
+        font-size: 10px;
+        height: 30px;
+        padding: 6px 8px;
         width: 100% !important;
+        margin-bottom: 5px;
+        width: 100%;
         margin-bottom: 5px;
       }
       
       #attendanceTable, #activityTable {
         font-size: 10px;
       }
-        table {
-    font-size: 11px;
-  }
+      
       th, td {
         white-space: nowrap;
         overflow: hidden;
@@ -425,29 +375,34 @@
         padding: 4px 6px;
         font-size: 10px;
       }
-       button[onclick="toggleHiddenColumns()"] {
-       display: none !important;
-      }
+  
+  table {
+    font-size: 10px;
+  }
+      
+  #activityTable th:nth-child(4),
+  #activityTable td:nth-child(4) {
+    display: none;
+  }
+      
+  button[onclick="toggleHiddenColumns()"] {
+    display: none !important;
+  }
+      
       .export-buttons {
+        justify-content: center;
         flex-direction: row !important;
         flex-wrap: nowrap !important;
-        justify-content: center;
+        gap: 5px !important;
       }
       
       button.export {
-        padding: 8px;
-        font-size: 13px;
+        padding: 8px 10px;
+        font-size: 10px;
         margin: 2px;
-        flex: 1 1 45%;
-    flex-direction: row !important;
-    flex-wrap: nowrap !important;
-    gap: 5px !important;
+        flex: 1;
       }
-
-     #activityTable th:nth-child(4),
-     #activityTable td:nth-child(4) {
-     display: none;
-     }
+      
       .stats-container {
         grid-template-columns: 1fr;
         gap: 10px;
@@ -489,9 +444,9 @@
 <body>
   <header class="header-container">
     <div class="header-right">
-      <img src="Picture3.png" alt="شعار مجلس الشارقة الرياضي" class="logo">
+      <img src="Picture3.png" alt="شعار الشارقة" class="logo">
       <div class="divider"></div>
-      <img src="logo.png" alt="شعار نادي كلباء الرياضي الثقافي" class="logo">
+      <img src="logo.png" alt="شعار نادي كلباء" class="logo">
       <div class="header-info">
         <div class="arabic-name">نادي كلباء الرياضي الثقافي</div>
         <div class="english-name">KALBA SPORTS & CULTURAL CLUB</div>
@@ -499,45 +454,20 @@
     </div>
   </header>
 
-<nav>
-  <button onclick="showMainView()" class="active">الحضور اليومي</button>
-  <button onclick="showActivitiesView()">الحضور حسب الأنشطة</button>
-  <button onclick="showStatsView()">الإحصائيات</button>
-  
-  <div class="dropdown">
-    <button>الفترات الزمنية ▼</button>
-    <div class="dropdown-content">
-      <a onclick="filterByPeriod('today')">اليوم</a>
-      <a onclick="applyMondayThursdayRange()">هذا الأسبوع (إثنين-خميس)</a>
-      <a onclick="filterByPeriod('month')">هذا الشهر</a>
-      <a onclick="filterByPeriod('all')">الكل</a>
-    </div>
-  </div>
-  
-  <div class="dropdown">
-    <button>نطاق مخصص ▼</button>
-    <div class="dropdown-content" id="dateRangePicker" style="padding: 10px; width: 250px;">
-      <div style="display: flex; gap: 10px; margin-bottom: 10px;">
-        <div>
-          <label style="color: #f4e733;">من</label>
-          <input type="date" id="startDate" style="width: 100%;">
-        </div>
-        <div>
-          <label style="color: #f4e733;">إلى</label>
-          <input type="date" id="endDate" style="width: 100%;">
-        </div>
+  <nav>
+    <button onclick="showMainView()" class="active">الحضور اليومي</button>
+    <button onclick="showActivitiesView()">الحضور حسب الأنشطة</button>
+    <button onclick="showStatsView()">الإحصائيات</button>
+    <div class="dropdown">
+      <button>الفترات الزمنية ▼</button>
+      <div class="dropdown-content">
+        <a onclick="filterByPeriod('today')">اليوم</a>
+        <a onclick="filterByPeriod('week')">هذا الأسبوع</a>
+        <a onclick="filterByPeriod('month')">هذا الشهر</a>
+        <a onclick="filterByPeriod('all')">الكل</a>
       </div>
-      <button onclick="applyDateRange()" 
-              style="background: #f4e733; color: black; border: none; padding: 5px 10px; width: 100%;">
-        تطبيق
-      </button>
     </div>
-  </div>
-</nav>
-  
-<div class="container" id="advancedStatsContainer" style="display: none;">
-  <div id="advancedStats"></div>
-</div>
+  </nav>
 
   <div class="container" id="mainView">
     <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
@@ -607,7 +537,7 @@
   <div class="container" id="activityView" style="display: none;">
     <h2 style="color:#f4e733; text-align:center">الحضور حسب الأنشطة</h2>
     <div id="activityControls" class="controls" style="margin-bottom:20px">
-
+      <!-- Dynamically added filters will appear here -->
     </div>
     <table id="activityTable">
       <thead>
@@ -828,49 +758,28 @@
       });
     }
 
-function filterByPeriod(period) {
-  const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}));
-  
-  filteredData = allData.filter(row => {
-    const rowDate = new Date(new Date(row.Timestamp).toLocaleString("en-US", {timeZone: "Asia/Dubai"}));
-    
-    switch(period) {
-      case 'today':
-        return rowDate.toDateString() === now.toDateString();
+    function filterByPeriod(period) {
+      const now = new Date();
+      filteredData = allData.filter(row => {
+        const rowDate = new Date(row.Timestamp);
         
-      case 'week':
-        const {startOfWeek, endOfWeek} = getCurrentWeekRange();
-        return rowDate >= startOfWeek && rowDate <= endOfWeek;
-        
-      case 'month':
-        return rowDate.getMonth() === now.getMonth() && 
-               rowDate.getFullYear() === now.getFullYear();
-               
-      default: // 'all'
-        return true;
+        switch(period) {
+          case 'today':
+            return rowDate.toDateString() === now.toDateString();
+          case 'week':
+            const startOfWeek = new Date(now);
+            startOfWeek.setDate(now.getDate() - now.getDay());
+            return rowDate >= startOfWeek;
+          case 'month':
+            return rowDate.getMonth() === now.getMonth() && 
+                   rowDate.getFullYear() === now.getFullYear();
+          default:
+            return true;
+        }
+      });
+      
+      updateFilteredView();
     }
-  });
-  
-  updateFilteredView();
-}
-    
-function getCurrentWeekRange() {
-  const now = new Date(new Date().toLocaleString("en-US", {timeZone: "Asia/Dubai"}));
-  const day = now.getDay(); // 0=Sunday, 1=Monday, etc.
-  
-  // Calculate Monday of this week
-  const startOfWeek = new Date(now);
-  const diff = day === 0 ? 6 : day - 1; // Days since Monday
-  startOfWeek.setDate(now.getDate() - diff);
-  startOfWeek.setHours(0, 0, 0, 0);
-  
-  // Calculate Thursday of this week (3 days after Monday)
-  const endOfWeek = new Date(startOfWeek);
-  endOfWeek.setDate(startOfWeek.getDate() + 3);
-  endOfWeek.setHours(23, 59, 59, 999);
-  
-  return {startOfWeek, endOfWeek};
-}
 
     function filterByDate() {
       const selectedDate = document.getElementById("datePicker").value;
@@ -1069,15 +978,6 @@ function renderMainTable() {
             <td>${latestRecord["Scanned By"] || ""}</td>
             <td>عام</td>
           `;
-  const isMobile = window.innerWidth <= 768;
-  
-  row.innerHTML = `
-    <td>${formatDate(entry.Timestamp)}</td>
-    <td>${entry["Child Name"] || ""}</td>
-    ${!isMobile ? `<td>${entry.ID || ""}</td>` : ''}
-    ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ''}
-    <td>${entry.Activity || ""}</td>
-  `;
           tbody.appendChild(row);
         });
       }
@@ -1129,6 +1029,16 @@ function renderMainTable() {
                 <td>${entry["Scanned By"] || ""}</td>
                 <td>${activity}</td>
               `;
+              
+  const isMobile = window.innerWidth <= 768;
+  
+  row.innerHTML = `
+    <td>${formatDate(entry.Timestamp)}</td>
+    <td>${entry["Child Name"] || ""}</td>
+    ${!isMobile ? `<td>${entry.ID || ""}</td>` : ''}
+    ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ''}
+    <td>${entry.Activity || ""}</td>
+  `;
               tbody.appendChild(row);
             });
           });
@@ -1292,79 +1202,7 @@ function toggleHiddenColumns() {
         <p><strong>إجمالي اليوم:</strong> ${todayData.length}</p>
       `;
     }
-    
-function showDateRangePicker() {
-  const picker = document.getElementById('dateRangePicker');
-  picker.classList.toggle('show');
-  
-  if (!document.getElementById('startDate').value) {
-    applyMondayThursdayRange();
-  }
-}
 
-function applyDateRange() {
-  const start = document.getElementById('startDate').value;
-  const end = document.getElementById('endDate').value;
-  
-  if (!start || !end) {
-    alert("الرجاء تحديد تاريخ البداية والنهاية");
-    return;
-  }
-
-  filteredData = allData.filter(row => {
-    return row.dateKey >= start && row.dateKey <= end;
-  });
-
-  updateFilteredView();
-}
-
-function updateAdvancedStats(start, end) {
-
-  const uniqueAllPeriod = new Set(filteredData.map(r => r.ID)).size;
-  
-  const daysInRange = getDatesBetween(start, end);
-  const dailyUniques = {};
-  
-  daysInRange.forEach(date => {
-    const dayData = filteredData.filter(r => r.dateKey === date);
-    dailyUniques[date] = new Set(dayData.map(r => r.ID)).size;
-  });
-
-  const statsHTML = `
-    <div class="stat-card">
-      <h3 style="color:#f4e733;">إحصائيات متقدمة</h3>
-      <p><strong>المجموع الكلي (جميع الأيام):</strong> ${filteredData.length} تسجيل</p>
-      <p><strong>اللاعبون المميزون (جميع الأيام):</strong> ${uniqueAllPeriod}</p>
-      <p><strong>اللاعبون المميزون حسب اليوم:</strong></p>
-      <ul>
-        ${Object.entries(dailyUniques).map(([date, count]) => 
-          `<li>${formatArabicDate(date)}: ${count} لاعب</li>`
-        ).join('')}
-      </ul>
-    </div>
-  `;
-
-  document.getElementById('advancedStats').innerHTML = statsHTML;
-}
-
-function getDatesBetween(start, end) {
-  const dates = [];
-  let current = new Date(start);
-  const endDate = new Date(end);
-
-  while (current <= endDate) {
-    dates.push(current.toISOString().split('T')[0]);
-    current.setDate(current.getDate() + 1);
-  }
-
-  return dates;
-}
-
-function formatArabicDate(isoDate) {
-  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', timeZone: 'Asia/Dubai };
-  return new Date(isoDate).toLocaleDateString('ar-EG', options);
-}
-    
 function updateSummary() {
   const selectedDate = document.getElementById("datePicker").value;
   
@@ -1417,12 +1255,6 @@ function updateSummary() {
         "النوع": row.isGeneral ? "عام" : "نشاط"
       }));
     }
-
-    function initialize() {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById("datePicker").value = today;
-      fetchData();
-    }
     
 function checkMobileView() {
   const isMobile = window.innerWidth <= 768;
@@ -1437,9 +1269,16 @@ function checkMobileView() {
   }
 }
 
+window.addEventListener('load', checkMobileView);
+window.addEventListener('resize', checkMobileView);
+
+    function initialize() {
+      const today = new Date().toISOString().split('T')[0];
+      document.getElementById("datePicker").value = today;
+      fetchData();
+    }
+
     window.onload = initialize;
-    window.addEventListener('load', checkMobileView);
-    window.addEventListener('resize', checkMobileView);
     
   </script>
   <footer>
