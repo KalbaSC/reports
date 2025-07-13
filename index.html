@@ -14,11 +14,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Kufi+Arabic:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    @font-face {
-      font-family: 'NotoKufiArabic';
-      src: url('NotoKufiArabic.ttf') format('truetype');
-    }
+@font-face {
+  font-family: 'Noto Kufi Arabic';
+  src: url('https://fonts.gstatic.com/s/notokufiarabic/v20/CSR44zlGmvQHdW7BQjwY0t7dwxQ6q8QZMFsQ.woff2') format('woff2');
+}
+    * {
+  direction: rtl;
+  text-align: right;
+}
     body {
       font-family: 'NotoKufiArabic', sans-serif;
       background: url('black_and_yellow_grunge_background.jpg') no-repeat center center fixed;
@@ -602,31 +607,42 @@
       return formatted;
     }
 
-    function processRawData(rawData) {
-      if (!Array.isArray(rawData)) return [];
+function processRawData(rawData) {
+  if (!Array.isArray(rawData)) return [];
+  
+  const now = new Date();
+  
+  return rawData
+    .filter(item => {
+      // First filter: Basic validation
+      if (!item || typeof item !== 'object') return false;
+      if (!item.ID || !item.Timestamp) return false;
       
-      const now = new Date();
+      // Check for corrupted IDs
+      if (item.ID.includes('/-v/')) return false;
       
-      return rawData
-        .filter(item => {
-          if (!item || typeof item !== 'object') return false;
-          if (!item.ID || !item.Timestamp) return false;
-          
-          const timestamp = new Date(item.Timestamp);
-          if (isNaN(timestamp.getTime())) return false;
-          
-          return timestamp <= now;
-        })
-        .map(item => {
-          const isGeneral = item.General === "✔️ حضر" || item.General === "حضر";
-          return {
-            ...item,
-            isGeneral: isGeneral,
-            dateKey: new Date(item.Timestamp).toISOString().split('T')[0],
-            isDuplicate: false
-          };
-        });
-    }
+      // Validate timestamp
+      const timestamp = new Date(item.Timestamp);
+      if (isNaN(timestamp.getTime())) return false;
+      
+      return timestamp <= now;
+    })
+    .map(item => {
+      // Clean up ID
+      const cleanID = item.ID.replace(/[^a-zA-Z0-9\-_]/g, '');
+      
+      // Determine if general attendance
+      const isGeneral = item.General === "✔️ حضر" || item.General === "حضر";
+      
+      return {
+        ...item,
+        ID: cleanID, // Use the cleaned ID
+        isGeneral: isGeneral,
+        dateKey: new Date(item.Timestamp).toISOString().split('T')[0],
+        isDuplicate: false
+      };
+    });
+}
 
     function getActivityRecords(rawData) {
       if (!Array.isArray(rawData)) return [];
@@ -692,50 +708,34 @@
       });
     }
 
-    async function fetchData() {
-      try {
-        const loadingElement = document.getElementById("loading");
-        if (loadingElement) {
-          loadingElement.style.display = "block";
-        }
-        
-        const res = await fetch(scriptURL);
-        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        
-        const rawData = await res.json();
-        if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
-        
-        allData = processRawData(rawData);
-        
-        const today = new Date().toISOString().split('T')[0];
-        document.getElementById("datePicker").value = today;
-        filteredData = allData.filter(row => row.dateKey === today);
-        
-        renderMainTable();
-        updateSummary();
-        populateDropdowns();
-        updateTodayStats();
-        
-        console.log("Data loaded successfully:", allData.length, "records");
-        
-      } catch (error) {
-        console.error("Error loading data:", error);
-        const tbody = document.querySelector("#attendanceTable tbody");
-        if (tbody) {
-          tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
-        }
-        
-      } finally {
-        const loadingElement = document.getElementById("loading");
-        if (loadingElement) {
-          loadingElement.style.display = "none";
-        }
-      }
-      console.log("Raw data:", rawData);
-document.fonts.ready.then(() => {
-  console.log('Fonts loaded:', document.fonts.check('1em NotoKufiArabic'));
-});
+async function fetchData() {
+  try {
+    // Show loading
+    document.getElementById("loading").style.display = "block";
+    
+    const res = await fetch(scriptURL);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    
+    const rawData = await res.json();
+    console.log("Raw data received:", rawData);
+    
+    if (!Array.isArray(rawData)) {
+      throw new Error("Invalid data format - expected array");
     }
+    
+    // Process data
+    allData = processRawData(rawData);
+    
+    // Rest of your code...
+  } catch (error) {
+    console.error("Data loading failed:", error);
+    document.querySelector("#attendanceTable tbody").innerHTML = `
+      <tr><td colspan="6" style="color:red">خطأ في تحميل البيانات: ${error.message}</td></tr>
+    `;
+  } finally {
+    document.getElementById("loading").style.display = "none";
+  }
+}
 
     function showMainView() {
       setActiveNavButton(0);
