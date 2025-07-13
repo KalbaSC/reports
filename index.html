@@ -947,12 +947,12 @@ function clearFilters() {
   filteredData = allData.filter(row => row.dateKey === today);
   updateFilteredView();
   
-  // Reset summary to default view
   const summaryElement = document.querySelector('.summary-box');
   summaryElement.innerHTML = `
     <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
     <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
   `;
+  updateSummary();
 }
 
     function showFilterOptions(value) {
@@ -1346,6 +1346,12 @@ function updateSummary() {
   const filteredUniquePlayers = new Set();
   filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
   document.getElementById("filteredCount").textContent = filteredUniquePlayers.size;
+
+const filteredCountEl = document.getElementById("filteredCount");
+if (filteredCountEl) {
+  filteredCountEl.textContent = filteredUniquePlayers.size;
+}
+
 }
 
 function countUniqueDailyAttendances(data) {
