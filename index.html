@@ -1686,6 +1686,7 @@ window.addEventListener('resize', checkMobileView);
       const today = new Date().toISOString().split('T')[0];
       document.getElementById("datePicker").value = today;
       fetchData();
+      document.getElementById('tableTitle').textContent = 'السجلات اليومية';
     }
 
     window.onload = initialize;
