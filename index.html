@@ -763,7 +763,13 @@ function filterByPeriod(period) {
     filterByDate(); 
     return;
   }
-    filteredData = getFilteredDataByPeriod(period);
+  
+  if (period === 'week') {
+    showWeekRangePicker();
+    return;
+  }
+  
+  filteredData = getFilteredDataByPeriod(period);
   updatePeriodSummary(period);
   renderPeriodTable(period);
   updateTodayStats();
@@ -774,6 +780,110 @@ function filterByPeriod(period) {
   
   if (document.getElementById("statsView").style.display !== "none") {
     renderCharts();
+  }
+}
+
+function showWeekRangePicker() {
+  // Create or show the range picker UI
+  let rangePicker = document.getElementById('weekRangePicker');
+  
+  if (!rangePicker) {
+    rangePicker = document.createElement('div');
+    rangePicker.id = 'weekRangePicker';
+    rangePicker.style.position = 'fixed';
+    rangePicker.style.top = '50%';
+    rangePicker.style.left = '50%';
+    rangePicker.style.transform = 'translate(-50%, -50%)';
+    rangePicker.style.backgroundColor = '#222';
+    rangePicker.style.padding = '20px';
+    rangePicker.style.border = '2px solid #f4e733';
+    rangePicker.style.borderRadius = '10px';
+    rangePicker.style.zIndex = '1000';
+    
+    rangePicker.innerHTML = `
+      <h3 style="color:#f4e733; text-align:center; margin-top:0">اختر أسبوع (إثنين-خميس)</h3>
+      <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+        <input type="date" id="weekStartDate" style="flex:1; padding:8px; border-radius:5px;">
+        <span style="color:white; align-self:center">إلى</span>
+        <input type="date" id="weekEndDate" style="flex:1; padding:8px; border-radius:5px;">
+      </div>
+      <div style="display: flex; justify-content: center; gap: 10px;">
+        <button onclick="applyWeekFilter()" style="background:#f4e733; color:black; border:none; padding:8px 15px; border-radius:5px; cursor:pointer">تطبيق</button>
+        <button onclick="closeWeekRangePicker()" style="background:#555; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer">إلغاء</button>
+      </div>
+    `;
+    
+    document.body.appendChild(rangePicker);
+    
+    // Auto-set current week dates
+    setCurrentWeekDates();
+  } else {
+    rangePicker.style.display = 'block';
+    setCurrentWeekDates();
+  }
+}
+
+function setCurrentWeekDates() {
+  const today = new Date();
+  const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon,...6=Sat
+  const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Days back to Monday
+  
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - diffToMonday);
+  
+  const thursday = new Date(monday);
+  thursday.setDate(monday.getDate() + 3); // Monday + 3 days = Thursday
+  
+  document.getElementById('weekStartDate').value = monday.toISOString().split('T')[0];
+  document.getElementById('weekEndDate').value = thursday.toISOString().split('T')[0];
+}
+
+function applyWeekFilter() {
+  const startDate = document.getElementById('weekStartDate').value;
+  const endDate = document.getElementById('weekEndDate').value;
+  
+  if (!startDate || !endDate) return;
+  
+  filteredData = allData.filter(row => {
+    const rowDate = row.dateKey;
+    return rowDate >= startDate && rowDate <= endDate;
+  });
+  
+  updateFilteredView();
+  updateWeekSummary(startDate, endDate);
+  closeWeekRangePicker();
+}
+
+function updateWeekSummary(startDate, endDate) {
+  const uniquePlayers = new Set();
+  filteredData.forEach(row => uniquePlayers.add(row.ID));
+  
+  document.getElementById("totalCount").textContent = uniquePlayers.size;
+  document.getElementById("filteredCount").textContent = uniquePlayers.size;
+  
+  // Update the summary text
+  const summaryElement = document.querySelector('.summary-box');
+  summaryElement.innerHTML = `
+    <span>إجمالي الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}: 
+    <span id="totalCount">${uniquePlayers.size}</span></span>
+    <button onclick="clearWeekFilter()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
+      <i class="fas fa-times"></i>
+    </button>
+  `;
+}
+
+function clearWeekFilter() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById("datePicker").value = today;
+  filteredData = allData.filter(row => row.dateKey === today);
+  updateFilteredView();
+  updateSummary();
+}
+
+function closeWeekRangePicker() {
+  const rangePicker = document.getElementById('weekRangePicker');
+  if (rangePicker) {
+    rangePicker.style.display = 'none';
   }
 }
 
@@ -819,6 +929,12 @@ function filterByPeriod(period) {
       showFilterOptions("");
       filteredData = allData.filter(row => row.dateKey === today);
       updateFilteredView();
+      
+  const summaryElement = document.querySelector('.summary-box');
+  summaryElement.innerHTML = `
+    <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
+    <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
+  `;
     }
 
     function showFilterOptions(value) {
