@@ -504,7 +504,7 @@
   </button>
 </div>
 <button id="viewToggle" class="export" style="background: #555; display: none;" onclick="toggleView()">
-  <i class="fas fa-exchange-alt"></i> عرض السجلات اليومية
+  <i class="fas fa-exchange-alt"></i> عرض حضور يوم واحد
 </button>
 
 <button onclick="toggleHiddenColumns()" class="export" style="background: #555;">
@@ -1614,7 +1614,7 @@ function applyWeekFilter() {
   
   document.getElementById('viewToggle').style.display = 'inline-block';
   showWeeklySummary = true;
-  document.getElementById('viewToggle').innerHTML = '<i class="fas fa-exchange-alt"></i> عرض السجلات اليومية';
+  document.getElementById('viewToggle').innerHTML = '<i class="fas fa-exchange-alt"></i> عرض حضور يوم واحد';
   
   renderWeeklySummaryTable();
   updateWeekSummary(startDate, endDate);
