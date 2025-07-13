@@ -518,6 +518,9 @@
   <i class="fas fa-eye"></i> عرض الأعمدة المخفية
 </button>
         
+<button onclick="sendWeeklySummary()">
+  <i class="fas fa-eye"></i> إرسال تقرير الحضور للأهالي
+</button>
       </div>
 
       <div class="summary-box">
@@ -630,6 +633,7 @@
           const isGeneral = item.General === "✔️ حضر" || item.General === "حضر";
           return {
             ...item,
+            ParentEmail: item.ParentEmail || '',
             isGeneral: isGeneral,
             dateKey: new Date(item.Timestamp).toISOString().split('T')[0],
             isDuplicate: false
@@ -1677,6 +1681,85 @@ function checkMobileView() {
       exportButtons.style.flexWrap = 'nowrap';
     }
   }
+}
+    
+function generateWeeklyAttendanceSummary(startDate, endDate) {
+  const report = {};
+  
+  filteredData.forEach(row => {
+    const dateKey = row.dateKey;
+    if (dateKey < startDate || dateKey > endDate) return;
+    
+    if (!report[row.ID]) {
+      report[row.ID] = {
+        id: row.ID,
+        name: `${row["Child Name"] || ""} ${row.Parent || ""}`,
+        parent: row.Parent || '',
+        parentEmail: row.ParentEmail || '',
+        daysAttended: new Set()
+      };
+    }
+    report[row.ID].daysAttended.add(dateKey);
+  });
+
+  return Object.values(report).map(child => {
+    const totalDays = child.daysAttended.size;
+    let message = '';
+
+    if (totalDays >= 4) {
+      message = 'شكراً لالتزام ابنكم الكامل بحضور جميع الأيام.';
+    } else if (totalDays >= 3) {
+      message = 'حضور جيد، نأمل الحفاظ على الاستمرارية.';
+    } else {
+      message = `يُرجى الاهتمام بحضور ابنكم، حضر ${totalDays} أيام فقط من أصل 4.`;
+    }
+
+    return {
+      ...child,
+      daysAttended: Array.from(child.daysAttended),
+      totalDays,
+      message
+    };
+  });
+}
+    
+function sendWeeklySummary() {
+  const today = new Date();
+  const dayOfWeek = today.getDay();
+  const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - diffToMonday);
+
+  const thursday = new Date(monday);
+  thursday.setDate(monday.getDate() + 3);
+
+  const startDate = monday.toISOString().split('T')[0];
+  const endDate = thursday.toISOString().split('T')[0];
+
+  const summary = generateWeeklyAttendanceSummary(startDate, endDate);
+
+  console.log('Generated Weekly Summary:', summary);
+
+  summary.forEach(record => {
+    if (!record.parentEmail) {
+      console.log(`No email for ${record.name}`);
+      return;
+    }
+
+    const payload = {
+      email: record.parentEmail,
+      name: record.name,
+      days: record.daysAttended,
+      total: record.totalDays,
+      message: record.message,
+      test: true  
+    };
+
+    console.log(`Simulating send to ${record.name} (${record.parentEmail}):`, payload);
+  });
+
+  alert('Simulation complete. Check console logs for details.');
 }
 
 window.addEventListener('load', checkMobileView);
