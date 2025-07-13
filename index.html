@@ -899,16 +899,34 @@ function renderWeeklySummaryTable() {
 
   summaryData.forEach(row => {
     const tr = document.createElement("tr");
+    if (row.isGeneral) tr.classList.add("general-attendance");
+    
     tr.innerHTML = `
       <td>${formatDate(row.Timestamp)}</td>
-      <td>${row["Child Name"] || ""}</td>
+      <td>${row["Child Name"] || ""} ${row.Parent || ""}</td> <!-- Added Parent name -->
       <td>${row.ID || ""}</td>
       <td>${row["Scanned By"] || ""}</td>
-      <td>${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-      <td>${row.isGeneral ? "عام" : "نشاط"}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
     `;
     tbody.appendChild(tr);
   });
+
+  const thead = document.querySelector("#attendanceTable thead");
+  thead.innerHTML = `
+    <tr>
+      <th>التاريخ والوقت</th>
+      <th>الاسم</th>
+      <th>المعرف</th>
+      <th>الموظف</th>
+      <th class="hidden-column">النشاط</th>
+      <th class="hidden-column">النوع</th>
+    </tr>
+  `;
+
+  document.querySelector('.controls').style.display = 'block';
+  document.querySelector('.export-buttons').style.display = 'flex';
+  document.querySelector('button[onclick="toggleHiddenColumns()"]').style.display = 'inline-block';
 }
     
 function updateSummary(isWeek = false) {
