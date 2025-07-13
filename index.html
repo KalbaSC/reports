@@ -1343,7 +1343,7 @@ function updateSummary() {
   document.getElementById("totalCount").textContent = uniquePlayers.size;
   
 const uniqueFilteredCount = new Set(filteredData.map(row => row.ID)).size;
-document.getElementById("filteredCount").textContent = uniqueFilteredCount;
+document.getElementById("filteredCount").textContent = uniqueCount;
 }
 
 function countUniqueDailyAttendances(data) {
