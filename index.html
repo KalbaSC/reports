@@ -1590,12 +1590,12 @@ function toggleView() {
   const tableTitle = document.getElementById('tableTitle');
 
   if (showWeeklySummary) {
-    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> عرض السجلات اليومية';
-    tableTitle.textContent = 'الملخص الأسبوعي';
+    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> عرض السجلات حضور يوم واحد فقط ';
+    tableTitle.textContent = 'حضور المنتسبين خلال الاسبوع ';
     renderWeeklySummaryTable();
   } else {
-    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> عرض الملخص الأسبوعي';
-    tableTitle.textContent = 'السجلات اليومية';
+    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> عرض الحضور خلال الاسبوع';
+    tableTitle.textContent = ' حضروا يوم واحد فقط';
     renderMainTable();
   }
 }
