@@ -1738,10 +1738,10 @@ function sendWeeklySummary() {
   const endDate = thursday.toISOString().split('T')[0];
 
   const summary = generateWeeklyAttendanceSummary(startDate, endDate);
-
-  const payload = {
+  
+  const batchData = {
     summaries: summary.map(record => ({
-      email: 'rawand@ksc.shj.ae',
+      email: 'rawand@ksc.shj.ae', 
       name: record.name,
       days: record.daysAttended,
       total: record.totalDays,
@@ -1749,16 +1749,33 @@ function sendWeeklySummary() {
     }))
   };
 
+  const btn = document.querySelector('button[onclick="sendWeeklySummary()"]');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإرسال...';
+
   fetch('https://script.google.com/macros/s/AKfycbysWX_UMRpmi_wv316IUcihXjjDVE-bTNsXagOWCDF2EjM33VaFP5Ru9YZkhcdcyFhIZQ/exec', {
     method: 'POST',
-    mode: 'no-cors',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(payload)
+    body: JSON.stringify(batchData)
   })
-  .then(() => alert('تم إرسال ملخصات الحضور جميعها إلى rawand@ksc.shj.ae للمراجعة.'))
-  .catch(err => console.error('Error sending summaries:', err));
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      alert('تم إرسال تقارير الحضور بنجاح');
+    } else {
+      alert('حدث خطأ أثناء الإرسال: ' + (data.error || ''));
+    }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('فشل الإرسال: ' + error.message);
+  })
+  .finally(() => {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> إرسال تقرير الحضور للأهالي';
+  });
 }
     
 window.addEventListener('load', checkMobileView);
