@@ -512,6 +512,9 @@
         <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
         <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
       </div>
+
+     <div id="uniqueTableContainer" style="margin-top:20px;"></div>
+
     </div>
 
     <table id="attendanceTable">
@@ -976,6 +979,7 @@ function clearFilters() {
       renderMainTable();
       updateSummary();
       updateTodayStats();
+      renderUniqueTable();
       
       if (document.getElementById("activityView").style.display !== "none") {
         renderActivityTable();
@@ -1381,16 +1385,13 @@ function countUniqueWeeklyAttendances(data) {
     recordsByDate[dateKey].push(row);
   });
   
-  // For each date, get unique IDs and add to our weekly set
   Object.entries(recordsByDate).forEach(([date, records]) => {
     const uniqueForDay = new Set();
     
-    // Get all unique IDs for this day
     records.forEach(row => {
       uniqueForDay.add(row.ID);
     });
     
-    // Add to weekly count (Set automatically handles duplicates)
     uniqueForDay.forEach(id => {
       weeklyUniqueAttendees.add(`${id}_${date}`); // Fixed: using the date parameter
     });
@@ -1509,6 +1510,49 @@ function renderPeriodTable(period) {
     `;
     tbody.appendChild(tr);
   });
+}
+
+    function renderUniqueTable() {
+  const uniquePerDay = {};
+
+  filteredData.forEach(row => {
+    const key = `${row.ID}_${row.dateKey}`;
+    if (!uniquePerDay[key]) {
+      uniquePerDay[key] = row;
+    }
+  });
+
+  const data = Object.values(uniquePerDay);
+  if (data.length === 0) {
+    document.getElementById("uniqueTableContainer").innerHTML = "<p>لا يوجد بيانات فريدة لكل يوم.</p>";
+    return;
+  }
+
+  let tableHTML = `
+    <table border="1" style="width:100%; text-align:center; border-collapse: collapse; color:white;">
+      <thead>
+        <tr>
+          <th>الاسم</th>
+          <th>المعرف</th>
+          <th>التاريخ</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  data.forEach(row => {
+    tableHTML += `
+      <tr>
+        <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+        <td>${row.ID || ""}</td>
+        <td>${formatDisplayDate(row.dateKey)}</td>
+      </tr>
+    `;
+  });
+
+  tableHTML += `</tbody></table>`;
+
+  document.getElementById("uniqueTableContainer").innerHTML = tableHTML;
 }
 
     function exportToExcel() {
