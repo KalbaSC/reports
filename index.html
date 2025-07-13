@@ -1344,16 +1344,6 @@ function updateWeekSummary(startDate, endDate) {
   const filteredUniquePlayers = new Set();
   filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
 
-  const playerNames = [];
-filteredData.forEach(row => {
-  if (row.ID && row["Child Name"] && !playerNames.includes(row["Child Name"])) {
-    playerNames.push(row["Child Name"]);
-  }
-});
-
-console.log(`إجمالي الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}: ${filteredUniquePlayers.size}`);
-console.log("اللاعبين المصفاة:", playerNames);
-
   const summaryElement = document.querySelector('.summary-box');
   if (summaryElement) {
     summaryElement.innerHTML = `
