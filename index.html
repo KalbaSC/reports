@@ -1322,18 +1322,31 @@ function toggleHiddenColumns() {
     }
 
 function updateSummary() {
-  const selectedDate = document.getElementById("datePicker").value;
+  const selectedDate = document.getElementById("datePicker")?.value; // Optional chaining
   
   const uniquePlayers = new Set();
   allData
     .filter(row => selectedDate ? row.dateKey === selectedDate : true)
     .forEach(row => uniquePlayers.add(row.ID));
-  
-  document.getElementById("totalCount").textContent = uniquePlayers.size;
-  
+
+  // Safely update totalCount
+  const totalCountElement = document.getElementById("totalCount");
+  if (totalCountElement) {
+    totalCountElement.textContent = uniquePlayers.size;
+  } else {
+    console.error("Element 'totalCount' not found!");
+  }
+
+  // Safely update filteredCount
+  const filteredCountElement = document.getElementById("filteredCount");
   const filteredUniquePlayers = new Set();
   filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
-  document.getElementById("filteredCount").textContent = filteredUniquePlayers.size;
+
+  if (filteredCountElement) {
+    filteredCountElement.textContent = filteredUniquePlayers.size;
+  } else {
+    console.error("Element 'filteredCount' not found!");
+  }
 }
 
 function countUniqueDailyAttendances(data) {
@@ -1551,6 +1564,9 @@ window.addEventListener('resize', checkMobileView);
       fetchData();
     }
 
+    document.addEventListener('DOMContentLoaded', function() {
+  initialize();
+});
     window.onload = initialize;
     
   </script>
