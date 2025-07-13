@@ -633,10 +633,8 @@ function formatDisplayDate(dateString) {
     timeZone: 'Asia/Dubai'
   };
   
-  // Handle Arabic locale formatting
   let formatted = date.toLocaleDateString('ar-EG', options);
   
-  // Clean up the Arabic date format (removes Arabic text for month names)
   formatted = formatted.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
                       .replace(/\s+/g, ' ')
                       .trim();
@@ -875,17 +873,15 @@ function applyWeekFilter() {
 }
 
 function updateWeekSummary(startDate, endDate) {
-  const uniquePlayers = new Set();
-  filteredData.forEach(row => uniquePlayers.add(row.ID));
+  const uniqueCount = countUniqueWeeklyAttendances(filteredData);
   
-  document.getElementById("totalCount").textContent = uniquePlayers.size;
-  document.getElementById("filteredCount").textContent = uniquePlayers.size;
+  document.getElementById("totalCount").textContent = uniqueCount;
+  document.getElementById("filteredCount").textContent = uniqueCount;
   
-  // Update the summary text
   const summaryElement = document.querySelector('.summary-box');
   summaryElement.innerHTML = `
     <span>إجمالي الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}: 
-    <span id="totalCount">${uniquePlayers.size}</span></span>
+    <span id="totalCount">${uniqueCount}</span></span>
     <button onclick="clearWeekFilter()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
       <i class="fas fa-times"></i>
     </button>
@@ -936,26 +932,27 @@ function closeWeekRangePicker() {
       updateFilteredView();
     }
 
-    function clearFilters() {
-      document.getElementById("filter-name").value = "";
-      document.getElementById("filter-id").value = "";
-      document.getElementById("filter-staff").value = "";
-      document.getElementById("filter-activity").value = "";
-      document.getElementById("filterType").value = "";
-      
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById("datePicker").value = today;
-      
-      showFilterOptions("");
-      filteredData = allData.filter(row => row.dateKey === today);
-      updateFilteredView();
-      
+function clearFilters() {
+  document.getElementById("filter-name").value = "";
+  document.getElementById("filter-id").value = "";
+  document.getElementById("filter-staff").value = "";
+  document.getElementById("filter-activity").value = "";
+  document.getElementById("filterType").value = "";
+  
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById("datePicker").value = today;
+  
+  showFilterOptions("");
+  filteredData = allData.filter(row => row.dateKey === today);
+  updateFilteredView();
+  
+  // Reset summary to default view
   const summaryElement = document.querySelector('.summary-box');
   summaryElement.innerHTML = `
     <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
     <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
   `;
-    }
+}
 
     function showFilterOptions(value) {
       document.getElementById("filter-name").classList.add("hidden");
@@ -1363,6 +1360,7 @@ function countUniqueDailyAttendances(data) {
 function countUniqueWeeklyAttendances(data) {
   const weeklyUniqueAttendees = new Set();
   
+  // First group records by date
   const recordsByDate = {};
   data.forEach(row => {
     if (!row.ID) return;
@@ -1373,15 +1371,18 @@ function countUniqueWeeklyAttendances(data) {
     recordsByDate[dateKey].push(row);
   });
   
+  // For each date, get unique IDs and add to our weekly set
   Object.entries(recordsByDate).forEach(([date, records]) => {
     const uniqueForDay = new Set();
     
+    // Get all unique IDs for this day
     records.forEach(row => {
       uniqueForDay.add(row.ID);
     });
     
+    // Add to weekly count (Set automatically handles duplicates)
     uniqueForDay.forEach(id => {
-      weeklyUniqueAttendees.add(`${id}_${date}`);
+      weeklyUniqueAttendees.add(`${id}_${date}`); // Fixed: using the date parameter
     });
   });
   
