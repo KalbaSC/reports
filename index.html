@@ -1739,30 +1739,28 @@ function sendWeeklySummary() {
 
   const summary = generateWeeklyAttendanceSummary(startDate, endDate);
 
-  summary.forEach(record => {
-    const payload = {
-      email: 'rawand@ksc.shj.ae',  
+  const payload = {
+    summaries: summary.map(record => ({
+      email: 'rawand@ksc.shj.ae',
       name: record.name,
       days: record.daysAttended,
       total: record.totalDays,
       message: record.message
-    };
+    }))
+  };
 
-    fetch('https://script.google.com/macros/s/AKfycbysWX_UMRpmi_wv316IUcihXjjDVE-bTNsXagOWCDF2EjM33VaFP5Ru9YZkhcdcyFhIZQ/exec', {
-      method: 'POST',
-      body: JSON.stringify(payload),
-      headers: {
-        'Content-Type': 'application/json'
-      }
-    })
-    .then(res => console.log(`Summary sent for ${record.name}`))
-    .catch(err => console.error(`Failed to send summary for ${record.name}`, err));
-  });
-
-  alert('تم إرسال ملخصات الحضور جميعها إلى rawand@ksc.shj.ae للمراجعة.');
+  fetch('https://script.google.com/macros/s/AKfycbysWX_UMRpmi_wv316IUcihXjjDVE-bTNsXagOWCDF2EjM33VaFP5Ru9YZkhcdcyFhIZQ/exec', {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  })
+  .then(() => alert('تم إرسال ملخصات الحضور جميعها إلى rawand@ksc.shj.ae للمراجعة.'))
+  .catch(err => console.error('Error sending summaries:', err));
 }
-
-
+    
 window.addEventListener('load', checkMobileView);
 window.addEventListener('resize', checkMobileView);
 
