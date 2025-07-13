@@ -1340,6 +1340,33 @@ function countUniqueDailyAttendances(data) {
   return uniqueAttendances.size;
 }
 
+function countUniqueWeeklyAttendances(data) {
+  const weeklyUniqueAttendees = new Set();
+  
+  const recordsByDate = {};
+  data.forEach(row => {
+    if (!row.ID) return;
+    const dateKey = row.dateKey;
+    if (!recordsByDate[dateKey]) {
+      recordsByDate[dateKey] = [];
+    }
+    recordsByDate[dateKey].push(row);
+  });
+  
+  Object.entries(recordsByDate).forEach(([date, records]) => {
+    const uniqueForDay = new Set();
+    
+    records.forEach(row => {
+      uniqueForDay.add(row.ID);
+    });
+    
+    uniqueForDay.forEach(id => {
+      weeklyUniqueAttendees.add(`${id}_${date}`);
+    });
+  });
+  
+  return weeklyUniqueAttendees.size;
+}
 
 function getFilteredDataByPeriod(period) {
   const now = new Date();
@@ -1348,10 +1375,16 @@ function getFilteredDataByPeriod(period) {
     
     switch(period) {
       case 'week':
-        const startOfWeek = new Date(now);
-        startOfWeek.setDate(now.getDate() - now.getDay());
-        startOfWeek.setHours(0, 0, 0, 0);
-        return rowDate >= startOfWeek && rowDate <= now;
+        const monday = new Date(now);
+        monday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
+        monday.setHours(0, 0, 0, 0);
+        
+        const thursday = new Date(monday);
+        thursday.setDate(monday.getDate() + 3);
+        thursday.setHours(23, 59, 59, 999);
+        
+        return rowDate >= monday && rowDate <= thursday;
+        
       case 'month':
         return rowDate.getMonth() === now.getMonth() && 
                rowDate.getFullYear() === now.getFullYear() &&
@@ -1365,16 +1398,39 @@ function getFilteredDataByPeriod(period) {
 
 function updatePeriodSummary(period) {
   if (period === 'today') {
-    // Use existing daily counting logic
     updateSummary();
     return;
   }
   
   const periodData = getFilteredDataByPeriod(period);
-  const uniqueCount = countUniqueDailyAttendances(periodData);
+  let uniqueCount;
+  
+  if (period === 'week') {
+    uniqueCount = countUniqueWeeklyAttendances(periodData);
+  } else {
+    uniqueCount = countUniqueDailyAttendances(periodData);
+  }
   
   document.getElementById("totalCount").textContent = uniqueCount;
   document.getElementById("filteredCount").textContent = uniqueCount;
+  
+  if (period === 'week') {
+    const now = new Date();
+    const monday = new Date(now);
+    monday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
+    
+    const thursday = new Date(monday);
+    thursday.setDate(monday.getDate() + 3);
+    
+    const summaryElement = document.querySelector('.summary-box');
+    summaryElement.innerHTML = `
+      <span>إجمالي الحضور من ${formatDisplayDate(monday)} إلى ${formatDisplayDate(thursday)}: 
+      <span id="totalCount">${uniqueCount}</span></span>
+      <button onclick="clearFilters()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
+        <i class="fas fa-times"></i>
+      </button>
+    `;
+  }
 }
 
 
@@ -1389,7 +1445,6 @@ function renderPeriodTable(period) {
     return;
   }
 
-  // Group by ID and date to show one record per ID per day
   const dailyAttendances = {};
   periodData.forEach(row => {
     if (!row.ID) return;
@@ -1398,7 +1453,6 @@ function renderPeriodTable(period) {
     if (!dailyAttendances[idDateKey]) {
       dailyAttendances[idDateKey] = row;
     } else {
-      // Keep earliest record for each ID+date
       const existingTime = new Date(dailyAttendances[idDateKey].Timestamp);
       const newTime = new Date(row.Timestamp);
       if (newTime < existingTime) {
@@ -1407,11 +1461,9 @@ function renderPeriodTable(period) {
     }
   });
 
-  // Convert to array and sort by timestamp
   const records = Object.values(dailyAttendances);
   records.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
 
-  // Render the records
   records.forEach(row => {
     const tr = document.createElement("tr");
     if (row.isGeneral) tr.classList.add("general-attendance");
