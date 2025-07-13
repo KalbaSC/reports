@@ -1,3 +1,9 @@
+filteredUniquePlayers
+is this even exist in my code?
+  const filteredUniquePlayers = new Set();
+  filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
+  document.getElementById("filteredCount").textContent = filteredUniquePlayers.size;
+}
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -441,7 +447,9 @@
     }
   </style>
 </head>
-<body>  
+<body>
+ <div id="filteredCount"></div>
+  
   <header class="header-container">
     <div class="header-right">
       <img src="Picture3.png" alt="شعار الشارقة" class="logo">
@@ -577,14 +585,6 @@
   </div>
 
   <script>
-let dataCache = {
-  allData: [],          
-  filteredData: [],   
-  byDate: {},        
-  byActivity: {},      
-  byStaff: {},          
-  stats: {}            
-};
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
     let allData = [];
     let filteredData = [];
@@ -714,43 +714,47 @@ function formatDisplayDate(dateString) {
       });
     }
 
-async function fetchData() {
-  try {
-    document.getElementById("loading").style.display = "block";
-    
-    const res = await fetch(scriptURL);
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-    
-    const rawData = await res.json();
-    if (!Array.isArray(rawData)) throw new Error("Invalid data format");
-    
-    // Process and cache all data
-    dataCache = {
-      allData: processRawData(rawData),
-      filteredData: [],
-      byDate: {},
-      byActivity: {},
-      byStaff: {},
-      stats: {},
-      lastUpdated: new Date()
-    };
-    
-    // Initial filter for today
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById("datePicker").value = today;
-    filterByDate();
-    
-  } catch (error) {
-    console.error("Error loading data:", error);
-    const tbody = document.querySelector("#attendanceTable tbody");
-    if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
-    }
-  } finally {
-    document.getElementById("loading").style.display = "none";
-  }
-}
+    async function fetchData() {
+      try {
+        const loadingElement = document.getElementById("loading");
+        if (loadingElement) {
+          loadingElement.style.display = "block";
+        }
         
+        const res = await fetch(scriptURL);
+        if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+        
+        const rawData = await res.json();
+        if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
+        
+        allData = processRawData(rawData);
+        
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById("datePicker").value = today;
+        filteredData = allData.filter(row => row.dateKey === today);
+        
+        renderMainTable();
+        updateSummary();
+        populateDropdowns();
+        updateTodayStats();
+        
+        console.log("Data loaded successfully:", allData.length, "records");
+        
+      } catch (error) {
+        console.error("Error loading data:", error);
+        const tbody = document.querySelector("#attendanceTable tbody");
+        if (tbody) {
+          tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
+        }
+        
+      } finally {
+        const loadingElement = document.getElementById("loading");
+        if (loadingElement) {
+          loadingElement.style.display = "none";
+        }
+      }
+    }
+
     function showMainView() {
       setActiveNavButton(0);
       document.getElementById("mainView").style.display = "block";
@@ -780,62 +784,29 @@ async function fetchData() {
       });
     }
 
-function filterByDate() {
-  const selectedDate = document.getElementById("datePicker").value;
-  applyFilters({ date: selectedDate });
-  updateFilteredView();
-}
-
-function filterTable() {
-  const filters = {
-    date: document.getElementById("datePicker").value,
-    name: document.getElementById("filter-name").value,
-    id: document.getElementById("filter-id").value,
-    staff: document.getElementById("filter-staff").value,
-    activity: document.getElementById("filter-activity").value
-  };
-  
-  applyFilters(filters);
-  updateFilteredView();
-}
-
 function filterByPeriod(period) {
-  let filtered = [];
-  const now = new Date();
-  
-  switch(period) {
-    case 'today':
-      const today = now.toISOString().split('T')[0];
-      filtered = applyFilters({ date: today });
-      break;
-      
-    case 'week':
-      const monday = new Date(now);
-      monday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
-      const thursday = new Date(monday);
-      thursday.setDate(monday.getDate() + 3);
-      
-      filtered = dataCache.allData.filter(row => {
-        const rowDate = new Date(row.Timestamp);
-        return rowDate >= monday && rowDate <= thursday;
-      });
-      break;
-      
-    case 'month':
-      filtered = dataCache.allData.filter(row => {
-        const rowDate = new Date(row.Timestamp);
-        return rowDate.getMonth() === now.getMonth() && 
-               rowDate.getFullYear() === now.getFullYear();
-      });
-      break;
-      
-    default:
-      filtered = dataCache.allData;
+  if (period === 'today') {
+    filterByDate(); 
+    return;
   }
   
-  dataCache.filteredData = filtered;
-  updateFilteredView();
+  if (period === 'week') {
+    showWeekRangePicker();
+    return;
+  }
+  
+  filteredData = getFilteredDataByPeriod(period);
   updatePeriodSummary(period);
+  renderPeriodTable(period);
+  updateTodayStats();
+  
+  if (document.getElementById("activityView").style.display !== "none") {
+    renderActivityTable();
+  }
+  
+  if (document.getElementById("statsView").style.display !== "none") {
+    renderCharts();
+  }
 }
 
 function showWeekRangePicker() {
@@ -940,65 +911,34 @@ function closeWeekRangePicker() {
   }
 }
 
-    function applyFilters(filters = {}) {
-  const cacheKey = JSON.stringify(filters);
-  
-  // Return cached data if available
-  if (dataCache.byDate[cacheKey]) {
-    dataCache.filteredData = dataCache.byDate[cacheKey];
-    return dataCache.filteredData;
-  }
+    function filterByDate() {
+      const selectedDate = document.getElementById("datePicker").value;
+      if (!selectedDate) return;
+      
+      filteredData = allData.filter(row => row.dateKey === selectedDate);
+      updateFilteredView();
+    }
 
-  // Apply filters to allData
-  let result = dataCache.allData;
-  
-  // Date filter
-  if (filters.date) {
-    result = result.filter(row => row.dateKey === filters.date);
-  }
-  
-  // Name filter
-  if (filters.name) {
-    const name = filters.name.toLowerCase();
-    result = result.filter(row => 
-      (row["Child Name"] || "").toLowerCase().includes(name)
-    );
-  }
-  
-  // ID filter
-  if (filters.id) {
-    const id = filters.id.toLowerCase();
-    result = result.filter(row => 
-      (row.ID || "").toLowerCase().includes(id)
-    );
-  }
-  
-  // Staff filter
-  if (filters.staff) {
-    result = result.filter(row => 
-      (row["Scanned By"] || "") === filters.staff
-    );
-  }
-  
-  // Activity filter
-  if (filters.activity) {
-    result = result.filter(row => 
-      filters.activity === "عام" ? row.isGeneral : (row.Activity || "") === filters.activity
-    );
-  }
-  
-  // Cache and return the result
-  dataCache.byDate[cacheKey] = result;
-  dataCache.filteredData = result;
-  return result;
-}
-    
-function clearCache() {
-  dataCache.byDate = {};
-  dataCache.byActivity = {};
-  dataCache.byStaff = {};
-  dataCache.stats = {};
-}
+    function filterTable() {
+      const name = document.getElementById("filter-name").value.toLowerCase();
+      const id = document.getElementById("filter-id").value.toLowerCase();
+      const staff = document.getElementById("filter-staff").value;
+      const activity = document.getElementById("filter-activity").value;
+
+      filteredData = allData.filter(row => {
+        const rowName = (row["Child Name"] || "").toLowerCase();
+        const rowId = (row.ID || "").toLowerCase();
+        const rowStaff = row["Scanned By"] || "";
+        const rowActivity = row.isGeneral ? "عام" : (row.Activity || "");
+
+        return (!name || rowName.includes(name)) &&
+               (!id || rowId.includes(id)) &&
+               (!staff || rowStaff === staff) &&
+               (!activity || (activity === "عام" ? row.isGeneral : rowActivity === activity));
+      });
+
+      updateFilteredView();
+    }
 
 function clearFilters() {
   document.getElementById("filter-name").value = "";
@@ -1011,9 +951,17 @@ function clearFilters() {
   document.getElementById("datePicker").value = today;
   
   showFilterOptions("");
-  clearCache();
-  filterByDate();
+  filteredData = allData.filter(row => row.dateKey === today);
+  updateFilteredView();
+  
+  // Reset summary to default view
+  const summaryElement = document.querySelector('.summary-box');
+  summaryElement.innerHTML = `
+    <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
+    <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
+  `;
 }
+
     function showFilterOptions(value) {
       document.getElementById("filter-name").classList.add("hidden");
       document.getElementById("filter-id").classList.add("hidden");
@@ -1042,49 +990,47 @@ function clearFilters() {
 
 function renderMainTable() {
   const tbody = document.querySelector("#attendanceTable tbody");
-  tbody.innerHTML = "";
-  
-  if (dataCache.filteredData.length === 0) {
+  if (filteredData.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
     return;
   }
 
-  // Use cached stats if available
-  const cacheKey = `mainTable-${dataCache.filteredData.length}`;
-  if (dataCache.stats[cacheKey]) {
-    tbody.innerHTML = dataCache.stats[cacheKey];
-    return;
-  }
+  tbody.innerHTML = "";
 
-  // Generate table HTML
-  let tableHTML = "";
   const players = {};
-  
-  dataCache.filteredData.forEach(row => {
+  filteredData.forEach(row => {
     if (!row.ID) return;
     if (!players[row.ID]) players[row.ID] = [];
     players[row.ID].push(row);
   });
 
-  Object.values(players).forEach(playerRows => {
+  const playerRecords = Object.values(players).map(playerRows => {
+
     playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-    const row = playerRows.find(r => r.isGeneral) || playerRows[0];
-    
-    tableHTML += `
-      <tr ${row.isGeneral ? 'class="general-attendance"' : ''}>
-        <td>${formatDate(row.Timestamp)}</td>
-        <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-        <td>${row.ID || ""}</td>
-        <td>${row["Scanned By"] || ""}</td>
-        <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-        <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
-      </tr>
-    `;
+
+    const generalRecord = playerRows.find(row => row.isGeneral);
+    if (generalRecord) return generalRecord;
+
+    return playerRows[0];
   });
 
-  // Cache and render
-  dataCache.stats[cacheKey] = tableHTML;
-  tbody.innerHTML = tableHTML;
+  playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+
+  playerRecords.forEach(row => {
+    const tr = document.createElement("tr");
+    if (row.isGeneral) tr.classList.add("general-attendance");
+    
+    tr.innerHTML = `
+      <td>${formatDate(row.Timestamp)}</td>
+      <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+      <td>${row.ID || ""}</td>
+      <td>${row["Scanned By"] || ""}</td>
+      <!-- Hidden columns (keep for logic but hide via CSS) -->
+      <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
     function renderActivityTable() {
@@ -1395,54 +1341,18 @@ function toggleHiddenColumns() {
     }
 
 function updateSummary() {
-  const uniquePlayers = new Set(dataCache.filteredData.map(row => row.ID));
+  const selectedDate = document.getElementById("datePicker").value;
   
-  document.getElementById("totalCount").textContent = 
-    new Set(dataCache.allData.map(row => row.ID)).size;
+  const uniquePlayers = new Set();
+  allData
+    .filter(row => selectedDate ? row.dateKey === selectedDate : true)
+    .forEach(row => uniquePlayers.add(row.ID));
   
-  document.getElementById("filteredCount").textContent = 
-    uniquePlayers.size;
-}
-
-function updateTodayStats() {
-  const today = new Date().toDateString();
-  const todayData = dataCache.filteredData.filter(row => 
-    new Date(row.Timestamp).toDateString() === today
-  );
-
-  // Check cache first
-  const cacheKey = `todayStats-${todayData.length}`;
-  if (dataCache.stats[cacheKey]) {
-    document.getElementById("todayStats").innerHTML = dataCache.stats[cacheKey];
-    return;
-  }
-
-  // Calculate stats
-  const staffToday = {};
-  let early = 0, late = 0;
+  document.getElementById("totalCount").textContent = uniquePlayers.size;
   
-  todayData.forEach(row => {
-    const name = row["Scanned By"] || "غير معروف";
-    staffToday[name] = (staffToday[name] || 0) + 1;
-
-    const time = new Date(row.Timestamp);
-    const totalMinutes = time.getHours() * 60 + time.getMinutes();
-    (totalMinutes < (17 * 60 + 11)) ? early++ : late++;
-  });
-
-  const staffList = Object.entries(staffToday)
-    .map(([name, count]) => `${name}: ${count}`)
-    .join("<br>");
-
-  const statsHTML = `
-    <p><strong>حسب الموظف:</strong><br>${staffList || "لا يوجد بيانات"}</p>
-    <p><strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}</p>
-    <p><strong>إجمالي اليوم:</strong> ${todayData.length}</p>
-  `;
-
-  // Cache and render
-  dataCache.stats[cacheKey] = statsHTML;
-  document.getElementById("todayStats").innerHTML = statsHTML;
+  const filteredUniquePlayers = new Set();
+  filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
+  document.getElementById("filteredCount").textContent = filteredUniquePlayers.size;
 }
 
 function countUniqueDailyAttendances(data) {
@@ -1661,6 +1571,7 @@ window.addEventListener('resize', checkMobileView);
 
     window.onload = initialize;
     
+   document.getElementById("filteredCount").textContent = filteredUniquePlayers.size;
   </script>
   
 <div class="footer-container">
