@@ -502,6 +502,11 @@
           <button class="export" onclick="exportToPDF()">
             <span class="download-icon"></span> PDF
           </button>
+          
+          <button id="exportUniqueBtn" class="export" style="display:none;" onclick="exportUniqueToExcel()">
+          <span class="download-icon"></span> Excel البيانات
+          </button>
+
         </div>
 <button onclick="toggleHiddenColumns()" class="export" style="background: #555;">
   <i class="fas fa-eye"></i> عرض الأعمدة المخفية
@@ -512,8 +517,6 @@
         <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
         <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
       </div>
-
-     <div id="uniqueTableContainer" style="margin-top:20px;"></div>
 
     </div>
 
@@ -803,6 +806,8 @@ function filterByPeriod(period) {
   if (document.getElementById("statsView").style.display !== "none") {
     renderCharts();
   }
+  document.getElementById("exportUniqueBtn").style.display = 'inline-block';
+
 }
 
 function showWeekRangePicker() {
@@ -961,6 +966,9 @@ function clearFilters() {
     <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
   `;
   updateSummary();
+
+  document.getElementById("exportUniqueBtn").style.display = 'none';
+
 }
 
     function showFilterOptions(value) {
@@ -979,7 +987,7 @@ function clearFilters() {
       renderMainTable();
       updateSummary();
       updateTodayStats();
-      renderUniqueTable();
+     // renderUniqueTable();
       
       if (document.getElementById("activityView").style.display !== "none") {
         renderActivityTable();
@@ -1512,7 +1520,50 @@ function renderPeriodTable(period) {
   });
 }
 
-    function renderUniqueTable() {
+   // function renderUniqueTable() {
+ // const uniquePerDay = {};
+
+ // filteredData.forEach(row => {
+   // const key = `${row.ID}_${row.dateKey}`;
+  //  if (!uniquePerDay[key]) {
+  //    uniquePerDay[key] = row;
+  //  }
+ // });
+
+ // const data = Object.values(uniquePerDay);
+ // if (data.length === 0) {
+  //  document.getElementById("uniqueTableContainer").innerHTML = "<p>لا يوجد بيانات فريدة لكل يوم.</p>";
+  //  return;
+  //}
+
+ // let tableHTML = `
+ //  <table border="1" style="width:100%; text-align:center; border-collapse: collapse; color:white;">
+//<thead>
+      //  <tr>
+       //   <th>الاسم</th>
+        //  <th>المعرف</th>
+        //  <th>التاريخ</th>
+       // </tr>
+     // </thead>
+    //  <tbody>
+//  `;
+
+  //data.forEach(row => {
+   // tableHTML += `
+    //  <tr>
+     //   <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+      //  <td>${row.ID || ""}</td>
+      //  <td>${formatDisplayDate(row.dateKey)}</td>
+     // </tr>
+  //  `;
+ // });
+
+ // tableHTML += `</tbody></table>`;
+
+ // document.getElementById("uniqueTableContainer").innerHTML = tableHTML;
+//}
+    
+function exportUniqueToExcel() {
   const uniquePerDay = {};
 
   filteredData.forEach(row => {
@@ -1522,37 +1573,16 @@ function renderPeriodTable(period) {
     }
   });
 
-  const data = Object.values(uniquePerDay);
-  if (data.length === 0) {
-    document.getElementById("uniqueTableContainer").innerHTML = "<p>لا يوجد بيانات فريدة لكل يوم.</p>";
-    return;
-  }
+  const data = Object.values(uniquePerDay).map(row => ({
+    "الاسم": `${row["Child Name"] || ""} ${row.Parent || ""}`,
+    "المعرف": row.ID || "",
+    "التاريخ": formatDisplayDate(row.dateKey)
+  }));
 
-  let tableHTML = `
-    <table border="1" style="width:100%; text-align:center; border-collapse: collapse; color:white;">
-      <thead>
-        <tr>
-          <th>الاسم</th>
-          <th>المعرف</th>
-          <th>التاريخ</th>
-        </tr>
-      </thead>
-      <tbody>
-  `;
-
-  data.forEach(row => {
-    tableHTML += `
-      <tr>
-        <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-        <td>${row.ID || ""}</td>
-        <td>${formatDisplayDate(row.dateKey)}</td>
-      </tr>
-    `;
-  });
-
-  tableHTML += `</tbody></table>`;
-
-  document.getElementById("uniqueTableContainer").innerHTML = tableHTML;
+  const wb = XLSX.utils.book_new();
+  const ws = XLSX.utils.json_to_sheet(data);
+  XLSX.utils.book_append_sheet(wb, ws, "بيانات المنتسبين خلال هذا الاسبوع");
+  XLSX.writeFile(wb, "weekly-attendance.xlsx");
 }
 
     function exportToExcel() {
