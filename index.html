@@ -855,17 +855,15 @@ function applyWeekFilter() {
 }
 
 function updateWeekSummary(startDate, endDate) {
-  const uniquePlayers = new Set();
-  filteredData.forEach(row => uniquePlayers.add(row.ID));
+  const uniqueCount = countUniqueWeeklyAttendances(filteredData);
   
-  document.getElementById("totalCount").textContent = uniquePlayers.size;
-  document.getElementById("filteredCount").textContent = uniquePlayers.size;
+  document.getElementById("totalCount").textContent = uniqueCount;
+  document.getElementById("filteredCount").textContent = uniqueCount;
   
-  // Update the summary text
   const summaryElement = document.querySelector('.summary-box');
   summaryElement.innerHTML = `
     <span>إجمالي الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}: 
-    <span id="totalCount">${uniquePlayers.size}</span></span>
+    <span id="totalCount">${uniqueCount}</span></span>
     <button onclick="clearWeekFilter()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
       <i class="fas fa-times"></i>
     </button>
@@ -916,26 +914,26 @@ function closeWeekRangePicker() {
       updateFilteredView();
     }
 
-    function clearFilters() {
-      document.getElementById("filter-name").value = "";
-      document.getElementById("filter-id").value = "";
-      document.getElementById("filter-staff").value = "";
-      document.getElementById("filter-activity").value = "";
-      document.getElementById("filterType").value = "";
-      
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById("datePicker").value = today;
-      
-      showFilterOptions("");
-      filteredData = allData.filter(row => row.dateKey === today);
-      updateFilteredView();
-      
+function clearFilters() {
+  document.getElementById("filter-name").value = "";
+  document.getElementById("filter-id").value = "";
+  document.getElementById("filter-staff").value = "";
+  document.getElementById("filter-activity").value = "";
+  document.getElementById("filterType").value = "";
+  
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById("datePicker").value = today;
+  
+  showFilterOptions("");
+  filteredData = allData.filter(row => row.dateKey === today);
+  updateFilteredView();
+  
   const summaryElement = document.querySelector('.summary-box');
   summaryElement.innerHTML = `
     <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
     <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
   `;
-    }
+}
 
     function showFilterOptions(value) {
       document.getElementById("filter-name").classList.add("hidden");
@@ -1361,7 +1359,7 @@ function countUniqueWeeklyAttendances(data) {
     });
     
     uniqueForDay.forEach(id => {
-      weeklyUniqueAttendees.add(`${id}_${date}`);
+      weeklyUniqueAttendees.add(`${id}_${date}`); 
     });
   });
   
@@ -1480,7 +1478,8 @@ function renderPeriodTable(period) {
   });
 }
 
-function formatDisplayDate(date) {
+function formatDisplayDate(dateString) {
+  const date = new Date(dateString);
   const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
   return date.toLocaleDateString('ar-EG', options);
 }
