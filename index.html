@@ -890,6 +890,8 @@ function updateWeekSummary(startDate, endDate) {
       </button>
     `;
   }
+updateWeekSummary(startDate, endDate);
+updateSummary(true);
 }
 
 function clearWeekFilter() {
@@ -1336,23 +1338,22 @@ function toggleHiddenColumns() {
       `;
     }
 
-function updateSummary() {
+function updateSummary(isWeek = false) {
   const selectedDate = document.getElementById("datePicker").value;
-  
+
   const uniquePlayers = new Set();
   allData
     .filter(row => selectedDate ? row.dateKey === selectedDate : true)
     .forEach(row => uniquePlayers.add(row.ID));
-  
+
   const filteredUniquePlayers = new Set();
   filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
 
-  // Always rebuild the summary-box with both counts
   const summaryElement = document.querySelector('.summary-box');
   if (summaryElement) {
     summaryElement.innerHTML = `
       <span id="summary">إجمالي الحضور: <span id="totalCount">${uniquePlayers.size}</span></span>
-      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
+      <span id="filteredSummary" style="${isWeek ? 'display:none;' : 'display:inline;'}">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
     `;
   }
 }
