@@ -235,6 +235,13 @@
       padding: 10px;
       border-radius: 5px;
     }
+#tableTitle {
+  font-weight: bold;
+  font-size: 20px;
+  border-bottom: 1px solid #f4e733;
+  display: inline-block;
+  padding-bottom: 5px;
+}
     .stats-container {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -847,8 +854,8 @@ function showWeekRangePicker() {
 
 function setCurrentWeekDates() {
   const today = new Date();
-  const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon,...6=Sat
-  const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Days back to Monday
+  const dayOfWeek = today.getDay(); 
+  const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; 
   
   const monday = new Date(today);
   monday.setDate(today.getDate() - diffToMonday);
@@ -861,6 +868,7 @@ function setCurrentWeekDates() {
 }
     
 function renderWeeklySummaryTable() {
+  document.getElementById('tableTitle').textContent = 'حضور المنتسبين خلال الاسبوع ';
   const tbody = document.querySelector("#attendanceTable tbody");
   tbody.innerHTML = "";
   
