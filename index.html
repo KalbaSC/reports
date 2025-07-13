@@ -503,10 +503,6 @@
             <span class="download-icon"></span> PDF
           </button>
           
-          <button id="exportUniqueBtn" class="export" style="display:none;" onclick="exportUniqueToExcel()">
-          <span class="download-icon"></span> Excel البيانات
-          </button>
-
         </div>
 <button onclick="toggleHiddenColumns()" class="export" style="background: #555;">
   <i class="fas fa-eye"></i> عرض الأعمدة المخفية
@@ -540,6 +536,8 @@
       </tbody>
     </table>
   </div>
+  
+<div id="weeklySummaryContainer" style="margin-top: 30px;"></div>
 
   <div class="container" id="activityView" style="display: none;">
     <h2 style="color:#f4e733; text-align:center">الحضور حسب الأنشطة</h2>
@@ -798,6 +796,9 @@ function filterByPeriod(period) {
   updatePeriodSummary(period);
   renderPeriodTable(period);
   updateTodayStats();
+  if (period === 'week') {
+  renderWeeklySummaryTable();
+}
   
   if (document.getElementById("activityView").style.display !== "none") {
     renderActivityTable();
@@ -811,7 +812,6 @@ function filterByPeriod(period) {
 }
 
 function showWeekRangePicker() {
-  // Create or show the range picker UI
   let rangePicker = document.getElementById('weekRangePicker');
   
   if (!rangePicker) {
@@ -842,7 +842,6 @@ function showWeekRangePicker() {
     
     document.body.appendChild(rangePicker);
     
-    // Auto-set current week dates
     setCurrentWeekDates();
   } else {
     rangePicker.style.display = 'block';
@@ -852,14 +851,14 @@ function showWeekRangePicker() {
 
 function setCurrentWeekDates() {
   const today = new Date();
-  const dayOfWeek = today.getDay(); // 0=Sun, 1=Mon,...6=Sat
-  const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; // Days back to Monday
+  const dayOfWeek = today.getDay(); 
+  const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
   
   const monday = new Date(today);
   monday.setDate(today.getDate() - diffToMonday);
   
   const thursday = new Date(monday);
-  thursday.setDate(monday.getDate() + 3); // Monday + 3 days = Thursday
+  thursday.setDate(monday.getDate() + 3); 
   
   document.getElementById('weekStartDate').value = monday.toISOString().split('T')[0];
   document.getElementById('weekEndDate').value = thursday.toISOString().split('T')[0];
@@ -987,7 +986,6 @@ function clearFilters() {
       renderMainTable();
       updateSummary();
       updateTodayStats();
-     // renderUniqueTable();
       
       if (document.getElementById("activityView").style.display !== "none") {
         renderActivityTable();
@@ -1382,7 +1380,6 @@ function countUniqueDailyAttendances(data) {
 function countUniqueWeeklyAttendances(data) {
   const weeklyUniqueAttendees = new Set();
   
-  // First group records by date
   const recordsByDate = {};
   data.forEach(row => {
     if (!row.ID) return;
@@ -1401,7 +1398,7 @@ function countUniqueWeeklyAttendances(data) {
     });
     
     uniqueForDay.forEach(id => {
-      weeklyUniqueAttendees.add(`${id}_${date}`); // Fixed: using the date parameter
+      weeklyUniqueAttendees.add(`${id}_${date}`); 
     });
   });
   
@@ -1520,48 +1517,72 @@ function renderPeriodTable(period) {
   });
 }
 
-   // function renderUniqueTable() {
- // const uniquePerDay = {};
+function renderWeeklyAttendance() {
+  const periodData = getFilteredDataByPeriod('week');
 
- // filteredData.forEach(row => {
-   // const key = `${row.ID}_${row.dateKey}`;
-  //  if (!uniquePerDay[key]) {
-  //    uniquePerDay[key] = row;
-  //  }
- // });
+  if (periodData.length === 0) {
+    document.getElementById("uniqueTableContainer").innerHTML = "<p>لا يوجد بيانات لهذا الأسبوع.</p>";
+    return;
+  }
 
- // const data = Object.values(uniquePerDay);
- // if (data.length === 0) {
-  //  document.getElementById("uniqueTableContainer").innerHTML = "<p>لا يوجد بيانات فريدة لكل يوم.</p>";
-  //  return;
-  //}
+  let fullTableHTML = `<h3 style="color:#f4e733; text-align:center;">حضور هذا الاسبوع</h3>
+  <table style="width:100%; border-collapse:collapse; text-align:center; color:white;">
+    <thead>
+      <tr>
+        <th>التاريخ والوقت</th>
+        <th>الاسم</th>
+        <th>المعرف</th>
+        <th>الموظف</th>
+      </tr>
+    </thead>
+    <tbody>`;
 
- // let tableHTML = `
- //  <table border="1" style="width:100%; text-align:center; border-collapse: collapse; color:white;">
-//<thead>
-      //  <tr>
-       //   <th>الاسم</th>
-        //  <th>المعرف</th>
-        //  <th>التاريخ</th>
-       // </tr>
-     // </thead>
-    //  <tbody>
-//  `;
+  periodData.forEach(row => {
+    fullTableHTML += `
+      <tr>
+        <td>${formatDate(row.Timestamp)}</td>
+        <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+        <td>${row.ID || ""}</td>
+        <td>${row["Scanned By"] || ""}</td>
+      </tr>`;
+  });
 
-  //data.forEach(row => {
-   // tableHTML += `
-    //  <tr>
-     //   <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-      //  <td>${row.ID || ""}</td>
-      //  <td>${formatDisplayDate(row.dateKey)}</td>
-     // </tr>
-  //  `;
- // });
+  fullTableHTML += `</tbody></table>`;
 
- // tableHTML += `</tbody></table>`;
+  fullTableHTML += `<h3 style="color:#f4e733; text-align:center; margin-top:20px;">المنتسبين اللذين حضروا مرة خلال الاسبوع</h3>
+  <table style="width:100%; border-collapse:collapse; text-align:center; color:white;">
+    <thead>
+      <tr>
+        <th>التاريخ والوقت</th>
+        <th>الاسم</th>
+        <th>المعرف</th>
+        <th>الموظف</th>
+      </tr>
+    </thead>
+    <tbody>`;
 
- // document.getElementById("uniqueTableContainer").innerHTML = tableHTML;
-//}
+  const uniquePerDay = {};
+  periodData.forEach(row => {
+    const key = `${row.ID}_${row.dateKey}`;
+    if (!uniquePerDay[key]) {
+      uniquePerDay[key] = row;
+    }
+  });
+
+  Object.values(uniquePerDay).forEach(row => {
+    fullTableHTML += `
+      <tr>
+        <td>${formatDate(row.Timestamp)}</td>
+        <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+        <td>${row.ID || ""}</td>
+        <td>${row["Scanned By"] || ""}</td>
+      </tr>`;
+  });
+
+  fullTableHTML += `</tbody></table>`;
+
+  document.getElementById("uniqueTableContainer").innerHTML = fullTableHTML;
+}
     
 function exportUniqueToExcel() {
   const uniquePerDay = {};
