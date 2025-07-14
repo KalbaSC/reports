@@ -32,6 +32,9 @@
     .container, #mainView, #activityView, #statsView {
       flex: 1 0 auto;
     }
+    main {
+     flex: 1;
+    }
     .header-container {
       width: 100%;
       background: #111;
@@ -484,7 +487,9 @@
       </div>
     </div>
   </nav>
-
+  
+<main style="flex: 1;">
+  
   <div class="container" id="mainView">
     <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
       حضور صيف الشارقة الرياضي - عطلتنا غير
@@ -1799,6 +1804,7 @@ function updateTitleAndControls(period) {
     window.onload = initialize;
     
   </script>
+  </main>
   
 <div class="footer-container">
   <footer>
