@@ -485,6 +485,7 @@
     <button onclick="showMainView()" class="active">الحضور </button>
     <button onclick="showActivitiesView()">الحضور حسب الأنشطة</button>
     <button onclick="showStatsView()">الإحصائيات</button>
+    <button onclick="showTopParticipants()">المنتسبون المميزون</button>
     <div class="dropdown">
       <button>الفترات الزمنية ▼</button>
       <div class="dropdown-content">
@@ -633,6 +634,12 @@
         <div id="todayStats"></div>
       </div>
     </div>
+    
+<div class="container" id="topParticipantsView" style="display: none;">
+  <h2 style="color:#f4e733; text-align:center">المنتسبون المميزون (اليوم)</h2>
+  <div id="topParticipantsContainer" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;"></div>
+</div>
+
   </div>
 
   <script>
@@ -830,11 +837,21 @@ function formatDisplayDate(dateString) {
       renderCharts();
     }
 
-    function setActiveNavButton(index) {
-      document.querySelectorAll('nav button').forEach((btn, i) => {
-        btn.classList.toggle('active', i === index);
-      });
-    }
+    function showTopParticipants() {
+  setActiveNavButton(3);
+  document.getElementById("mainView").style.display = "none";
+  document.getElementById("activityView").style.display = "none";
+  document.getElementById("statsView").style.display = "none";
+  document.getElementById("topParticipantsView").style.display = "block";
+  
+  renderTopParticipants();
+}
+
+function setActiveNavButton(index) {
+  document.querySelectorAll('nav button').forEach((btn, i) => {
+    btn.classList.toggle('active', i === index);
+  });
+}
 
 function filterByPeriod(period) {
   if (period === 'today') {
@@ -1670,6 +1687,48 @@ function toggleView() {
   }
 }
 
+function renderTopParticipants() {
+  const container = document.getElementById('topParticipantsContainer');
+  container.innerHTML = '';
+
+  const todayKey = new Date().toISOString().split('T')[0];
+  const todayRecords = allData.filter(r => r.dateKey === todayKey && !r.isGeneral && r.Activity);
+
+  const participationCounts = {};
+
+  todayRecords.forEach(row => {
+    if (!row.ID) return;
+    if (!participationCounts[row.ID]) {
+      participationCounts[row.ID] = {
+        name: `${row["Child Name"] || ""} ${row.Parent || ""}`,
+        count: 0,
+        image: row.Image || 'default-avatar.png'  
+      };
+    }
+    participationCounts[row.ID].count++;
+  });
+
+  const top5 = Object.values(participationCounts)
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 5);
+
+  if (top5.length === 0) {
+    container.innerHTML = `<p>لا يوجد مشاركين في الأنشطة اليوم</p>`;
+    return;
+  }
+
+  top5.forEach(participant => {
+    const card = document.createElement('div');
+    card.style = "background:#222; border:1px solid #f4e733; border-radius:10px; padding:10px; text-align:center; width:150px;";
+
+    card.innerHTML = `
+      <img src="${participant.image}" alt="${participant.name}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid #f4e733;">
+      <h4 style="color:#f4e733;">${participant.name}</h4>
+      <p>أنشطة: ${participant.count}</p>
+    `;
+    container.appendChild(card);
+  });
+}
 
 function applyWeekFilter() {
   const startDate = document.getElementById('weekStartDate').value;
