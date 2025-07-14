@@ -1683,12 +1683,28 @@ function showWeeklyPlayerAttendance() {
   let message = '';
   for (const id in attendanceMap) {
     const player = attendanceMap[id];
-    message += `لقد حضر اللاعب ${player.name} ${player.days.size} أيام هذا الأسبوع. شكرا على التزامكم.<br>`;
+    const daysCount = player.days.size;
+    let evaluation = '';
+
+    if (daysCount >= 4) {
+      evaluation = 'ممتاز! حضور مميز هذا الأسبوع.';
+    } else if (daysCount === 3) {
+      evaluation = 'جيد! واصل الحضور لتحصل على تقييم أفضل.';
+    } else if (daysCount === 2) {
+      evaluation = 'يمكنك أن تكون أفضل، ننتظر التزاماً أكثر.';
+    } else if (daysCount === 1) {
+      evaluation = 'حضور ضعيف هذا الأسبوع. نرجو تحسين الحضور.';
+    } else {
+      evaluation = 'لم يحضر هذا الأسبوع.';
+    }
+
+    message += `اللاعب ${player.name} (ID: ${id}) حضر ${daysCount} أيام هذا الأسبوع. ${evaluation}<br>`;
   }
 
   document.getElementById('weeklyMessageContent').innerHTML = message || "لا يوجد حضور لهذا الأسبوع.";
   document.getElementById('showWeeklyMsgBtn').style.display = 'inline-block';
 }
+
 
 function openWeeklyMessage() {
   document.getElementById('weeklyMessagePopup').style.display = 'block';
