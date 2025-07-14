@@ -1773,13 +1773,13 @@ function showWeeklyPlayerAttendance() {
       evaluation = 'لم يحضر ابنكم هذا الأسبوع. نأمل رؤيته قريباً.';
     }
 
-    const testData = {
-      email: "rawand@ksc.shj.ae",
-      name: player.name,
-      id: firstId,
-      daysCount: daysCount,
-      evaluation: evaluation
-    };
+const testData = {
+  email: "rawand@ksc.shj.ae",
+  name: player.name,
+  id: firstId,
+  days: daysCount,  
+  evaluation: evaluation
+};
 
     fetch('https://script.google.com/macros/s/AKfycbxgoDcFpUpq2KFadPCxs4a1HptA2SxVunZ80z4feLmqh52Rh2qFmKTORw9vhtEofY2C/exec', {
       method: 'POST',
