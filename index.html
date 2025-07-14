@@ -1626,6 +1626,7 @@ function applyWeekFilter() {
   
   renderWeeklySummaryTable();
   updateWeekSummary(startDate, endDate);
+  showWeeklyPlayerAttendance();
   closeWeekRangePicker();
 }
     function exportToExcel() {
@@ -1666,6 +1667,38 @@ function applyWeekFilter() {
       }));
     }
     
+function showWeeklyPlayerAttendance() {
+  const attendanceMap = {};
+
+  filteredData.forEach(row => {
+    if (!attendanceMap[row.ID]) {
+      attendanceMap[row.ID] = {
+        name: `${row["Child Name"] || ""} ${row.Parent || ""}`,
+        days: new Set()
+      };
+    }
+    attendanceMap[row.ID].days.add(row.dateKey);
+  });
+
+  let message = '';
+  for (const id in attendanceMap) {
+    const player = attendanceMap[id];
+    message += `لقد حضر اللاعب ${player.name} ${player.days.size} أيام هذا الأسبوع. شكرا على التزامكم.<br>`;
+  }
+
+  document.getElementById('weeklyMessageContent').innerHTML = message || "لا يوجد حضور لهذا الأسبوع.";
+  document.getElementById('showWeeklyMsgBtn').style.display = 'inline-block';
+}
+
+function openWeeklyMessage() {
+  document.getElementById('weeklyMessagePopup').style.display = 'block';
+}
+
+function closeWeeklyMessage() {
+  document.getElementById('weeklyMessagePopup').style.display = 'none';
+}
+
+    
 function checkMobileView() {
   const isMobile = window.innerWidth <= 768;
   if (isMobile) {
@@ -1692,7 +1725,17 @@ window.addEventListener('resize', checkMobileView);
     window.onload = initialize;
     
   </script>
-  
+
+<button id="showWeeklyMsgBtn" class="export" style="display:none; background:#f4e733; color:black; margin-top:10px;" onclick="openWeeklyMessage()">عرض ملخص الحضور الأسبوعي</button>
+
+<div id="weeklyMessagePopup" style="
+  display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:#222; color:white; border:2px solid #f4e733; border-radius:10px; padding:20px; z-index:1000; max-width:80%; max-height:70%; overflow:auto; text-align:right;">
+  <h3 style="color:#f4e733;">ملخص الحضور الأسبوعي</h3>
+  <div id="weeklyMessageContent"></div>
+  <button onclick="closeWeeklyMessage()" style="margin-top:10px; background:#f4e733; color:black; border:none; padding:5px 15px; border-radius:5px;">إغلاق</button>
+</div>
+
 <div class="footer-container">
   <footer>
     <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
@@ -1705,8 +1748,6 @@ window.addEventListener('resize', checkMobileView);
       <a href="https://tiktok.com/@kalbasc" target="_blank"><i class="fab fa-tiktok"></i></a>
     </div>
   </footer>
-</div>
-
-  
+</div>  
 </body>
 </html>
