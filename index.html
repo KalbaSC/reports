@@ -984,7 +984,6 @@ function renderWeeklySummaryTable() {
     tbody.appendChild(tr);
   });
 
-  // Make sure table headers are correct
   const thead = document.querySelector("#attendanceTable thead");
   thead.innerHTML = `
     <tr>
@@ -1702,7 +1701,7 @@ function renderTopParticipants() {
       participationCounts[row.ID] = {
         name: `${row["Child Name"] || ""} ${row.Parent || ""}`,
         count: 0,
-        image: row.Image || 'default-avatar.png'  
+        image: row.Image || 'user-icon.png'  
       };
     }
     participationCounts[row.ID].count++;
