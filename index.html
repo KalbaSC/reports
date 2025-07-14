@@ -236,11 +236,11 @@
       border-radius: 5px;
     }
 #tableTitle {
-  font-weight: bold;
-  font-size: 20px;
-  border-bottom: 1px solid #f4e733;
-  display: inline-block;
-  padding-bottom: 5px;
+  text-align: center !important;
+  width: 100%;
+  display: block !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
 }
     .stats-container {
       display: grid;
@@ -803,6 +803,7 @@ function formatDisplayDate(dateString) {
 function filterByPeriod(period) {
   if (period === 'today') {
     filterByDate(); 
+    hideWeeklyControls();
     return;
   }
   
@@ -833,6 +834,7 @@ function showWeeklyControls() {
 function hideWeeklyControls() {
   document.getElementById('viewToggle').style.display = 'none';
   document.getElementById('showWeeklyMsgBtn').style.display = 'none';
+  closeWeeklyMessage();
 }
 
 function showWeekRangePicker() {
@@ -985,6 +987,7 @@ function closeWeekRangePicker() {
       
       filteredData = allData.filter(row => row.dateKey === selectedDate);
       updateFilteredView();
+      hideWeeklyControls();
     }
 
     function filterTable() {
