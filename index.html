@@ -1754,9 +1754,44 @@ function showWeeklyPlayerAttendance() {
 
   document.getElementById('weeklyMessageContent').innerHTML = message || "لا يوجد حضور لهذا الأسبوع.";
   document.getElementById('showWeeklyMsgBtn').style.display = 'inline-block';
+
+  // SEND EMAIL FOR FIRST CHILD ONLY
+  const firstId = Object.keys(attendanceMap)[0];
+  if (firstId) {
+    const player = attendanceMap[firstId];
+    const daysCount = player.days.size;
+    let evaluation = '';
+
+    if (daysCount >= 4) {
+      evaluation = 'ممتاز! نشكركم على حرصكم والتزام ابنكم.';
+    } else if (daysCount === 3) {
+      evaluation = 'جيد! نأمل منكم تشجيع ابنكم على الحضور الكامل.';
+    } else if (daysCount === 2) {
+      evaluation = 'يرجى تشجيع ابنكم للحضور بشكل أفضل في الأسبوع القادم.';
+    } else if (daysCount === 1) {
+      evaluation = 'نرجو منكم تحفيز ابنكم على الالتزام بالحضور، فقد حضر يوماً واحداً فقط.';
+    } else {
+      evaluation = 'لم يحضر ابنكم هذا الأسبوع. نأمل رؤيته قريباً.';
+    }
+
+    const testData = {
+      email: "rawand@ksc.shj.ae",
+      name: player.name,
+      id: firstId,
+      daysCount: daysCount,
+      evaluation: evaluation
+    };
+
+    fetch('https://script.google.com/macros/s/AKfycbxgoDcFpUpq2KFadPCxs4a1HptA2SxVunZ80z4feLmqh52Rh2qFmKTORw9vhtEofY2C/exec', {
+      method: 'POST',
+      body: JSON.stringify(testData),
+      headers: { 'Content-Type': 'application/json' }
+    })
+    .then(res => res.text())
+    .then(result => alert("Test email sent: " + result))
+    .catch(err => console.error("Test email send error:", err));
+  }
 }
-
-
 
 function openWeeklyMessage() {
   document.getElementById('weeklyMessagePopup').style.display = 'block';
@@ -1808,7 +1843,6 @@ function updateTitleAndControls(period) {
     datePicker.style.display = 'inline-block';
   }
 }
-
     window.onload = initialize;
     
   </script>
