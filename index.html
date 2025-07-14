@@ -1701,14 +1701,20 @@ function renderTopParticipants() {
     if (!participationCounts[row.ID]) {
       participationCounts[row.ID] = {
         name: `${row["Child Name"] || ""} ${row.Parent || ""}`,
-        count: 0,
-        image: row.Image || 'user-icon.png'  
+        id: row.ID,
+        activities: new Set(),
+        image: row.Image || 'user-icon.png'
       };
     }
-    participationCounts[row.ID].count++;
+    participationCounts[row.ID].activities.add(row.Activity); // unique activities only
   });
 
+  // Prepare sorted list
   const top5 = Object.values(participationCounts)
+    .map(p => ({
+      ...p,
+      count: p.activities.size
+    }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);
 
@@ -1717,15 +1723,39 @@ function renderTopParticipants() {
     return;
   }
 
-  top5.forEach(participant => {
+  const crowns = ['👑', '🥈', '🥉'];
+
+  top5.forEach((participant, index) => {
+    const crown = crowns[index] || '';
+
     const card = document.createElement('div');
-    card.style = "background:#222; border:1px solid #f4e733; border-radius:10px; padding:10px; text-align:center; width:150px;";
+    card.style = `
+      background:#222; 
+      border:1px solid #f4e733; 
+      border-radius:10px; 
+      padding:10px; 
+      text-align:center; 
+      width:150px; 
+      transform: scale(0.95); 
+      transition: transform 0.3s ease;
+    `;
+
+    card.addEventListener('mouseenter', () => {
+      card.style.transform = 'scale(1.05)';
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = 'scale(0.95)';
+    });
 
     card.innerHTML = `
-      <img src="${participant.image}" alt="${participant.name}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid #f4e733;">
+      <div style="font-size:24px;">${crown}</div>
+      <img src="${participant.image}" alt="${participant.name}" 
+        style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid #f4e733;">
       <h4 style="color:#f4e733;">${participant.name}</h4>
+      <p style="color:gray; margin:4px 0;">ID: ${participant.id}</p>
       <p>أنشطة: ${participant.count}</p>
     `;
+
     container.appendChild(card);
   });
 }
