@@ -524,6 +524,17 @@
         <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
         <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
       </div>
+      
+<button id="showWeeklyMsgBtn" class="export" style="display:none; background:#f4e733; color:black; margin-top:10px;" onclick="openWeeklyMessage()">عرض ملخص الحضور الأسبوعي</button>
+
+<div id="weeklyMessagePopup" style="
+  display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+  background:#222; color:white; border:2px solid #f4e733; border-radius:10px; padding:20px; z-index:1000; max-width:80%; max-height:70%; overflow:auto; text-align:right;">
+  <h3 style="color:#f4e733;">ملخص الحضور الأسبوعي</h3>
+  <div id="weeklyMessageContent"></div>
+  <button onclick="closeWeeklyMessage()" style="margin-top:10px; background:#f4e733; color:black; border:none; padding:5px 15px; border-radius:5px;">إغلاق</button>
+</div>
+      
     </div>
 <h3 id="tableTitle" style="text-align:center; color:#f4e733; margin-top: 20px;"></h3>
     <table id="attendanceTable">
@@ -868,7 +879,7 @@ function setCurrentWeekDates() {
 }
     
 function renderWeeklySummaryTable() {
-  document.getElementById('tableTitle').textContent = 'حضور المنتسبين خلال الاسبوع ';
+  document.getElementById('tableTitle').textContent = 'الحضور الأسبوعي ';
   const tbody = document.querySelector("#attendanceTable tbody");
   tbody.innerHTML = "";
   
@@ -1460,18 +1471,15 @@ function countUniqueWeeklyAttendances(data) {
     recordsByDate[dateKey].push(row);
   });
   
-  // For each date, get unique IDs and add to our weekly set
   Object.entries(recordsByDate).forEach(([date, records]) => {
     const uniqueForDay = new Set();
     
-    // Get all unique IDs for this day
     records.forEach(row => {
       uniqueForDay.add(row.ID);
     });
     
-    // Add to weekly count (Set automatically handles duplicates)
     uniqueForDay.forEach(id => {
-      weeklyUniqueAttendees.add(`${id}_${date}`); // Fixed: using the date parameter
+      weeklyUniqueAttendees.add(`${id}_${date}`); 
     });
   });
   
@@ -1598,12 +1606,12 @@ function toggleView() {
   const tableTitle = document.getElementById('tableTitle');
 
   if (showWeeklySummary) {
-    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> عرض السجلات حضور يوم واحد فقط ';
-    tableTitle.textContent = 'حضور المنتسبين خلال الاسبوع ';
+    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> الاسماء ';
+    tableTitle.textContent = 'الحضور الأسبوعي ';
     renderWeeklySummaryTable();
   } else {
-    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> عرض الحضور خلال الاسبوع';
-    tableTitle.textContent = ' حضروا يوم واحد فقط';
+    toggleBtn.innerHTML = '<i class="fas fa-exchange-alt"></i> الحضور الأسبوعي';
+    tableTitle.textContent = ' الاسماء';
     renderMainTable();
   }
 }
@@ -1629,6 +1637,7 @@ function applyWeekFilter() {
   showWeeklyPlayerAttendance();
   closeWeekRangePicker();
 }
+    
     function exportToExcel() {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(prepareExportData());
@@ -1742,17 +1751,7 @@ window.addEventListener('resize', checkMobileView);
     window.onload = initialize;
     
   </script>
-
-<button id="showWeeklyMsgBtn" class="export" style="display:none; background:#f4e733; color:black; margin-top:10px;" onclick="openWeeklyMessage()">عرض ملخص الحضور الأسبوعي</button>
-
-<div id="weeklyMessagePopup" style="
-  display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
-  background:#222; color:white; border:2px solid #f4e733; border-radius:10px; padding:20px; z-index:1000; max-width:80%; max-height:70%; overflow:auto; text-align:right;">
-  <h3 style="color:#f4e733;">ملخص الحضور الأسبوعي</h3>
-  <div id="weeklyMessageContent"></div>
-  <button onclick="closeWeeklyMessage()" style="margin-top:10px; background:#f4e733; color:black; border:none; padding:5px 15px; border-radius:5px;">إغلاق</button>
-</div>
-
+  
 <div class="footer-container">
   <footer>
     <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
@@ -1766,5 +1765,6 @@ window.addEventListener('resize', checkMobileView);
     </div>
   </footer>
 </div>  
+
 </body>
 </html>
