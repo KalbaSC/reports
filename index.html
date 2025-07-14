@@ -511,7 +511,7 @@
   </button>
 </div>
 <button id="viewToggle" class="export" style="background: #555; display: none;" onclick="toggleView()">
-  <i class="fas fa-exchange-alt"></i> عرض حضور يوم واحد
+  <i class="fas fa-exchange-alt"></i> قائمة الأسماء 
 </button>
 
 <button onclick="toggleHiddenColumns()" class="export" style="background: #555;">
@@ -825,6 +825,16 @@ function filterByPeriod(period) {
   }
 }
 
+function showWeeklyControls() {
+  document.getElementById('viewToggle').style.display = 'inline-block';
+  document.getElementById('showWeeklyMsgBtn').style.display = 'inline-block';
+}
+
+function hideWeeklyControls() {
+  document.getElementById('viewToggle').style.display = 'none';
+  document.getElementById('showWeeklyMsgBtn').style.display = 'none';
+}
+
 function showWeekRangePicker() {
   let rangePicker = document.getElementById('weekRangePicker');
   
@@ -959,6 +969,7 @@ function clearWeekFilter() {
   filteredData = allData.filter(row => row.dateKey === today);
   updateFilteredView();
   updateSummary();
+  hideWeeklyControls();
 }
 
 function closeWeekRangePicker() {
@@ -1015,6 +1026,7 @@ function clearFilters() {
   
   renderMainTable();
   updateSummary();
+  hideWeeklyControls();
   
   const summaryElement = document.querySelector('.summary-box');
   summaryElement.innerHTML = `
@@ -1635,6 +1647,7 @@ function applyWeekFilter() {
   renderWeeklySummaryTable();
   updateWeekSummary(startDate, endDate);
   showWeeklyPlayerAttendance();
+  showWeeklyControls();
   closeWeekRangePicker();
 }
     
