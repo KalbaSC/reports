@@ -824,6 +824,7 @@ function filterByPeriod(period) {
   if (document.getElementById("statsView").style.display !== "none") {
     renderCharts();
   }
+    updateTitleAndControls(period);
 }
 
 function showWeeklyControls() {
@@ -987,7 +988,7 @@ function closeWeekRangePicker() {
       
       filteredData = allData.filter(row => row.dateKey === selectedDate);
       updateFilteredView();
-      hideWeeklyControls();
+      updateTitleAndControls('today');
     }
 
     function filterTable() {
@@ -1763,6 +1764,21 @@ window.addEventListener('resize', checkMobileView);
       fetchData();
       document.getElementById('tableTitle').textContent = 'السجلات اليومية';
     }
+    
+function updateTitleAndControls(period) {
+  const tableTitle = document.getElementById('tableTitle');
+
+  if (period === 'week') {
+    tableTitle.textContent = 'الحضور الأسبوعي';
+    showWeeklyControls();
+  } else if (period === 'today') {
+    tableTitle.textContent = 'الحضور اليومي';
+    hideWeeklyControls();
+  } else {
+    tableTitle.textContent = 'الحضور';
+    hideWeeklyControls();
+  }
+}
 
     window.onload = initialize;
     
