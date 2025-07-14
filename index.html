@@ -1768,7 +1768,44 @@ function testSendFirstKidEvaluation() {
   .catch(err => console.error("Test email send error:", err));
 }
 
+function showWeeklyPlayerAttendance() {
+  const attendanceMap = {};
 
+  filteredData.forEach(row => {
+    if (!attendanceMap[row.ID]) {
+      attendanceMap[row.ID] = {
+        name: ${row["Child Name"] || ""} ${row.Parent || ""},
+        days: new Set()
+      };
+    }
+    attendanceMap[row.ID].days.add(row.dateKey);
+  });
+
+  let message = '';
+  for (const id in attendanceMap) {
+    const player = attendanceMap[id];
+    const daysCount = player.days.size;
+    let evaluation = '';
+
+    if (daysCount >= 4) {
+      evaluation = 'ممتاز! نشكركم على حرصكم والتزام ابنكم.';
+    } else if (daysCount === 3) {
+      evaluation = 'جيد! نأمل منكم تشجيع ابنكم على الحضور الكامل.';
+    } else if (daysCount === 2) {
+      evaluation = 'يرجى تشجيع ابنكم للحضور بشكل أفضل في الأسبوع القادم.';
+    } else if (daysCount === 1) {
+      evaluation = 'نرجو منكم تحفيز ابنكم على الالتزام بالحضور، فقد حضر يوماً واحداً فقط.';
+    } else {
+      evaluation = 'لم يحضر ابنكم هذا الأسبوع. نأمل رؤيته قريباً.';
+    }
+
+    message += ولي أمر ${player.name} (ID: ${id}): حضر ابنكم ${daysCount} أيام هذا الأسبوع. ${evaluation}<br>;
+  }
+
+  document.getElementById('weeklyMessageContent').innerHTML = message || "لا يوجد حضور لهذا الأسبوع.";
+  document.getElementById('showWeeklyMsgBtn').style.display = 'inline-block';
+}
+    
 function openWeeklyMessage() {
   document.getElementById('weeklyMessagePopup').style.display = 'block';
 }
