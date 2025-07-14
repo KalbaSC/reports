@@ -23,8 +23,14 @@
       background: url('black_and_yellow_grunge_background.jpg') no-repeat center center fixed;
       background-size: cover;
       color: white;
+      height: 100%;
       margin: 0;
       padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+    body > .footer-container {
+      margin-top: auto;
     }
     .header-container {
       width: 100%;
@@ -271,6 +277,8 @@
 #mainView.show-hidden-columns .hidden-column {
   display: table-cell;
 }
+
+    
     @media (max-width: 768px) {
  .header-right {
     padding: 10px 10px;
