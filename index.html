@@ -1719,47 +1719,91 @@ function applyWeekFilter() {
     }
     
 function testSendFirstKidEvaluation() {
-  const attendanceMap = {};
+  try {
+    const attendanceMap = {};
 
-  filteredData.forEach(row => {
-    if (!attendanceMap[row.ID]) {
-      attendanceMap[row.ID] = {
-        name: `${row["Child Name"] || ""} ${row.Parent || ""}`,
-        days: new Set()
-      };
+    // Validate filteredData exists and has content
+    if (!filteredData || filteredData.length === 0) {
+      alert("لا يوجد بيانات حضور متاحة للاختبار.");
+      return;
     }
-    attendanceMap[row.ID].days.add(row.dateKey);
-  });
 
-  const firstId = Object.keys(attendanceMap)[0];
-  if (!firstId) {
-    alert("No attendance data available for testing.");
-    return;
+    // Process attendance data
+    filteredData.forEach(row => {
+      if (!row.ID) return; // Skip rows without ID
+      
+      if (!attendanceMap[row.ID]) {
+        attendanceMap[row.ID] = {
+          name: `${row["Child Name"] || ""} ${row.Parent || ""}`.trim(),
+          days: new Set()
+        };
+      }
+      if (row.dateKey) {
+        attendanceMap[row.ID].days.add(row.dateKey);
+      }
+    });
+
+    const firstId = Object.keys(attendanceMap)[0];
+    if (!firstId) {
+      alert("لا يوجد بيانات حضور صالحة للاختبار.");
+      return;
+    }
+
+    const player = attendanceMap[firstId];
+    const daysCount = player.days.size;
+    let evaluation = '';
+
+    // Determine evaluation message
+    if (daysCount >= 4) {
+      evaluation = 'ممتاز! نشكركم على حرصكم والتزام ابنكم.';
+    } else if (daysCount === 3) {
+      evaluation = 'جيد! نأمل منكم تشجيع ابنكم على الحضور الكامل.';
+    } else if (daysCount === 2) {
+      evaluation = 'يرجى تشجيع ابنكم للحضور بشكل أفضل.';
+    } else if (daysCount === 1) {
+      evaluation = 'نرجو منكم تحفيز ابنكم على الالتزام بالحضور.';
+    } else {
+      evaluation = 'لم يحضر ابنكم هذا الأسبوع. نأمل رؤيته قريباً.';
+    }
+
+    const testData = [{
+      id: firstId,
+      name: player.name,
+      email: "rawand@ksc.shj.ae",
+      days: daysCount,
+      evaluation: evaluation
+    }];
+
+    const confirmSend = confirm(`هل تريد إرسال بريد اختباري إلى rawand@ksc.shj.ae؟\n\nالبيانات:\nالاسم: ${player.name}\nالأيام: ${daysCount}\nالتقييم: ${evaluation}`);
+    
+    if (!confirmSend) return;
+
+    fetch('https://script.google.com/macros/s/AKfycbxgoDcFpUpq2KFadPCxs4a1HptA2SxVunZ80z4feLmqh52Rh2qFmKTORw9vhtEofY2C/exec', {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(testData)
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      return response.text();
+    })
+    .then(result => {
+      console.log("Test email result:", result);
+      alert("تم إرسال البريد الاختباري بنجاح إلى rawand@ksc.shj.ae");
+    })
+    .catch(error => {
+      console.error("Error sending test email:", error);
+      alert(`خطأ في إرسال البريد الاختباري: ${error.message}`);
+    });
+
+  } catch (error) {
+    console.error("Error in testSendFirstKidEvaluation:", error);
+    alert(`حدث خطأ غير متوقع: ${error.message}`);
   }
-
-  const player = attendanceMap[firstId];
-  const daysCount = player.days.size;
-  let evaluation = '';
-
-  if (daysCount >= 4) evaluation = 'ممتاز! نشكركم على حرصكم والتزام ابنكم.';
-  else if (daysCount === 3) evaluation = 'جيد! نأمل منكم تشجيع ابنكم على الحضور الكامل.';
-  else if (daysCount === 2) evaluation = 'يرجى تشجيع ابنكم للحضور بشكل أفضل.';
-  else if (daysCount === 1) evaluation = 'نرجو منكم تحفيز ابنكم على الالتزام بالحضور.';
-  else evaluation = 'لم يحضر ابنكم هذا الأسبوع. نأمل رؤيته قريباً.';
-
-  const testData = [{
-    id: firstId,
-    name: player.name,
-    email: "rawand@ksc.shj.ae",  // test to your email
-    days: daysCount,
-    evaluation: evaluation
-  }];
-
-  fetch('https://script.google.com/macros/s/AKfycbxgoDcFpUpq2KFadPCxs4a1HptA2SxVunZ80z4feLmqh52Rh2qFmKTORw9vhtEofY2C/exec', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-   body: JSON.stringify(testData)
-  });
 }
 
 function showWeeklyPlayerAttendance() {
