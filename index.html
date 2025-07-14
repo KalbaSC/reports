@@ -965,14 +965,16 @@ function updateSummary(isWeek = false) {
     `;
   }
 }
-
+    
 function clearWeekFilter() {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById("datePicker").value = today;
+  document.getElementById('datePicker').style.display = 'inline-block';
   filteredData = allData.filter(row => row.dateKey === today);
   updateFilteredView();
   updateSummary();
   hideWeeklyControls();
+  document.getElementById('tableTitle').textContent = 'الحضور اليومي';
 }
 
 function closeWeekRangePicker() {
@@ -1024,7 +1026,7 @@ function clearFilters() {
   
   showFilterOptions("");
   filteredData = allData.filter(row => row.dateKey === today);
-  
+  document.getElementById('datePicker').style.display = 'inline-block';
   document.getElementById('viewToggle').style.display = 'none';
   showWeeklySummary = false;
   
@@ -1037,6 +1039,7 @@ function clearFilters() {
     <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
     <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
   `;
+  document.getElementById('tableTitle').textContent = 'الحضور اليومي';
 }
 
     function showFilterOptions(value) {
@@ -1767,16 +1770,20 @@ window.addEventListener('resize', checkMobileView);
     
 function updateTitleAndControls(period) {
   const tableTitle = document.getElementById('tableTitle');
+  const datePicker = document.getElementById('datePicker');
 
   if (period === 'week') {
     tableTitle.textContent = 'الحضور الأسبوعي';
     showWeeklyControls();
+    datePicker.style.display = 'none';
   } else if (period === 'today') {
     tableTitle.textContent = 'الحضور اليومي';
     hideWeeklyControls();
+    datePicker.style.display = 'inline-block';
   } else {
     tableTitle.textContent = 'الحضور';
     hideWeeklyControls();
+    datePicker.style.display = 'inline-block';
   }
 }
 
