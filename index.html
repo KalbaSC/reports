@@ -1777,7 +1777,7 @@ function testSendFirstKidEvaluation() {
     
     if (!confirmSend) return;
 
-    fetch('evaluationScriptURL', {
+    fetch(evaluationScriptURL, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
