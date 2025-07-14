@@ -623,6 +623,8 @@
 
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
+    const evaluationScriptURL = 'https://script.google.com/macros/s/AKfycbzM5l_aW83oGFsdOgUxHhTZ9xwkNcXj_L5DrRiKNf-wnAHhL49dJtikVBTaIO9K-AnP/exec';
+
     let allData = [];
     let filteredData = [];
     let charts = {};
@@ -1775,7 +1777,7 @@ function testSendFirstKidEvaluation() {
     
     if (!confirmSend) return;
 
-    fetch('https://script.google.com/macros/s/AKfycbzM5l_aW83oGFsdOgUxHhTZ9xwkNcXj_L5DrRiKNf-wnAHhL49dJtikVBTaIO9K-AnP/exec', {
+    fetch('evaluationScriptURL', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
