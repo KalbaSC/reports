@@ -1755,7 +1755,6 @@ function showWeeklyPlayerAttendance() {
   document.getElementById('weeklyMessageContent').innerHTML = message || "لا يوجد حضور لهذا الأسبوع.";
   document.getElementById('showWeeklyMsgBtn').style.display = 'inline-block';
 
-  // SEND EMAIL FOR FIRST CHILD ONLY
   const firstId = Object.keys(attendanceMap)[0];
   if (firstId) {
     const player = attendanceMap[firstId];
@@ -1784,12 +1783,12 @@ function showWeeklyPlayerAttendance() {
 
     fetch('https://script.google.com/macros/s/AKfycbxgoDcFpUpq2KFadPCxs4a1HptA2SxVunZ80z4feLmqh52Rh2qFmKTORw9vhtEofY2C/exec', {
       method: 'POST',
-      body: JSON.stringify(testData),
+      mode: 'no-cors',
+      body: JSON.stringify(testData), 
       headers: { 'Content-Type': 'application/json' }
-    })
-    .then(res => res.text())
-    .then(result => alert("Test email sent: " + result))
-    .catch(err => console.error("Test email send error:", err));
+})
+.then(res => console.log("Request sent, no-cors response status:", res.status))
+.catch(err => console.error("Send error:", err));
   }
 }
 
