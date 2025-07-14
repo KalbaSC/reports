@@ -1501,7 +1501,6 @@ function countUniqueDailyAttendances(data) {
 function countUniqueWeeklyAttendances(data) {
   const weeklyUniqueAttendees = new Set();
   
-  // First group records by date
   const recordsByDate = {};
   data.forEach(row => {
     if (!row.ID) return;
@@ -1776,7 +1775,7 @@ function testSendFirstKidEvaluation() {
     
     if (!confirmSend) return;
 
-    fetch('https://script.google.com/macros/s/AKfycbzM5l_aW83oGFsdOgUxHhTZ9xwkNcXj_L5DrRiKNf-wnAHhL49dJtikVBTaIO9K-AnP/exec', {
+    fetch('https://script.google.com/macros/s/AKfycbwWtLbk3wEedQvo2gaFXh88JlmZQ68Ei0cTMwGsXTHoSypzs0_Yw_oThawDCS7p8vde/exec', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
