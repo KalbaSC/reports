@@ -1649,13 +1649,14 @@ function applyWeekFilter() {
   
   document.getElementById('viewToggle').style.display = 'inline-block';
   showWeeklySummary = true;
-  document.getElementById('viewToggle').innerHTML = '<i class="fas fa-exchange-alt"></i> عرض حضور يوم واحد';
+  document.getElementById('viewToggle').innerHTML = '<i class="fas fa-exchange-alt"></i> الأسماء';
   
   renderWeeklySummaryTable();
   updateWeekSummary(startDate, endDate);
   showWeeklyPlayerAttendance();
   showWeeklyControls();
   closeWeekRangePicker();
+  document.getElementById('datePicker').style.display = 'none';
 }
     
     function exportToExcel() {
