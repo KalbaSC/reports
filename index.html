@@ -1774,8 +1774,8 @@ function showWeeklyPlayerAttendance() {
   filteredData.forEach(row => {
     if (!attendanceMap[row.ID]) {
       attendanceMap[row.ID] = {
-        name: ${row["Child Name"] || ""} ${row.Parent || ""},
-        days: new Set()
+      name: `${row["Child Name"] || ""} ${row.Parent || ""}`,
+      days: new Set()
       };
     }
     attendanceMap[row.ID].days.add(row.dateKey);
