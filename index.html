@@ -1722,15 +1722,13 @@ function testSendFirstKidEvaluation() {
   try {
     const attendanceMap = {};
 
-    // Validate filteredData exists and has content
     if (!filteredData || filteredData.length === 0) {
       alert("لا يوجد بيانات حضور متاحة للاختبار.");
       return;
     }
 
-    // Process attendance data
     filteredData.forEach(row => {
-      if (!row.ID) return; // Skip rows without ID
+      if (!row.ID) return; 
       
       if (!attendanceMap[row.ID]) {
         attendanceMap[row.ID] = {
@@ -1753,7 +1751,6 @@ function testSendFirstKidEvaluation() {
     const daysCount = player.days.size;
     let evaluation = '';
 
-    // Determine evaluation message
     if (daysCount >= 4) {
       evaluation = 'ممتاز! نشكركم على حرصكم والتزام ابنكم.';
     } else if (daysCount === 3) {
@@ -1778,7 +1775,7 @@ function testSendFirstKidEvaluation() {
     
     if (!confirmSend) return;
 
-    fetch('https://script.google.com/macros/s/AKfycbxgoDcFpUpq2KFadPCxs4a1HptA2SxVunZ80z4feLmqh52Rh2qFmKTORw9vhtEofY2C/exec', {
+    fetch('https://https://script.google.com/macros/s/AKfycbzM5l_aW83oGFsdOgUxHhTZ9xwkNcXj_L5DrRiKNf-wnAHhL49dJtikVBTaIO9K-AnP/exec', {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
