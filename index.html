@@ -818,6 +818,7 @@ function formatDisplayDate(dateString) {
       document.getElementById("mainView").style.display = "block";
       document.getElementById("activityView").style.display = "none";
       document.getElementById("statsView").style.display = "none";
+      document.getElementById("topParticipantsView").style.display = "none";
     }
 
     function showActivitiesView() {
@@ -825,6 +826,7 @@ function formatDisplayDate(dateString) {
       document.getElementById("mainView").style.display = "none";
       document.getElementById("activityView").style.display = "block";
       document.getElementById("statsView").style.display = "none";
+      document.getElementById("topParticipantsView").style.display = "none";
       renderActivityTable();
     }
 
@@ -833,16 +835,16 @@ function formatDisplayDate(dateString) {
       document.getElementById("mainView").style.display = "none";
       document.getElementById("activityView").style.display = "none";
       document.getElementById("statsView").style.display = "block";
+      document.getElementById("topParticipantsView").style.display = "none";
       renderCharts();
     }
 
-    function showTopParticipants() {
+function showTopParticipants() {
   setActiveNavButton(3);
   document.getElementById("mainView").style.display = "none";
   document.getElementById("activityView").style.display = "none";
   document.getElementById("statsView").style.display = "none";
   document.getElementById("topParticipantsView").style.display = "block";
-  
   renderTopParticipants();
 }
 
