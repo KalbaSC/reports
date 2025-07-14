@@ -1718,86 +1718,6 @@ function applyWeekFilter() {
       }));
     }
     
-function testSendFirstKidEvaluation() {
-  try {
-    const attendanceMap = {};
-
-    if (!filteredData || filteredData.length === 0) {
-      alert("لا يوجد بيانات حضور متاحة للاختبار.");
-      return;
-    }
-
-    filteredData.forEach(row => {
-      if (!row.ID) return; 
-      
-      if (!attendanceMap[row.ID]) {
-        attendanceMap[row.ID] = {
-          name: `${row["Child Name"] || ""} ${row.Parent || ""}`.trim(),
-          days: new Set()
-        };
-      }
-      if (row.dateKey) {
-        attendanceMap[row.ID].days.add(row.dateKey);
-      }
-    });
-
-    const firstId = Object.keys(attendanceMap)[0];
-    if (!firstId) {
-      alert("لا يوجد بيانات حضور صالحة للاختبار.");
-      return;
-    }
-
-    const player = attendanceMap[firstId];
-    const daysCount = player.days.size;
-    let evaluation = '';
-
-    if (daysCount >= 4) {
-      evaluation = 'ممتاز! نشكركم على حرصكم والتزام ابنكم.';
-    } else if (daysCount === 3) {
-      evaluation = 'جيد! نأمل منكم تشجيع ابنكم على الحضور الكامل.';
-    } else if (daysCount === 2) {
-      evaluation = 'يرجى تشجيع ابنكم للحضور بشكل أفضل.';
-    } else if (daysCount === 1) {
-      evaluation = 'نرجو منكم تحفيز ابنكم على الالتزام بالحضور.';
-    } else {
-      evaluation = 'لم يحضر ابنكم هذا الأسبوع. نأمل رؤيته قريباً.';
-    }
-
-    const testData = [{
-      id: firstId,
-      name: player.name,
-      email: "rawand@ksc.shj.ae", // Test email
-      days: daysCount,
-      evaluation: evaluation
-    }];
-
-    const confirmSend = confirm(`هل تريد إرسال بريد اختباري إلى rawand@ksc.shj.ae؟\n\nالبيانات:\nالاسم: ${player.name}\nالأيام: ${daysCount}\nالتقييم: ${evaluation}`);
-    
-    if (!confirmSend) return;
-
-    // Create a form and submit it to avoid CORS
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = 'https://script.google.com/macros/s/AKfycbxpVjxcwqyTolCIOJI1mfLoy5Bbb1tQnTOP6348L06_hBMWaZmC5hwd_NQ8hZWc-mzr/exec';
-    
-    const input = document.createElement('input');
-    input.type = 'hidden';
-    input.name = 'data';
-    input.value = JSON.stringify(testData);
-    form.appendChild(input);
-    
-    document.body.appendChild(form);
-    form.submit();
-    
-    // Remove the form after submission
-    setTimeout(() => document.body.removeChild(form), 1000);
-
-  } catch (error) {
-    console.error("Error in testSendFirstKidEvaluation:", error);
-    alert(`حدث خطأ غير متوقع: ${error.message}`);
-  }
-}
-
 function showWeeklyPlayerAttendance() {
   const attendanceMap = {};
 
@@ -1844,6 +1764,78 @@ function closeWeeklyMessage() {
   document.getElementById('weeklyMessagePopup').style.display = 'none';
 }
 
+function testSendFirstKidEvaluation() {
+  try {
+    const attendanceMap = {};
+
+    if (!filteredData || filteredData.length === 0) {
+      alert("لا يوجد بيانات حضور متاحة للاختبار.");
+      return;
+    }
+
+    filteredData.forEach(row => {
+      if (!row.ID) return;
+      
+      if (!attendanceMap[row.ID]) {
+        attendanceMap[row.ID] = {
+          name: `${row["Child Name"] || ""} ${row.Parent || ""}`.trim(),
+          days: new Set()
+        };
+      }
+      if (row.dateKey) {
+        attendanceMap[row.ID].days.add(row.dateKey);
+      }
+    });
+
+    const firstId = Object.keys(attendanceMap)[0];
+    if (!firstId) {
+      alert("لا يوجد بيانات حضور صالحة للاختبار.");
+      return;
+    }
+
+    const player = attendanceMap[firstId];
+    const daysCount = player.days.size;
+    let evaluation = '';
+
+    if (daysCount >= 4) {
+      evaluation = 'ممتاز! نشكركم على حرصكم والتزام ابنكم.';
+    } else if (daysCount === 3) {
+      evaluation = 'جيد! نأمل منكم تشجيع ابنكم على الحضور الكامل.';
+    } else if (daysCount === 2) {
+      evaluation = 'يرجى تشجيع ابنكم للحضور بشكل أفضل.';
+    } else if (daysCount === 1) {
+      evaluation = 'نرجو منكم تحفيز ابنكم على الالتزام بالحضور.';
+    } else {
+      evaluation = 'لم يحضر ابنكم هذا الأسبوع. نأمل رؤيته قريباً.';
+    }
+
+    const testData = [{
+      id: firstId,
+      name: player.name,
+      email: "rawand@ksc.shj.ae",
+      days: daysCount,
+      evaluation: evaluation
+    }];
+
+    const confirmSend = confirm(`هل تريد إرسال بريد اختباري إلى rawand@ksc.shj.ae؟\n\nالبيانات:\nالاسم: ${player.name}\nالأيام: ${daysCount}\nالتقييم: ${evaluation}`);
+    if (!confirmSend) return;
+
+    fetch('https://script.google.com/macros/s/AKfycbxpVjxcwqyTolCIOJI1mfLoy5Bbb1tQnTOP6348L06_hBMWaZmC5hwd_NQ8hZWc-mzr/exec', {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(testData)
+    });
+
+    alert("تم إرسال الطلب، قد لا يظهر تأكيد بسبب وضع no-cors");
+
+  } catch (error) {
+    console.error("Error in testSendFirstKidEvaluation:", error);
+    alert(`حدث خطأ غير متوقع: ${error.message}`);
+  }
+}
     
 function checkMobileView() {
   const isMobile = window.innerWidth <= 768;
