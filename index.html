@@ -1799,7 +1799,7 @@ function showWeeklyPlayerAttendance() {
       evaluation = 'لم يحضر ابنكم هذا الأسبوع. نأمل رؤيته قريباً.';
     }
 
-    message += ولي أمر ${player.name} (ID: ${id}): حضر ابنكم ${daysCount} أيام هذا الأسبوع. ${evaluation}<br>;
+    message += `ولي أمر ${player.name} (ID: ${id}): حضر ابنكم ${daysCount} أيام هذا الأسبوع. ${evaluation}<br>`;
   }
 
   document.getElementById('weeklyMessageContent').innerHTML = message || "لا يوجد حضور لهذا الأسبوع.";
