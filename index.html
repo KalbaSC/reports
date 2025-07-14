@@ -1766,7 +1766,7 @@ function testSendFirstKidEvaluation() {
     const testData = [{
       id: firstId,
       name: player.name,
-      email: "rawand@ksc.shj.ae",
+      email: "rawand@ksc.shj.ae", // Test email
       days: daysCount,
       evaluation: evaluation
     }];
@@ -1775,27 +1775,22 @@ function testSendFirstKidEvaluation() {
     
     if (!confirmSend) return;
 
-    fetch('https://script.google.com/macros/s/AKfycbwWtLbk3wEedQvo2gaFXh88JlmZQ68Ei0cTMwGsXTHoSypzs0_Yw_oThawDCS7p8vde/exec', {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(testData)
-    })
-    .then(response => {
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return response.text();
-    })
-    .then(result => {
-      console.log("Test email result:", result);
-      alert("تم إرسال البريد الاختباري بنجاح إلى rawand@ksc.shj.ae");
-    })
-    .catch(error => {
-      console.error("Error sending test email:", error);
-      alert(`خطأ في إرسال البريد الاختباري: ${error.message}`);
-    });
+    // Create a form and submit it to avoid CORS
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = 'https://script.google.com/macros/s/AKfycbxpVjxcwqyTolCIOJI1mfLoy5Bbb1tQnTOP6348L06_hBMWaZmC5hwd_NQ8hZWc-mzr/exec';
+    
+    const input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'data';
+    input.value = JSON.stringify(testData);
+    form.appendChild(input);
+    
+    document.body.appendChild(form);
+    form.submit();
+    
+    // Remove the form after submission
+    setTimeout(() => document.body.removeChild(form), 1000);
 
   } catch (error) {
     console.error("Error in testSendFirstKidEvaluation:", error);
