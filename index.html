@@ -1757,11 +1757,9 @@ sorted.forEach((participant, index) => {
 
   card.innerHTML = `
     <div style="font-size: 24px;">${emoji}</div>
-<img src="images/top/${participant.id}.png" alt="${participant.name}" style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid #f4e733;">
 <img src="images/top/${participant.id}.png" alt="${participant.name}" 
      onerror="this.onerror=null;this.src='images/user-icon.png';"
      style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid #f4e733;">
-
     <h4 style="color:#f4e733; margin: 10px 0 4px 0;">${participant.name}</h4>
     <p style="color:#ccc; font-size: 14px;">ID: ${participant.id}</p>
     <p style="color:#aaa; font-size: 14px;">أنشطة: ${participant.count}</p>
