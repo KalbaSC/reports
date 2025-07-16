@@ -718,6 +718,23 @@ function formatDisplayDate(dateString) {
   
   return formatted;
 }
+   
+function animateCount(elementId, targetValue) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+
+  const start = parseInt(el.textContent) || 0;
+  const duration = 600;
+  const stepTime = Math.abs(Math.floor(duration / (Math.abs(targetValue - start) || 1)));
+  let current = start;
+  const increment = targetValue > start ? 1 : -1;
+
+  const timer = setInterval(() => {
+    current += increment;
+    el.textContent = current;
+    if (current === targetValue) clearInterval(timer);
+  }, stepTime);
+}
 
     function getActivityRecords(rawData) {
       if (!Array.isArray(rawData)) return [];
@@ -1022,12 +1039,15 @@ function updateSummary(isWeek = false) {
   filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
 
   const summaryElement = document.querySelector('.summary-box');
-  if (summaryElement) {
-    summaryElement.innerHTML = `
-      <span id="summary">إجمالي الحضور: <span id="totalCount">${uniquePlayers.size}</span></span>
-      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
-    `;
-  }
+if (summaryElement) {
+  summaryElement.innerHTML = `
+    <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
+    <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
+  `;
+
+  animateCount("totalCount", uniquePlayers.size);
+  animateCount("filteredCount", filteredUniquePlayers.size);
+}
 }
     
 function clearWeekFilter() {
@@ -1519,14 +1539,18 @@ function updateWeekSummary(startDate, endDate) {
 
   const summaryElement = document.querySelector('.summary-box');
   if (summaryElement) {
-    summaryElement.innerHTML = `
-      <span>إجمالي الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}: 
-      <span id="totalCount">${uniqueCount}</span></span>
-      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
-      <button onclick="clearWeekFilter()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
-        <i class="fas fa-times"></i>
-      </button>
-    `;
+summaryElement.innerHTML = `
+  <span>إجمالي الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}: 
+  <span id="totalCount">0</span></span>
+  <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
+  <button onclick="clearWeekFilter()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
+    <i class="fas fa-times"></i>
+  </button>
+`;
+
+animateCount("totalCount", uniqueCount);
+animateCount("filteredCount", filteredUniquePlayers.size);
+
   }
 }
 
@@ -1595,7 +1619,6 @@ function getFilteredDataByPeriod(period) {
   });
 }
 
-
 function updatePeriodSummary(period) {
   if (period === 'today') {
     updateSummary();
@@ -1611,9 +1634,6 @@ function updatePeriodSummary(period) {
     uniqueCount = countUniqueDailyAttendances(periodData);
   }
   
-  document.getElementById("totalCount").textContent = uniqueCount;
-  document.getElementById("filteredCount").textContent = uniqueCount;
-  
   if (period === 'week') {
     const now = new Date();
     const monday = new Date(now);
@@ -1625,14 +1645,17 @@ function updatePeriodSummary(period) {
     const summaryElement = document.querySelector('.summary-box');
     summaryElement.innerHTML = `
       <span>إجمالي الحضور من ${formatDisplayDate(monday)} إلى ${formatDisplayDate(thursday)}: 
-      <span id="totalCount">${uniqueCount}</span></span>
+      <span id="totalCount">0</span></span>
+      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
       <button onclick="clearFilters()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
         <i class="fas fa-times"></i>
       </button>
     `;
   }
-}
 
+  animateCount("totalCount", uniqueCount);
+  animateCount("filteredCount", uniqueCount);
+}
 
 function renderPeriodTable(period) {
   const tbody = document.querySelector("#attendanceTable tbody");
