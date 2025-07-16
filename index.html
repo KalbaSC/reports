@@ -783,17 +783,6 @@ function formatDisplayDate(dateString) {
       populateDropdown('filter-staff', staff, 'اختر الموظف');
     }
 
-    function updateFilterChips() {
-  $('#activeFilters').empty();
-  
-  if ($('#filter-name').val()) {
-    $('#activeFilters').append(
-      `<span class="chip">اسم: ${$('#filter-name').val()} <span onclick="$('#filter-name').val(''); filterTable()">×</span></span>`
-    );
-  }
-  // Repeat for other filters...
-}
-
     function populateDropdown(id, values, defaultText) {
       const select = document.getElementById(id);
       select.innerHTML = `<option value="">${defaultText}</option>`;
