@@ -532,28 +532,56 @@
     <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
       حضور صيف الشارقة الرياضي - عطلتنا غير
     </div>
-
+    
 <div class="controls">
-  <div class="filter-bar">
-    <div class="search-group">
-      <select id="filterType" class="filter-type-selector" onchange="showFilterOptions(this.value)">
-        <option value="">🔍 بحث حسب...</option>
-        <option value="name">الاسم</option>
-        <option value="id">المعرّف</option>
-        <option value="staff">الموظف</option>
-        <option value="activity">النشاط</option>
-      </select>
+      <div class="filter-bar">
+        <div class="search-group">
+          <select id="filterType" onchange="showFilterOptions(this.value)">
+            <option value="">🔍 بحث حسب...</option>
+            <div id="activeFilters" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;"></div>
+            <option value="name">الاسم</option>
+            <option value="id">المعرّف</option>
+            <option value="staff">الموظف</option>
+            <option value="activity">النشاط</option>
+          </select>
 
-      <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." onkeyup="filterTable()" autocomplete="off">
-      <input id="filter-id" class="hidden" placeholder="أدخل المعرف..." onkeyup="filterTable()">
-      <select id="filter-staff" class="hidden" onchange="filterTable()"></select>
-      <select id="filter-activity" class="hidden" onchange="filterTable()"></select>
+          <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." onkeyup="filterTable()" autocomplete="off">
+          <input id="filter-id" class="hidden" placeholder="أدخل المعرف..." onkeyup="filterTable()">
+          <select id="filter-staff" class="hidden" onchange="filterTable()"></select>
+          <select id="filter-activity" class="hidden" onchange="filterTable()"></select>
 
-      <input type="date" id="datePicker" onchange="filterByDate()">
-      <button onclick="clearFilters()" class="clear-btn">مسح الفلاتر</button>
-      
-      <div id="activeFilters" class="chip-container"></div>
-    </div>
+          <input type="date" id="datePicker" onchange="filterByDate()">
+          <button onclick="clearFilters()" class="clear-btn">مسح الفلاتر</button>
+        </div>
+
+<button id="weeklyEmailBtn" class="export" 
+        style="display: none; background: #d9534f; color: white;"
+        onclick="promptForPassword()">
+  <i class="fas fa-paper-plane"></i> إرسال تقارير الأسبوع
+</button>
+        
+<div class="export-buttons">
+  <button class="export" onclick="exportToExcel()">
+    <span class="download-icon"></span> Excel
+  </button>
+  <button class="export" onclick="exportToPDF()">
+    <span class="download-icon"></span> PDF
+  </button>
+</div>
+<button id="viewToggle" class="export" style="background: #555; display: none;" onclick="toggleView()">
+  <i class="fas fa-exchange-alt"></i> قائمة الأسماء 
+</button>
+
+<button onclick="toggleHiddenColumns()" class="export" style="background: #555;">
+  <i class="fas fa-eye"></i> عرض الأعمدة المخفية
+</button>
+        
+      </div>
+
+      <div class="summary-box">
+        <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
+        <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
+      </div>
     
 <button id="showWeeklyMsgBtn" class="export" style="display:none; background:#f4e733; color:black; margin-top:10px;" onclick="openWeeklyMessage()">عرض ملخص الحضور الأسبوعي</button>
 
