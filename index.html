@@ -13,6 +13,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+
   <style>
     @font-face {
       font-family: 'NotoKufiArabic';
@@ -520,6 +525,7 @@
         <div class="search-group">
           <select id="filterType" onchange="showFilterOptions(this.value)">
             <option value="">🔍 بحث حسب...</option>
+            <div id="activeFilters" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;"></div>
             <option value="name">الاسم</option>
             <option value="id">المعرّف</option>
             <option value="staff">الموظف</option>
@@ -767,10 +773,26 @@ function formatDisplayDate(dateString) {
         if (row.Activity && row.Activity.trim() !== "") activities.add(row.Activity);
         if (row["Scanned By"]) staff.add(row["Scanned By"]);
       });
+      
+     $('#filter-staff, #filter-activity').select2({
+       placeholder: "اختر متعدد",
+       allowClear: true
+     });
 
       populateDropdown('filter-activity', activities, 'اختر النشاط');
       populateDropdown('filter-staff', staff, 'اختر الموظف');
     }
+
+    function updateFilterChips() {
+  $('#activeFilters').empty();
+  
+  if ($('#filter-name').val()) {
+    $('#activeFilters').append(
+      `<span class="chip">اسم: ${$('#filter-name').val()} <span onclick="$('#filter-name').val(''); filterTable()">×</span></span>`
+    );
+  }
+  // Repeat for other filters...
+}
 
     function populateDropdown(id, values, defaultText) {
       const select = document.getElementById(id);
@@ -865,31 +887,6 @@ function setActiveNavButton(index) {
   });
 }
     
-function filterTable() {
-  const name = document.getElementById("filter-name").value.toLowerCase();
-  const id = document.getElementById("filter-id").value.toLowerCase();
-  const staff = Array.from(document.getElementById("filter-staff").selectedOptions)
-                   .map(opt => opt.value);
-  const activities = Array.from(document.getElementById("filter-activity").selectedOptions)
-                        .map(opt => opt.value);
-
-  filteredData = allData.filter(row => {
-    const rowName = (row["Child Name"] || "").toLowerCase();
-    const rowId = (row.ID || "").toLowerCase();
-    const rowStaff = row["Scanned By"] || "";
-    const rowActivity = row.isGeneral ? "عام" : (row.Activity || "");
-
-    return (!name || rowName.includes(name)) &&
-           (!id || rowId.includes(id)) &&
-           (staff.length === 0 || staff.includes(rowStaff)) &&
-           (activities.length === 0 || 
-            (activities.includes("عام") && row.isGeneral) ||
-            activities.includes(rowActivity));
-  });
-
-  updateFilteredView();
-}
-
 function filterByPeriod(period) {
   if (period === 'today') {
     filterByDate(); 
@@ -1081,28 +1078,56 @@ function closeWeekRangePicker() {
       updateFilteredView();
       updateTitleAndControls('today');
     }
+    
+function filterTable() {
+  const name = $('#filter-name').val().toLowerCase();
+  const id = $('#filter-id').val().toLowerCase();
+  const staffValues = $('#filter-staff').val() || [];
+  const activityValues = $('#filter-activity').val() || [];
 
-    function filterTable() {
-      const name = document.getElementById("filter-name").value.toLowerCase();
-      const id = document.getElementById("filter-id").value.toLowerCase();
-      const staff = document.getElementById("filter-staff").value;
-      const activity = document.getElementById("filter-activity").value;
+  filteredData = allData.filter(row => {
+    const rowName = (row["Child Name"] || "").toLowerCase();
+    const rowId = (row.ID || "").toLowerCase();
+    const staff = row["Scanned By"] || "";
+    const activity = row.isGeneral ? "عام" : (row.Activity || "");
 
-      filteredData = allData.filter(row => {
-        const rowName = (row["Child Name"] || "").toLowerCase();
-        const rowId = (row.ID || "").toLowerCase();
-        const rowStaff = row["Scanned By"] || "";
-        const rowActivity = row.isGeneral ? "عام" : (row.Activity || "");
+    return (!name || rowName.includes(name)) &&
+           (!id || rowId.includes(id)) &&
+           (staffValues.length === 0 || staffValues.includes(staff)) &&
+           (activityValues.length === 0 || activityValues.includes(activity));
+  });
 
-        return (!name || rowName.includes(name)) &&
-               (!id || rowId.includes(id)) &&
-               (!staff || rowStaff === staff) &&
-               (!activity || (activity === "عام" ? row.isGeneral : rowActivity === activity));
-      });
+  updateFilteredView();
+  updateFilterChips();  
+}
 
-      updateFilteredView();
-    }
+function updateFilterChips() {
+  $('#activeFilters').empty();
 
+  if ($('#filter-name').val()) {
+    $('#activeFilters').append(`<span class="chip">اسم: ${$('#filter-name').val()} <span onclick="$('#filter-name').val(''); filterTable()">×</span></span>`);
+  }
+
+  if ($('#filter-id').val()) {
+    $('#activeFilters').append(`<span class="chip">المعرف: ${$('#filter-id').val()} <span onclick="$('#filter-id').val(''); filterTable()">×</span></span>`);
+  }
+
+  ($('#filter-staff').val() || []).forEach(val => {
+    $('#activeFilters').append(`<span class="chip">الموظف: ${val} <span onclick="removeChip('filter-staff', '${val}')">×</span></span>`);
+  });
+
+  ($('#filter-activity').val() || []).forEach(val => {
+    $('#activeFilters').append(`<span class="chip">النشاط: ${val} <span onclick="removeChip('filter-activity', '${val}')">×</span></span>`);
+  });
+}
+
+function removeChip(filterId, value) {
+  const current = $(`#${filterId}`).val() || [];
+  const updated = current.filter(v => v !== value);
+  $(`#${filterId}`).val(updated).trigger('change');
+  filterTable();
+}
+    
 function clearFilters() {
   document.getElementById("filter-name").value = "";
   document.getElementById("filter-id").value = "";
@@ -2010,12 +2035,28 @@ function checkMobileView() {
 window.addEventListener('load', checkMobileView);
 window.addEventListener('resize', checkMobileView);
 
-    function initialize() {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById("datePicker").value = today;
-      fetchData();
-      document.getElementById('tableTitle').textContent = 'السجلات اليومية';
-    }
+function initialize() {
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById("datePicker").value = today;
+  fetchData().then(() => {
+    setupAutocomplete();
+  });
+  document.getElementById('tableTitle').textContent = 'السجلات اليومية';
+  
+  $('#filter-staff, #filter-activity').select2({
+    placeholder: "اختر متعدد",
+    allowClear: true,
+    width: 'resolve',
+    dir: "rtl"
+  });
+}
+
+function setupAutocomplete() {
+  $('#filter-name').autocomplete({
+    source: [...new Set(allData.map(i => i["Child Name"]).filter(n => n))],
+    minLength: 2
+  });
+}
     
 function updateTitleAndControls(period) {
   const tableTitle = document.getElementById('tableTitle');
