@@ -1702,12 +1702,12 @@ function renderTopParticipants() {
   const container = document.getElementById('topParticipantsContainer');
   container.innerHTML = '';
 
-  const todayKey = new Date().toISOString().split('T')[0];
-  const todayRecords = allData.filter(r => r.dateKey === todayKey && !r.isGeneral && r.Activity);
+  const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
+  const selectedRecords = allData.filter(r => r.dateKey === selectedDate && !r.isGeneral && r.Activity);
 
   const participationCounts = {};
 
-  todayRecords.forEach(row => {
+  selectedRecords.forEach(row => {
     if (!row.ID) return;
     const activityKey = `${row.ID}_${row.Activity}`;
     
@@ -1728,7 +1728,7 @@ function renderTopParticipants() {
     .slice(0, 5);
 
   if (sorted.length === 0) {
-    container.innerHTML = `<p>لا يوجد مشاركين في الأنشطة اليوم</p>`;
+    container.innerHTML = `<p>لا يوجد مشاركين في الأنشطة لهذا التاريخ</p>`;
     return;
   }
 
