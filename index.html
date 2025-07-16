@@ -97,6 +97,7 @@
       margin-top: 30px;
     }
     .controls {
+      align-items: flex-end;
       display: flex;
       flex-wrap: wrap;
       align-items: center;
@@ -124,19 +125,26 @@
 .search-group select,
 .search-group input,
 .search-group button.clear-btn,
-#datePicker {
-  height: 40px;
+#datePicker,
+.export-buttons button,
+button.export {
+  flex: 0 1 160px;
+  height: 38px;
   padding: 8px 12px;
-  font-size: 15px;
+  font-size: 12px;
   border-radius: 6px;
   border: none;
   box-sizing: border-box;
   min-width: 140px;
   flex: 1;
 }
-
+    
+#filterType {
+  min-width: 180px;
+}
+    
 .filter-type-selector {
-  min-width: 160px;
+  min-width: 180px;
 }
     .export-buttons {
       display: flex;
@@ -308,8 +316,9 @@
       display: flex;
       flex-wrap: wrap;
       gap: 5px;
-      margin-top: 5px;
+      margin-top: 10px;
       width: 100%;
+      justify-content: flex-start;
    }
     .chip-remove {
       margin-right: 5px;
