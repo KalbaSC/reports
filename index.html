@@ -836,11 +836,17 @@ function formatDisplayDate(dateString) {
        placeholder: "اختر متعدد",
        allowClear: true
      });
+      
+$('#filter-staff, #filter-activity').on('select2:select', function() {
+    $(this).next('.select2-container').find('.select2-selection__rendered').removeAttr('title');
+});
+      
+$('#filter-staff, #filter-activity').next('.select2-container').find('.select2-selection__rendered').removeAttr('title');
 
       populateDropdown('filter-activity', activities, 'اختر النشاط');
       populateDropdown('filter-staff', staff, 'اختر الموظف');
     }
-
+  
     function populateDropdown(id, values, defaultText) {
       const select = document.getElementById(id);
       select.innerHTML = `<option value="">${defaultText}</option>`;
