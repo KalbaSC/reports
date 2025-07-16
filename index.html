@@ -111,7 +111,7 @@
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   width: 100%;
 }
 
@@ -143,9 +143,11 @@ button.export {
 .export-buttons {
   display: flex;
   gap: 12px;
-  align-items: right;
+  align-items: center;
+  justify-content: flex-end;
   margin-left: auto;
 }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -289,7 +291,7 @@ button.export {
   border-radius: 15px;
   font-size: 13px;
   cursor: default;
-  transition: all 0.2s ease;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   }
 .chip span {
   margin-left: 8px;
@@ -420,8 +422,10 @@ button.export {
         padding: 10px;
       }
       
-      .filter-bar {
+  .filter-bar {
     flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
   }
   
   .search-group {
@@ -452,11 +456,17 @@ button.export {
     flex: 1;
     padding: 8px;
     font-size: 12px;
-  }
+    min-width: 120px;
+    min-width: 120px;
+}
 
  .select2-container {
     width: 100% !important;
   }
+      #datePicker,
+.search-group select {
+    padding: 8px 12px;
+}
   
   #datePicker {
     width: 100% !important;
