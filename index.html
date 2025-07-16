@@ -1134,7 +1134,7 @@ function closeWeekRangePicker() {
     }
     
 function filterTable() {
-  const name = $('#filter-name').val().toLowerCase();
+  const name = $('#filter-name').val().toLowerCase().replace(/\s+/g, ' ').trim();
   const id = $('#filter-id').val().toLowerCase();
   const staffValues = $('#filter-staff').val() ? [].concat($('#filter-staff').val()) : [];
   const activityValues = $('#filter-activity').val() ? [].concat($('#filter-activity').val()) : [];
@@ -1153,7 +1153,7 @@ function filterTable() {
   }
 
   filteredData = dataset.filter(row => {
-    const rowName = (row["Child Name"] || "").toLowerCase();
+    const rowName = `${row["Child Name"] || ""} ${row.Parent || ""}`.toLowerCase().replace(/\s+/g, ' ').trim();
     const rowId = (row.ID || "").toLowerCase();
     const staff = row["Scanned By"] || "";
     const activity = row.isGeneral ? "عام" : (row.Activity || "");
@@ -2143,10 +2143,10 @@ function initialize() {
 }
 
 function setupAutocomplete() {
-  $('#filter-name').autocomplete({
-    source: [...new Set(allData.map(i => i["Child Name"]).filter(n => n))],
-    minLength: 2
-  });
+$('#filter-name').autocomplete({
+  source: [...new Set(allData.map(i => `${i["Child Name"] || ""} ${i.Parent || ""}`.trim()).filter(n => n))],
+  minLength: 2
+});
   $('#filter-name').attr('autocomplete', 'off');
 }
     
