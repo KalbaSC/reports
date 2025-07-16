@@ -106,20 +106,22 @@
       padding: 15px;
       border-radius: 10px;
     }
-  .filter-bar {
+.filter-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
+  justify-content: flex-start;
   width: 100%;
 }
 
 .search-group {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 12px;
   align-items: center;
-  flex: 1;
+  justify-content: flex-start;
+  flex: 1 1 auto;
 }
 
 .search-group select,
@@ -128,39 +130,22 @@
 #datePicker,
 .export-buttons button,
 button.export {
-  flex: 0 1 160px;
-  height: 38px;
-  padding: 8px 12px;
-  font-size: 12px;
-  border-radius: 6px;
+  flex: 0 1 auto;
+  height: 40px;
+  padding: 8px 16px;
+  font-size: 13px;
+  border-radius: 8px;
   border: none;
   box-sizing: border-box;
-  min-width: 140px;
-  flex: 1;
+  min-width: 160px;
 }
-    
-#filterType {
-  min-width: 180px;
+
+.export-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: right;
+  margin-left: auto;
 }
-    
-.filter-type-selector {
-  min-width: 180px;
-}
-    .export-buttons {
-      display: flex;
-      flex-direction: row;
-      gap: 10px;
-    }
-    button.export {
-      background: #f4e733;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
-      margin: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      color: black;
-    }
     table {
       width: 100%;
       border-collapse: collapse;
