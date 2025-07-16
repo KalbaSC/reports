@@ -287,7 +287,7 @@
       text-align: center;
       padding: 20px;
     }
-    .chip {
+.chip {
   display: inline-block;
   background-color: #f4e733;
   color: black;
@@ -296,27 +296,33 @@
   border-radius: 15px;
   font-size: 13px;
   cursor: default;
-}
-
+  transition: all 0.2s ease;
+  }
 .chip span {
   margin-left: 8px;
   color: red;
   font-weight: bold;
   cursor: pointer;
-}
-        .chip-container {
+  }
+.chip-container {
       display: flex;
       flex-wrap: wrap;
       gap: 5px;
       margin-top: 5px;
       width: 100%;
-    }
-
+   }
     .chip-remove {
       margin-right: 5px;
       cursor: pointer;
       font-weight: bold;
     }
+.chip:hover {
+  transform: scale(1.05);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+.chip-remove:hover {
+  color: darkred;
+}
 @keyframes pop {
   0% { transform: scale(0.9); opacity: 0.2; }
   100% { transform: scale(1); opacity: 1; }
