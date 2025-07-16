@@ -105,33 +105,39 @@
       padding: 15px;
       border-radius: 10px;
     }
-    .filter-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      align-items: center;
-      justify-content: space-between;
-      width: 100%;
-    }
-    .search-group {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      gap: 10px;
-      flex: 1;
-    }
-    .search-group select,
-    .search-group input,
-    .search-group button.clear-btn {
-      height: 40px;
-      padding: 8px 12px;
-      font-size: 15px;
-      border-radius: 6px;
-      border: none;
-      box-sizing: border-box;
-      flex: 1;
-      min-width: 140px;
-    }
+  .filter-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.search-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  flex: 1;
+}
+
+.search-group select,
+.search-group input,
+.search-group button.clear-btn,
+#datePicker {
+  height: 40px;
+  padding: 8px 12px;
+  font-size: 15px;
+  border-radius: 6px;
+  border: none;
+  box-sizing: border-box;
+  min-width: 140px;
+  flex: 1;
+}
+
+.filter-type-selector {
+  min-width: 160px;
+}
     .export-buttons {
       display: flex;
       flex-direction: row;
@@ -298,6 +304,19 @@
   font-weight: bold;
   cursor: pointer;
 }
+        .chip-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      margin-top: 5px;
+      width: 100%;
+    }
+
+    .chip-remove {
+      margin-right: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
 @keyframes pop {
   0% { transform: scale(0.9); opacity: 0.2; }
   100% { transform: scale(1); opacity: 1; }
@@ -402,37 +421,66 @@
       }
       
       .filter-bar {
-       flex-direction: column;
-       gap: 8px;
-      }
-      
-      .search-group {
-        width: 100%;
-      }
-      
-      .search-group select,
-      .search-group input,
-      .search-group button.clear-btn,
-      #datePicker {
-        font-size: 10px;
-        height: 30px;
-        padding: 6px 8px;
-        width: 100% !important;
-        margin-bottom: 5px;
-        width: 100%;
-        margin-bottom: 5px;
-      }
-      
+    flex-direction: column;
+  }
+  
+  .search-group {
+    width: 100%;
+  }
+  
+  .search-group select,
+  .search-group input,
+  .search-group button.clear-btn,
+  #datePicker {
+    width: 100%;
+    margin-bottom: 8px;
+    font-size: 14px;
+    height: 36px;
+  }
+  
+  .filter-type-selector {
+    width: 100%;
+  }
+  
+  .export-buttons {
+    flex-direction: row !important;
+    justify-content: center;
+    width: 100%;
+  }
+  
+  .export-buttons button {
+    flex: 1;
+    padding: 8px;
+    font-size: 12px;
+  }
+
+ .select2-container {
+    width: 100% !important;
+  }
+  
+  #datePicker {
+    width: 100% !important;
+  }
+  
+  .filter-type-selector {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  
+  .chip {
+    font-size: 12px;
+    padding: 4px 8px;
+  }
+  
+  th, td {
+    padding: 4px 6px;
+    font-size: 12px;
+  }
+  
+  .hidden-column {
+    display: none !important;
+  }      
       #attendanceTable, #activityTable {
-        font-size: 10px;
-      }
-      
-      th, td {
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        max-width: 100px;
-        padding: 4px 6px;
         font-size: 10px;
       }
   
@@ -443,21 +491,7 @@
   #activityTable th:nth-child(4) {
     display: none;
   }
-      
-      .export-buttons {
-        justify-content: center;
-        flex-direction: row !important;
-        flex-wrap: nowrap !important;
-        gap: 5px !important;
-      }
-      
-      button.export {
-        padding: 8px 10px;
-        font-size: 10px;
-        margin: 2px;
-        flex: 1;
-      }
-      
+         
       .stats-container {
         grid-template-columns: 1fr;
         gap: 10px;
