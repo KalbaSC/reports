@@ -545,7 +545,7 @@
             <option value="activity">النشاط</option>
           </select>
 
-          <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." onkeyup="filterTable()">
+          <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." onkeyup="filterTable()" autocomplete="off">
           <input id="filter-id" class="hidden" placeholder="أدخل المعرف..." onkeyup="filterTable()">
           <select id="filter-staff" class="hidden" onchange="filterTable()"></select>
           <select id="filter-activity" class="hidden" onchange="filterTable()"></select>
@@ -2067,6 +2067,7 @@ function setupAutocomplete() {
     source: [...new Set(allData.map(i => i["Child Name"]).filter(n => n))],
     minLength: 2
   });
+  $('#filter-name').attr('autocomplete', 'off');
 }
     
 function updateTitleAndControls(period) {
