@@ -281,6 +281,23 @@
       text-align: center;
       padding: 20px;
     }
+    .chip {
+  display: inline-block;
+  background-color: #f4e733;
+  color: black;
+  padding: 5px 10px;
+  margin: 3px;
+  border-radius: 15px;
+  font-size: 13px;
+  cursor: default;
+}
+
+.chip span {
+  margin-left: 8px;
+  color: red;
+  font-weight: bold;
+  cursor: pointer;
+}
 @keyframes pop {
   0% { transform: scale(0.9); opacity: 0.2; }
   100% { transform: scale(1); opacity: 1; }
@@ -876,30 +893,32 @@ function setActiveNavButton(index) {
 }
     
 function filterByPeriod(period) {
+  currentPeriod = period; 
+
   if (period === 'today') {
-    filterByDate(); 
+    filterByDate();
     hideWeeklyControls();
     return;
   }
-  
+
   if (period === 'week') {
     showWeekRangePicker();
     return;
   }
-  
+
   filteredData = getFilteredDataByPeriod(period);
   updatePeriodSummary(period);
   renderPeriodTable(period);
   updateTodayStats();
-  
+
   if (document.getElementById("activityView").style.display !== "none") {
     renderActivityTable();
   }
-  
+
   if (document.getElementById("statsView").style.display !== "none") {
     renderCharts();
   }
-    updateTitleAndControls(period);
+  updateTitleAndControls(period);
 }
 
 function showWeeklyControls() {
@@ -1070,10 +1089,23 @@ function closeWeekRangePicker() {
 function filterTable() {
   const name = $('#filter-name').val().toLowerCase();
   const id = $('#filter-id').val().toLowerCase();
-  const staffValues = $('#filter-staff').val() || [];
-  const activityValues = $('#filter-activity').val() || [];
+  const staffValues = $('#filter-staff').val() ? [].concat($('#filter-staff').val()) : [];
+  const activityValues = $('#filter-activity').val() ? [].concat($('#filter-activity').val()) : [];
 
-  filteredData = allData.filter(row => {
+  let dataset = [];
+
+  if (currentPeriod === 'today') {
+    const selectedDate = document.getElementById("datePicker").value;
+    dataset = allData.filter(row => row.dateKey === selectedDate);
+  } else if (currentPeriod === 'week') {
+    dataset = getFilteredDataByPeriod('week');
+  } else if (currentPeriod === 'month') {
+    dataset = getFilteredDataByPeriod('month');
+  } else {
+    dataset = [...allData];
+  }
+
+  filteredData = dataset.filter(row => {
     const rowName = (row["Child Name"] || "").toLowerCase();
     const rowId = (row.ID || "").toLowerCase();
     const staff = row["Scanned By"] || "";
@@ -1086,7 +1118,7 @@ function filterTable() {
   });
 
   updateFilteredView();
-  updateFilterChips();  
+  updateFilterChips();
 }
 
 function updateFilterChips() {
@@ -1100,11 +1132,13 @@ function updateFilterChips() {
     $('#activeFilters').append(`<span class="chip">المعرف: ${$('#filter-id').val()} <span onclick="$('#filter-id').val(''); filterTable()">×</span></span>`);
   }
 
-  ($('#filter-staff').val() || []).forEach(val => {
+  const staffValues = $('#filter-staff').val() ? [].concat($('#filter-staff').val()) : [];
+  staffValues.forEach(val => {
     $('#activeFilters').append(`<span class="chip">الموظف: ${val} <span onclick="removeChip('filter-staff', '${val}')">×</span></span>`);
   });
 
-  ($('#filter-activity').val() || []).forEach(val => {
+  const activityValues = $('#filter-activity').val() ? [].concat($('#filter-activity').val()) : [];
+  activityValues.forEach(val => {
     $('#activeFilters').append(`<span class="chip">النشاط: ${val} <span onclick="removeChip('filter-activity', '${val}')">×</span></span>`);
   });
 }
