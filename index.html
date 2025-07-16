@@ -864,6 +864,31 @@ function setActiveNavButton(index) {
     btn.classList.toggle('active', i === index);
   });
 }
+    
+function filterTable() {
+  const name = document.getElementById("filter-name").value.toLowerCase();
+  const id = document.getElementById("filter-id").value.toLowerCase();
+  const staff = Array.from(document.getElementById("filter-staff").selectedOptions)
+                   .map(opt => opt.value);
+  const activities = Array.from(document.getElementById("filter-activity").selectedOptions)
+                        .map(opt => opt.value);
+
+  filteredData = allData.filter(row => {
+    const rowName = (row["Child Name"] || "").toLowerCase();
+    const rowId = (row.ID || "").toLowerCase();
+    const rowStaff = row["Scanned By"] || "";
+    const rowActivity = row.isGeneral ? "عام" : (row.Activity || "");
+
+    return (!name || rowName.includes(name)) &&
+           (!id || rowId.includes(id)) &&
+           (staff.length === 0 || staff.includes(rowStaff)) &&
+           (activities.length === 0 || 
+            (activities.includes("عام") && row.isGeneral) ||
+            activities.includes(rowActivity));
+  });
+
+  updateFilteredView();
+}
 
 function filterByPeriod(period) {
   if (period === 'today') {
