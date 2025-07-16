@@ -444,10 +444,6 @@
     display: none;
   }
       
-  button[onclick="toggleHiddenColumns()"] {
-    display: none !important;
-  }
-      
       .export-buttons {
         justify-content: center;
         flex-direction: row !important;
@@ -2044,19 +2040,11 @@ function testSendFirstKidEvaluation() {
     
 function checkMobileView() {
   const isMobile = window.innerWidth <= 768;
-  if (isMobile) {
-    document.querySelector('button[onclick="toggleHiddenColumns()"]').style.display = 'none';
-    
-    const exportButtons = document.querySelector('.export-buttons');
-    if (exportButtons) {
-      exportButtons.style.flexDirection = 'row';
-      exportButtons.style.flexWrap = 'nowrap';
-    }
+  const btn = document.querySelector('button[onclick="toggleHiddenColumns()"]');
+  if (btn) {
+    btn.style.display = isMobile ? 'none' : 'inline-block';
   }
 }
-
-window.addEventListener('load', checkMobileView);
-window.addEventListener('resize', checkMobileView);
 
 function initialize() {
   const today = new Date().toISOString().split('T')[0];
@@ -2100,7 +2088,9 @@ function updateTitleAndControls(period) {
   }
 }
     window.onload = initialize;
-    
+    window.addEventListener('load', checkMobileView);
+    window.addEventListener('resize', checkMobileView);
+
   </script>
   </main>
   
