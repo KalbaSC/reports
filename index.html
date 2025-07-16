@@ -1119,34 +1119,55 @@ function filterTable() {
 }
 
 function updateFilterChips() {
-  $('#activeFilters').empty();
+  const container = $('#activeFilters');
+  container.empty();
 
   if ($('#filter-name').val()) {
-    $('#activeFilters').append(`<span class="chip">اسم: ${$('#filter-name').val()} <span onclick="$('#filter-name').val(''); filterTable()">×</span></span>`);
+    container.append(`
+      <div class="chip">
+        <span class="chip-remove" onclick="$('#filter-name').val(''); filterTable()">×</span>
+        اسم: ${$('#filter-name').val()}
+      </div>
+    `);
   }
 
   if ($('#filter-id').val()) {
-    $('#activeFilters').append(`<span class="chip">المعرف: ${$('#filter-id').val()} <span onclick="$('#filter-id').val(''); filterTable()">×</span></span>`);
+    container.append(`
+      <div class="chip">
+        <span class="chip-remove" onclick="$('#filter-id').val(''); filterTable()">×</span>
+        المعرف: ${$('#filter-id').val()}
+      </div>
+    `);
   }
 
   const staffValues = $('#filter-staff').val() ? [].concat($('#filter-staff').val()) : [];
   staffValues.forEach(val => {
-    $('#activeFilters').append(`<span class="chip">الموظف: ${val} <span onclick="removeChip('filter-staff', '${val}')">×</span></span>`);
+    container.append(`
+      <div class="chip">
+        <span class="chip-remove" onclick="removeFilterValue('filter-staff', '${val.replace(/'/g, "\\'")}')">×</span>
+        الموظف: ${val}
+      </div>
+    `);
   });
 
   const activityValues = $('#filter-activity').val() ? [].concat($('#filter-activity').val()) : [];
   activityValues.forEach(val => {
-    $('#activeFilters').append(`<span class="chip">النشاط: ${val} <span onclick="removeChip('filter-activity', '${val}')">×</span></span>`);
+    container.append(`
+      <div class="chip">
+        <span class="chip-remove" onclick="removeFilterValue('filter-activity', '${val.replace(/'/g, "\\'")}')">×</span>
+        النشاط: ${val}
+      </div>
+    `);
   });
 }
 
-function removeChip(filterId, value) {
-  const current = $(`#${filterId}`).val() || [];
-  const updated = current.filter(v => v !== value);
-  $(`#${filterId}`).val(updated).trigger('change');
+function removeFilterValue(filterId, value) {
+  const currentValues = $(`#${filterId}`).val() || [];
+  const updatedValues = currentValues.filter(v => v !== value);
+  $(`#${filterId}`).val(updatedValues).trigger('change');
   filterTable();
 }
-    
+
 function clearFilters() {
   document.getElementById("filter-name").value = "";
   document.getElementById("filter-id").value = "";
@@ -1163,16 +1184,15 @@ function clearFilters() {
   document.getElementById('viewToggle').style.display = 'none';
   showWeeklySummary = false;
   
+  $('#filter-staff').val(null).trigger('change');
+  $('#filter-activity').val(null).trigger('change');
+  
   renderMainTable();
   updateSummary();
   hideWeeklyControls();
-  
-  const summaryElement = document.querySelector('.summary-box');
-  summaryElement.innerHTML = `
-    <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
-    <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
-  `;
   document.getElementById('tableTitle').textContent = 'الحضور اليومي';
+  
+  $('#activeFilters').empty();
 }
 
     function showFilterOptions(value) {
