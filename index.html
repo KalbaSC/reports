@@ -2049,16 +2049,26 @@ function checkMobileView() {
 function initialize() {
   const today = new Date().toISOString().split('T')[0];
   document.getElementById("datePicker").value = today;
+  
+  document.getElementById("filter-name").value = "";
+  document.getElementById("filter-id").value = "";
+  document.getElementById("filter-staff").value = "";
+  document.getElementById("filter-activity").value = "";
+  document.getElementById("filterType").value = "";
+  
   fetchData().then(() => {
     setupAutocomplete();
+    filterByDate();
   });
+  
   document.getElementById('tableTitle').textContent = 'السجلات اليومية';
   
   $('#filter-staff, #filter-activity').select2({
     placeholder: "اختر متعدد",
     allowClear: true,
-    width: 'resolve',
-    dir: "rtl"
+    width: '100%',
+    dir: "rtl",
+    dropdownAutoWidth: true
   });
 }
 
