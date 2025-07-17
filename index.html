@@ -306,10 +306,12 @@ button.clear-btn {
 .chip-remove:hover {
   color: darkred;
 }
-.select2-container .select2-results__option[aria-live="polite"] {
-    display: none !important;
+.select2-results__options[aria-live] {
+  display: none !important;
 }
-
+.select2-results__options {
+  aria-live: off !important;
+}
 @keyframes pop {
   0% { transform: scale(0.9); opacity: 0.2; }
   100% { transform: scale(1); opacity: 1; }
@@ -822,33 +824,32 @@ function formatDisplayDate(dateString) {
       `;
     }
 
-    function populateDropdowns() {
-      const activities = new Set(['عام']);
-      const staff = new Set();
+function populateDropdowns() {
+  const activities = new Set(['عام']);
+  const staff = new Set();
 
-      allData.forEach(row => {
-        if (row.Activity && row.Activity.trim() !== "") activities.add(row.Activity);
-        if (row["Scanned By"]) staff.add(row["Scanned By"]);
-      });
-      
-     $('#filter-staff, #filter-activity').select2({
-       placeholder: "اختر متعدد",
-       allowClear: true
-     });
+  allData.forEach(row => {
+    if (row.Activity && row.Activity.trim() !== "") activities.add(row.Activity);
+    if (row["Scanned By"]) staff.add(row["Scanned By"]);
+  });
 
-setTimeout(() => {
-    $('.select2-selection').removeAttr('aria-live');
-}, 100);
-      
-$('#filter-staff, #filter-activity').on('select2:select', function() {
+  $('#filter-staff, #filter-activity').select2({
+    placeholder: "اختر متعدد",
+    allowClear: true,
+    dropdownCssClass: 'select2-no-aria-live'
+  });
+
+  setTimeout(() => {
+    $('.select2-results__options').removeAttr('aria-live');
+  }, 100);
+
+  $('#filter-staff, #filter-activity').on('select2:select', function() {
     $(this).next('.select2-container').find('.select2-selection__rendered').removeAttr('title');
-});
-      
-$('#filter-staff, #filter-activity').next('.select2-container').find('.select2-selection__rendered').removeAttr('title');
+  });
 
-      populateDropdown('filter-activity', activities, 'اختر النشاط');
-      populateDropdown('filter-staff', staff, 'اختر الموظف');
-    }
+  populateDropdown('filter-activity', activities, 'اختر النشاط');
+  populateDropdown('filter-staff', staff, 'اختر الموظف');
+}
   
     function populateDropdown(id, values, defaultText) {
       const select = document.getElementById(id);
