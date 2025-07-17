@@ -563,14 +563,13 @@ table {
         <div class="search-group">
           <select id="filterType" onchange="showFilterOptions(this.value)">
             <option value="">🔍 بحث حسب...</option>
-            <div id="activeFilters" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;"></div>
             <option value="name">الاسم</option>
             <option value="id">المعرّف</option>
             <option value="staff">الموظف</option>
             <option value="activity">النشاط</option>
           </select>
           
-<div id="activeFilters" class="chip-container"></div>
+<div id="activeFilters" class="chip-container" style="margin-top: 10px; display: flex; flex-wrap: wrap; gap: 5px;"></div>
 <div class="filter-inputs" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
     <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." autocomplete="off">
     <input id="filter-id" class="hidden" placeholder="أدخل المعرف...">
@@ -578,7 +577,7 @@ table {
     <select id="filter-activity" class="hidden"></select>
 </div>
 
-    <input type="date" id="datePicker" onchange="filterByDate()">
+<input type="date" id="datePicker" onchange="filterByDate()">
     <button onclick="clearFilters()" class="clear-btn">مسح الفلاتر</button>
 </div>
 
@@ -2119,7 +2118,7 @@ function initialize() {
   $('#filter-staff, #filter-activity').select2({
     placeholder: "اختر متعدد",
     allowClear: true,
-    width: 'resolve'
+    width: 'resolve',
     dir: "rtl",
     dropdownAutoWidth: true
   });
