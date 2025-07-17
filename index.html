@@ -835,17 +835,12 @@ function populateDropdowns() {
 
   $('#filter-staff, #filter-activity').select2({
     placeholder: "اختر متعدد",
-    allowClear: true,
-    dropdownCssClass: 'select2-no-aria-live'
+    allowClear: true
   });
 
   setTimeout(() => {
     $('.select2-results__options').removeAttr('aria-live');
   }, 100);
-
-  $('#filter-staff, #filter-activity').on('select2:select', function() {
-    $(this).next('.select2-container').find('.select2-selection__rendered').removeAttr('title');
-  });
 
   populateDropdown('filter-activity', activities, 'اختر النشاط');
   populateDropdown('filter-staff', staff, 'اختر الموظف');
