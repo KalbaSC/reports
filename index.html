@@ -1143,6 +1143,7 @@ function closeWeekRangePicker() {
     }
     
 function filterTable() {
+  $('#filter-name').attr('autocomplete', 'off');
   const name = $('#filter-name').val().toLowerCase().replace(/\s+/g, ' ').trim();
   const id = $('#filter-id').val().toLowerCase();
   const staffValues = $('#filter-staff').val() ? [].concat($('#filter-staff').val()) : [];
@@ -1180,7 +1181,7 @@ function filterTable() {
 function updateFilterChips() {
   const container = $('#activeFilters');
   container.empty();
-
+  $('#filter-name').attr('autocomplete', 'off');
   if ($('#filter-name').val()) {
     container.append(`
       <div class="chip">
