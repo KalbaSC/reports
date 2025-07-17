@@ -96,58 +96,44 @@
       border-radius: 10px;
       margin-top: 30px;
     }
-    .controls {
-      align-items: flex-end;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      background: #222;
-      padding: 15px;
-      border-radius: 10px;
-    }
+.controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: #1e1e1e;
+  padding: 15px 20px;
+  border-radius: 12px;
+  border: 1px solid #f4e733;
+}
 .filter-bar {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
   justify-content: space-between;
-  width: 100%;
 }
-
-.search-group {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  align-items: center;
-  justify-content: flex-start;
-  flex: 1 1 auto;
-}
-
-.search-group select,
 .search-group input,
-.search-group button.clear-btn,
-#datePicker,
-.export-buttons button,
-button.export {
-  flex: 0 1 auto;
-  height: 40px;
-  padding: 8px 16px;
-  font-size: 13px;
+.search-group select,
+button.export,
+button.clear-btn {
+  border: 1px solid #f4e733;
+  background: #000;
+  color: #fff;
+  padding: 8px 14px;
   border-radius: 8px;
+  font-size: 13px;
+  min-width: 140px;
+}
+
+.export-buttons button {
+  background: #f4e733;
+  color: #000;
   border: none;
-  box-sizing: border-box;
-  min-width: 160px;
 }
-
-.export-buttons {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  justify-content: flex-end;
-  margin-left: auto;
+button.clear-btn {
+  background: #d9534f;
+  color: white;
 }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -264,6 +250,7 @@ button.export {
   display: block !important;
   margin-left: auto !important;
   margin-right: auto !important;
+  padding: 5px 10px;
 }
     .stats-container {
       display: grid;
@@ -442,7 +429,7 @@ button.export {
   #datePicker {
     width: 100%;
     margin-bottom: 8px;
-    font-size: 14px;
+    font-size: 10px;
     height: 36px;
   }
   
@@ -482,13 +469,13 @@ button.export {
   }
   
   .chip {
-    font-size: 12px;
+    font-size: 10px;
     padding: 4px 8px;
   }
   
   th, td {
     padding: 4px 6px;
-    font-size: 12px;
+    font-size: 10px;
   }
   
   .hidden-column {
@@ -502,8 +489,16 @@ button.export {
     font-size: 10px;
   }
       
+  #activityTable td:nth-child(3), 
+  #activityTable th:nth-child(3),
+  #activityTable td:nth-child(4), 
   #activityTable th:nth-child(4) {
     display: none;
+  }
+  
+  #activityTable td, #activityTable th {
+    font-size: 10px;
+    padding: 6px 8px;
   }
          
       .stats-container {
@@ -521,14 +516,14 @@ button.export {
       }
       
       .summary-box {
-        font-size: 13px;
+        font-size: 12px;
         margin-top: 5px;
         text-align: center;
         width: 100%;
       }
       
       .activity-group td {
-        font-size: 13px;
+        font-size: 10px;
         padding: 3px;
       }
       
@@ -2153,12 +2148,16 @@ function initialize() {
 }
 
 function setupAutocomplete() {
-$('#filter-name').autocomplete({
-  source: [...new Set(allData.map(i => `${i["Child Name"] || ""} ${i.Parent || ""}`.trim()).filter(n => n))],
-  minLength: 2
-});
-  $('#filter-name').attr('autocomplete', 'off');
+  $('#filter-name').autocomplete({
+    source: [...new Set(allData.map(i => `${i["Child Name"] || ""} ${i.Parent || ""}`.trim()).filter(n => n))],
+    minLength: 2
+  });
+
+  setTimeout(() => {
+    $('.ui-autocomplete').removeAttr('aria-live');
+  }, 100);
 }
+
     
 function updateTitleAndControls(period) {
   const tableTitle = document.getElementById('tableTitle');
