@@ -562,20 +562,22 @@ table {
             <option value="activity">النشاط</option>
           </select>
           
-          <div id="activeFilters" class="chip-container"></div>
-          <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." onkeyup="filterTable()" autocomplete="off">
-          <input id="filter-id" class="hidden" placeholder="أدخل المعرف..." onkeyup="filterTable()">
-          <select id="filter-staff" class="hidden" onchange="filterTable()"></select>
-          <select id="filter-activity" class="hidden" onchange="filterTable()"></select>
+<div id="activeFilters" class="chip-container"></div>
+<div class="filter-inputs" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;">
+    <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." autocomplete="off">
+    <input id="filter-id" class="hidden" placeholder="أدخل المعرف...">
+    <select id="filter-staff" class="hidden"></select>
+    <select id="filter-activity" class="hidden"></select>
+</div>
 
-          <input type="date" id="datePicker" onchange="filterByDate()">
-          <button onclick="clearFilters()" class="clear-btn">مسح الفلاتر</button>
-        </div>
+    <input type="date" id="datePicker" onchange="filterByDate()">
+    <button onclick="clearFilters()" class="clear-btn">مسح الفلاتر</button>
+</div>
 
 <button id="weeklyEmailBtn" class="export" 
         style="display: none; background: #d9534f; color: white;"
         onclick="promptForPassword()">
-  <i class="fas fa-paper-plane"></i> إرسال تقارير الأسبوع
+   <i class="fas fa-paper-plane"></i> إرسال تقارير الأسبوع
 </button>
         
 <div class="export-buttons">
