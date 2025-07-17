@@ -314,6 +314,14 @@ footer {
 .select2-results__options {
   aria-live: off !important;
 }
+.select2-container--default .select2-selection--multiple {
+  background-color: #000;
+  border: 1px solid #f4e733;
+  border-radius: 8px;
+  min-height: 40px;
+  font-size: 13px;
+  color: white;
+}
 @keyframes pop {
   0% { transform: scale(0.9); opacity: 0.2; }
   100% { transform: scale(1); opacity: 1; }
@@ -2111,7 +2119,7 @@ function initialize() {
   $('#filter-staff, #filter-activity').select2({
     placeholder: "اختر متعدد",
     allowClear: true,
-    width: '100%',
+    width: 'resolve'
     dir: "rtl",
     dropdownAutoWidth: true
   });
