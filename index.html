@@ -953,11 +953,12 @@ function setActiveNavButton(index) {
 function filterByPeriod(period) {
   currentPeriod = period; 
 
-  if (period === 'today') {
-    filterByDate();
-    hideWeeklyControls();
-    return;
-  }
+if (period === 'today') {
+  document.getElementById('datePicker').style.display = 'inline-block';
+  filterByDate();
+  hideWeeklyControls();
+  return;
+}
 
   if (period === 'week') {
     showWeekRangePicker();
@@ -1140,14 +1141,17 @@ function closeWeekRangePicker() {
   }
 }
 
-    function filterByDate() {
-      const selectedDate = document.getElementById("datePicker").value;
-      if (!selectedDate) return;
-      
-      filteredData = allData.filter(row => row.dateKey === selectedDate);
-      updateFilteredView();
-      updateTitleAndControls('today');
-    }
+function filterByDate() {
+  let selectedDate = document.getElementById("datePicker").value;
+  if (!selectedDate) {
+    selectedDate = new Date().toISOString().split('T')[0];
+    document.getElementById("datePicker").value = selectedDate;
+  }
+  
+  filteredData = allData.filter(row => row.dateKey === selectedDate);
+  updateFilteredView();
+  updateTitleAndControls('today');
+}
     
 function filterTable() {
   $('#filter-name').attr('autocomplete', 'off');
