@@ -1348,13 +1348,15 @@ function renderMainTable() {
   }
 }
 
-    function renderActivityTable() {
+function renderActivityTable() {
   const tbody = document.querySelector("#activityTable tbody");
   const controls = document.getElementById("activityControls");
   tbody.innerHTML = "";
 
-  const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
-  const dateRecords = allData.filter(row => row.dateKey === selectedDate);
+let dateRecords;
+  
+const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
+let dateRecords = (currentPeriod === 'all') ? allData : allData.filter(row => row.dateKey === selectedDate);
 
   if (dateRecords.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
@@ -1913,29 +1915,23 @@ function applyWeekFilter() {
   const endDate = document.getElementById('weekEndDate').value;
   
   if (!startDate || !endDate) return;
-  
+
   filteredData = allData.filter(row => row.dateKey >= startDate && row.dateKey <= endDate);
 
   showWeeklySummary = true;
   document.getElementById('viewToggle').style.display = 'inline-block';
-  document.getElementById('viewToggle').innerHTML = '<i class="fas fa-exchange-alt"></i> الأسماء';
+  document.getElementById('viewToggle').innerHTML = '<i class="fas fa-exchange-alt"></i> الاسماء';
   
   renderWeeklySummaryTable();
   updateWeekSummary(startDate, endDate);
-  showWeeklyPlayerAttendance();
   showWeeklyControls();
   closeWeekRangePicker();
   document.getElementById('datePicker').style.display = 'none';
+  updateTitleAndControls('week');
 
-  if (document.getElementById("activityView").style.display !== "none") {
-    renderActivityTable();
-  }
-  if (document.getElementById("statsView").style.display !== "none") {
-    renderCharts();
-  }
-  if (document.getElementById("topParticipantsView").style.display !== "none") {
-    renderTopParticipants();
-  }
+  if (document.getElementById("activityView").style.display !== "none") renderActivityTable();
+  if (document.getElementById("statsView").style.display !== "none") renderCharts();
+  if (document.getElementById("topParticipantsView").style.display !== "none") renderTopParticipants();
 }
     
     function exportToExcel() {
