@@ -1158,14 +1158,7 @@ function filterTable() {
   const staffValues = $('#filter-staff').val() ? [].concat($('#filter-staff').val()) : [];
   const activityValues = $('#filter-activity').val() ? [].concat($('#filter-activity').val()) : [];
 
-let dataset = [];
-
-if (currentPeriod === 'today') {
-  const selectedDate = document.getElementById("datePicker").value;
-  dataset = allData.filter(row => row.dateKey === selectedDate);
-} else {
-  dataset = getFilteredDataByPeriod(currentPeriod);
-}
+  let dataset = getFilteredDataByPeriod(currentPeriod);
 
   filteredData = dataset.filter(row => {
     const rowName = `${row["Child Name"] || ""} ${row.Parent || ""}`.toLowerCase().replace(/\s+/g, ' ').trim();
@@ -1273,6 +1266,7 @@ function clearFilters() {
     }
 
     function updateFilteredView() {
+      filteredData = getFilteredDataByPeriod(currentPeriod);
       renderMainTable();
       updateSummary();
       updateTodayStats();
@@ -2137,10 +2131,12 @@ function initialize() {
   document.getElementById("filter-activity").value = "";
   document.getElementById("filterType").value = "";
   
-  fetchData().then(() => {
-    setupAutocomplete();
-    filterByDate();
-  });
+fetchData().then(() => {
+  setupAutocomplete();
+  currentPeriod = 'today';
+  filteredData = getFilteredDataByPeriod(currentPeriod);
+  updateFilteredView();
+});
   
   document.getElementById('tableTitle').textContent = 'السجلات اليومية';
   
