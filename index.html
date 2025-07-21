@@ -1271,6 +1271,10 @@ function clearFilters() {
   updateFilteredView();
   updateSummary();
   updateTodayStats();
+
+  if (document.getElementById("activityView").style.display !== "none") {
+    renderActivityTable();
+  }
 }
 
     function showFilterOptions(value) {
@@ -1339,8 +1343,15 @@ function renderActivityTable() {
   const controls = document.getElementById("activityControls");
   tbody.innerHTML = "";
   
-const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
-let dateRecords = (currentPeriod === 'all') ? allData : allData.filter(row => row.dateKey === selectedDate);
+let dateRecords;
+if (currentPeriod === 'all') {
+  dateRecords = allData;
+} else if (currentPeriod === 'today') {
+  const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
+  dateRecords = allData.filter(row => row.dateKey === selectedDate);
+} else {
+  dateRecords = getFilteredDataByPeriod(currentPeriod);
+}
 
   if (dateRecords.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
