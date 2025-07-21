@@ -1136,6 +1136,7 @@ function closeWeekRangePicker() {
 }
 
 function filterByDate() {
+  currentPeriod = 'today';
   let selectedDate = document.getElementById("datePicker").value;
   if (!selectedDate) {
     selectedDate = new Date().toISOString().split('T')[0];
@@ -1156,7 +1157,13 @@ function filterTable() {
   const staffValues = $('#filter-staff').val() ? [].concat($('#filter-staff').val()) : [];
   const activityValues = $('#filter-activity').val() ? [].concat($('#filter-activity').val()) : [];
 
-  let dataset = getFilteredDataByPeriod(currentPeriod);
+let dataset;
+if (currentPeriod === 'today') {
+  const selectedDate = document.getElementById("datePicker").value;
+  dataset = allData.filter(row => row.dateKey === selectedDate);
+} else {
+  dataset = getFilteredDataByPeriod(currentPeriod);
+}
 
   filteredData = dataset.filter(row => {
     const rowName = `${row["Child Name"] || ""} ${row.Parent || ""}`.toLowerCase().replace(/\s+/g, ' ').trim();
@@ -1264,9 +1271,12 @@ function clearFilters() {
     }
 
 function updateFilteredView() {
-  if (currentPeriod !== 'today') {
+  if (currentPeriod === 'today') {
+    filterByDate(); 
+  } else {
     filteredData = getFilteredDataByPeriod(currentPeriod);
   }
+
   renderMainTable();
   updateSummary();
   updateTodayStats();
@@ -1274,7 +1284,7 @@ function updateFilteredView() {
   if (document.getElementById("activityView").style.display !== "none") {
     renderActivityTable();
   }
-  
+
   if (document.getElementById("statsView").style.display !== "none") {
     renderCharts();
   }
