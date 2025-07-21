@@ -945,7 +945,8 @@ function setActiveNavButton(index) {
 }
     
 function filterByPeriod(period) {
-  currentPeriod = period; 
+  currentPeriod = period;
+  localStorage.setItem('currentPeriod', period);
 
 if (period === 'today') {
   document.getElementById('datePicker').style.display = 'inline-block';
@@ -1230,32 +1231,28 @@ function removeFilterValue(filterId, value) {
   $(`#${filterId}`).val(updatedValues).trigger('change');
   filterTable();
 }
+    
+function getFirstAttendancePerPlayer(data) {
+  const players = {};
+  data.forEach(row => {
+    if (!row.ID) return;
+    if (!players[row.ID]) players[row.ID] = [];
+    players[row.ID].push(row);
+  });
 
+  return Object.values(players).map(playerRows => {
+    playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+    return playerRows.find(r => r.isGeneral) || playerRows[0];
+  });
+}
+    
 function clearFilters() {
-  document.getElementById("filter-name").value = "";
-  document.getElementById("filter-id").value = "";
-  document.getElementById("filter-staff").value = "";
-  document.getElementById("filter-activity").value = "";
-  document.getElementById("filterType").value = "";
-  
-  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
-  document.getElementById("datePicker").value = today;
-  
-  showFilterOptions("");
-  filteredData = allData.filter(row => row.dateKey === today);
-  document.getElementById('datePicker').style.display = 'inline-block';
-  document.getElementById('viewToggle').style.display = 'none';
-  showWeeklySummary = false;
-  
-  $('#filter-staff').val(null).trigger('change');
-  $('#filter-activity').val(null).trigger('change');
-  
-  renderMainTable();
-  updateSummary();
-  hideWeeklyControls();
-  document.getElementById('tableTitle').textContent = 'الحضور اليومي';
-  
-  $('#activeFilters').empty();
+  ["filter-name", "filter-id", "filter-staff", "filter-activity", "filterType"].forEach(id => document.getElementById(id).value = "");
+  $('#filter-staff, #filter-activity').val(null).trigger('change');
+
+  filteredData = getFilteredDataByPeriod(currentPeriod);
+  updateFilteredView();
+  updateFilterChips();
 }
 
     function showFilterOptions(value) {
@@ -1290,76 +1287,33 @@ function updateFilteredView() {
   }
 }
 
+function createAttendanceRow(row) {
+  const tr = document.createElement("tr");
+  if (row.isGeneral) tr.classList.add("general-attendance");
+
+  tr.innerHTML = `
+    <td>${formatDate(row.Timestamp)}</td>
+    <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+    <td>${row.ID || ""}</td>
+    <td>${row["Scanned By"] || ""}</td>
+    <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+    <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+  `;
+  return tr;
+}
+
 function renderMainTable() {
   const tbody = document.querySelector("#attendanceTable tbody");
+  tbody.innerHTML = "";
+
   if (filteredData.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
     return;
   }
 
-  tbody.innerHTML = "";
+  const playerRecords = getFirstAttendancePerPlayer(filteredData);
 
-  if (showWeeklySummary) {
-    const players = {};
-    filteredData.forEach(row => {
-      if (!row.ID) return;
-      if (!players[row.ID]) players[row.ID] = [];
-      players[row.ID].push(row);
-    });
-
-    const playerRecords = Object.values(players).map(playerRows => {
-      playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-      const generalRecord = playerRows.find(row => row.isGeneral);
-      return generalRecord || playerRows[0];
-    });
-
-    playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-
-    playerRecords.forEach(row => {
-      const tr = document.createElement("tr");
-      if (row.isGeneral) tr.classList.add("general-attendance");
-      
-      tr.innerHTML = `
-        <td>${formatDate(row.Timestamp)}</td>
-        <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-        <td>${row.ID || ""}</td>
-        <td>${row["Scanned By"] || ""}</td>
-        <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-        <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  } else {
-    const players = {};
-    filteredData.forEach(row => {
-      if (!row.ID) return;
-      if (!players[row.ID]) players[row.ID] = [];
-      players[row.ID].push(row);
-    });
-
-    const playerRecords = Object.values(players).map(playerRows => {
-      playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-      const generalRecord = playerRows.find(row => row.isGeneral);
-      return generalRecord || playerRows[0];
-    });
-
-    playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-
-    playerRecords.forEach(row => {
-      const tr = document.createElement("tr");
-      if (row.isGeneral) tr.classList.add("general-attendance");
-      
-      tr.innerHTML = `
-        <td>${formatDate(row.Timestamp)}</td>
-        <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-        <td>${row.ID || ""}</td>
-        <td>${row["Scanned By"] || ""}</td>
-        <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-        <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
+  playerRecords.forEach(row => tbody.appendChild(createAttendanceRow(row)));
 }
 
 function renderActivityTable() {
@@ -1499,6 +1453,21 @@ let dateRecords = (currentPeriod === 'all') ? allData : allData.filter(row => ro
   }
 }
 
+function renderCharts() {
+  document.getElementById('pieStaff').parentNode.innerHTML += '<div id="statsLoading">جاري تحميل الإحصائيات...</div>';
+  renderStaffChart();
+  renderTimingChart();
+  renderDailyStats();
+  document.getElementById('statsLoading').remove();
+}
+
+function setActiveNavButton(index) {
+  document.querySelectorAll('nav button').forEach((btn, i) => {
+    btn.classList.toggle('active', i === index);
+    btn.setAttribute('aria-current', i === index ? 'page' : 'false');
+  });
+}    
+    
 function filterActivityTable() {
   const activity = document.getElementById("activityFilter").value;
   const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
@@ -2132,6 +2101,7 @@ function checkMobileView() {
 }
 
 function initialize() {
+  currentPeriod = localStorage.getItem('currentPeriod') || 'today';
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
   document.getElementById("datePicker").value = today;
 
