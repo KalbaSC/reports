@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="mobile-web-app-capable" content="yes">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="theme-color" content="#000000">
   <link rel="icon" href="data:,">
@@ -341,7 +341,7 @@ button.clear-btn {
 }
 
     
-    @media (max-width: 768px) {
+   @media (max-width: 768px) {
  .header-right {
     padding: 10px 10px;
     flex-direction: row;
@@ -377,58 +377,57 @@ button.clear-btn {
       .hidden-column {
         display: none !important;
       }
-      
+
 .container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 10px auto;
-  padding: 10px;
+  width: 90%;
+  margin: 20px auto;
+  padding: 20px 20px; 
   box-sizing: border-box;
-  overflow-x: hidden; 
   font-size: 12px;
+  overflow-x: auto;
  -webkit-overflow-scrolling: touch;
 }
- 
+
       nav {
-   flex-wrap: nowrap;
-    overflow-x: auto;
-    padding: 5px;
-    justify-content: flex-start;
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 5px;
       }
-      
-  nav button, .dropdown > button {
-    white-space: nowrap;
-    flex: 0 0 auto;
-  }
-      
-  .dropdown-content {
-    width: 100vw;
-    right: 0;
-    left: auto;
-    transform: none;
-    position: fixed;
-    top: auto;
-    bottom: 0;
+
+      nav button, .dropdown > button {
+        font-size: 10px;
+        padding: 6px 8px;
+        margin: 2px;
+        min-width: auto;
+        flex: 1;
       }
-  .dropdown > button {
-    font-size: 14px;
-    padding: 8px 12px;
-    margin: 0 5px;
-  }
-  #weekRangePicker h3 {
-    font-size: 16px;
-    margin: 5px 0;
-  }   
+
+      .dropdown-content {
+        min-width: 100px;
+        right: 0;
+      }
+
+      .container {
+        width: 100%;
+        padding: 10px;
+        margin: 10px auto;
+        overflow-x: auto;
+      }
+
       .controls {
         padding: 10px;
       }
-      
+
   .filter-bar {
     flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
   }
-  .search-group, .export-buttons {
+
+  .search-group {
     width: 100%;
   }
+
   .search-group select,
   .search-group input,
   .search-group button.clear-btn,
@@ -437,15 +436,18 @@ button.clear-btn {
     margin-bottom: 8px;
     font-size: 10px;
     height: 36px;
-  } 
+  }
+
   .filter-type-selector {
     width: 100%;
-  } 
+  }
+
   .export-buttons {
     flex-direction: row !important;
     justify-content: center;
     width: 100%;
-  } 
+  }
+
   .export-buttons button {
     flex: 1;
     padding: 8px;
@@ -453,90 +455,88 @@ button.clear-btn {
     min-width: 120px;
     min-width: 120px;
 }
+
  .select2-container {
     width: 100% !important;
   }
-#datePicker,
+      #datePicker,
 .search-group select {
     padding: 8px 12px;
 }
-  
+
   #datePicker {
     width: 100% !important;
   }
-  
+
   .filter-type-selector {
     width: 100%;
     margin-bottom: 8px;
   }
-  
+
   .chip {
     font-size: 10px;
     padding: 4px 8px;
   }
-  
+
   th, td {
     padding: 4px 6px;
     font-size: 10px;
   }
-  
+
   .hidden-column {
     display: none !important;
   }      
       #attendanceTable, #activityTable {
         font-size: 10px;
       }
-  
+
   table {
-    font-size: 12px;
+    font-size: 10px;
   }
-  
-  th, td {
-    padding: 6px 4px;
-  }
+
+  #activityTable td:nth-child(3), 
+  #activityTable th:nth-child(3),
   #activityTable td:nth-child(4), 
   #activityTable th:nth-child(4) {
-    display: table-cell !important;
+    display: none;
   }
+
   #activityTable td, #activityTable th {
-    padding: 4px 6px;
-    font-size: 12px;
+    font-size: 10px;
+    padding: 6px 8px;
   }
-  button[onclick="toggleHiddenColumns()"] {
-    display: inline-block !important;
-    font-size: 12px;
-    padding: 8px 12px;
-    margin-top: 10px;
-  }     
-  .stats-container {
-    grid-template-columns: 1fr;
-  }
+
+      .stats-container {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+
       .stat-card {
         padding: 10px;
       }
-      
+
       .title {
         font-size: 18px;
         margin-bottom: 15px;
       }
-      
+
       .summary-box {
         font-size: 12px;
         margin-top: 5px;
         text-align: center;
         width: 100%;
       }
-      
+
       .activity-group td {
         font-size: 10px;
         padding: 3px;
       }
-      
+
       footer {
         padding: 10px;
         font-size: 12px;
       }
-      
+
       .social-icons a {
         font-size: 16px;
         margin: 0 5px;
