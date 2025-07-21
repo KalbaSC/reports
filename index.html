@@ -948,36 +948,20 @@ function filterByPeriod(period) {
   currentPeriod = period;
   localStorage.setItem('currentPeriod', period);
 
-if (period === 'today') {
-  document.getElementById('datePicker').style.display = 'inline-block';
-  filterByDate();
-  hideWeeklyControls();
-  return;
-}
-
-  if (period === 'week') {
-    showWeekRangePicker();
+  if (period === 'today') {
+    filterByDate(); // Reset to today
+    hideWeeklyControls();
     return;
   }
 
+  if (period === 'week') {
+    showWeekRangePicker(); // Let user pick dates
+    return;
+  }
+
+  // Force-update all views with the new filter
   filteredData = getFilteredDataByPeriod(period);
-  updatePeriodSummary(period);
-
-  if (document.getElementById("mainView").style.display !== "none") {
-    renderMainTable();
-  }
-  if (document.getElementById("activityView").style.display !== "none") {
-    renderActivityTable();
-  }
-  if (document.getElementById("statsView").style.display !== "none") {
-    renderCharts();
-  }
-  if (document.getElementById("topParticipantsView").style.display !== "none") {
-    renderTopParticipants();
-  }
-
-  updateTodayStats();
-  updateTitleAndControls(period);
+  updateFilteredView(); // Refresh all tables/charts
 }
 
 function showWeeklyControls() {
@@ -1252,29 +1236,20 @@ function getFirstAttendancePerPlayer(data) {
 }
     
 function clearFilters() {
-  ["filter-name", "filter-id", "filter-staff", "filter-activity", "filterType"].forEach(id => {
-    const element = document.getElementById(id);
-    if (element) element.value = "";
-  });
+  // Clear search inputs
+  $("#filter-name, #filter-id").val("");
+  $("#filter-staff, #filter-activity").val(null).trigger("change");
 
-  $('#filter-staff, #filter-activity').val(null).trigger('change');
+  // Reset to today's data (like page load)
+  currentPeriod = "today";
+  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Dubai" });
+  document.getElementById("datePicker").value = today;
+  filteredData = allData.filter((row) => row.dateKey === today);
 
-  if (currentPeriod === 'today') {
-    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
-    document.getElementById("datePicker").value = today;
-    filteredData = allData.filter(row => row.dateKey === today);
-  } else {
-    filteredData = getFilteredDataByPeriod(currentPeriod);
-  }
-
-  updateFilterChips();
+  // Update all views
   updateFilteredView();
   updateSummary();
-  updateTodayStats();
-
-  if (document.getElementById("activityView").style.display !== "none") {
-    renderActivityTable();
-  }
+  hideWeeklyControls();
 }
 
     function showFilterOptions(value) {
@@ -1291,22 +1266,26 @@ function clearFilters() {
 
 function updateFilteredView() {
   if (currentPeriod === 'today') {
-    filterByDate(); 
+    filterByDate(); // Respect the selected date
   } else {
     filteredData = getFilteredDataByPeriod(currentPeriod);
   }
 
-  renderMainTable();
-  updateSummary();
-  updateTodayStats();
-
+  // Refresh the currently active view
+  if (document.getElementById("mainView").style.display !== "none") {
+    renderMainTable();
+  }
   if (document.getElementById("activityView").style.display !== "none") {
     renderActivityTable();
   }
-
   if (document.getElementById("statsView").style.display !== "none") {
     renderCharts();
   }
+  if (document.getElementById("topParticipantsView").style.display !== "none") {
+    renderTopParticipants();
+  }
+
+  updateSummary();
 }
 
 function createAttendanceRow(row) {
@@ -1932,22 +1911,16 @@ function applyWeekFilter() {
   
   if (!startDate || !endDate) return;
 
+  // Filter data for the selected range
   filteredData = allData.filter(row => row.dateKey >= startDate && row.dateKey <= endDate);
 
-  showWeeklySummary = true;
-  document.getElementById('viewToggle').style.display = 'inline-block';
-  document.getElementById('viewToggle').innerHTML = '<i class="fas fa-exchange-alt"></i> الاسماء';
-  
-  renderWeeklySummaryTable();
-  updateWeekSummary(startDate, endDate);
+  // Update UI
+  document.getElementById('tableTitle').textContent = `الحضور من ${startDate} إلى ${endDate}`;
   showWeeklyControls();
   closeWeekRangePicker();
-  document.getElementById('datePicker').style.display = 'none';
-  updateTitleAndControls('week');
 
-  if (document.getElementById("activityView").style.display !== "none") renderActivityTable();
-  if (document.getElementById("statsView").style.display !== "none") renderCharts();
-  if (document.getElementById("topParticipantsView").style.display !== "none") renderTopParticipants();
+  // Refresh all views
+  updateFilteredView();
 }
     
     function exportToExcel() {
