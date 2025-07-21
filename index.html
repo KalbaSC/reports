@@ -881,10 +881,6 @@ function populateDropdowns() {
         
         allData = processRawData(rawData);
         
-        const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
-        document.getElementById("datePicker").value = today;
-        filteredData = allData.filter(row => row.dateKey === today);
-        
         renderMainTable();
         updateSummary();
         populateDropdowns();
@@ -2124,22 +2120,21 @@ function checkMobileView() {
 function initialize() {
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
   document.getElementById("datePicker").value = today;
-  
+
   document.getElementById("filter-name").value = "";
   document.getElementById("filter-id").value = "";
   document.getElementById("filter-staff").value = "";
   document.getElementById("filter-activity").value = "";
   document.getElementById("filterType").value = "";
-  
-fetchData().then(() => {
-  setupAutocomplete();
-  currentPeriod = 'today';
-  filteredData = getFilteredDataByPeriod(currentPeriod);
-  updateFilteredView();
-});
-  
+
+  fetchData().then(() => {
+    setupAutocomplete();
+    currentPeriod = 'today';
+    filterByDate();  // Filter data by today's date after fetching
+  });
+
   document.getElementById('tableTitle').textContent = 'السجلات اليومية';
-  
+
   $('#filter-staff, #filter-activity').select2({
     placeholder: "اختر متعدد",
     allowClear: true,
