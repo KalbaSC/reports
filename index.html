@@ -327,7 +327,7 @@ button.clear-btn {
 #mainView .hidden-column {
   display: none;
 }
-    
+
 #topParticipantsContainer {
   display: flex;
   flex-wrap: wrap;
@@ -340,8 +340,8 @@ button.clear-btn {
   display: table-cell;
 }
 
-    
-   @media (max-width: 768px) {
+
+    @media (max-width: 768px) {
  .header-right {
     padding: 10px 10px;
     flex-direction: row;
@@ -542,10 +542,10 @@ button.clear-btn {
         margin: 0 5px;
       }
     }
-</style>
+  </style>
 </head>
 <body>
- 
+
   <header class="header-container">
     <div class="header-right">
       <img src="Picture3.png" alt="شعار الشارقة" class="logo">
@@ -573,14 +573,14 @@ button.clear-btn {
       </div>
     </div>
   </nav>
-  
+
 <main style="flex: 1;">
-  
+
   <div class="container" id="mainView">
     <div class="title" style="color: #f4e733; text-align: center; font-weight: bold; font-size: 24px; margin-bottom: 25px;">
       حضور صيف الشارقة الرياضي - عطلتنا غير
     </div>
-    
+
 <div class="controls">
       <div class="filter-bar">
         <div class="search-group">
@@ -592,7 +592,7 @@ button.clear-btn {
             <option value="staff">الموظف</option>
             <option value="activity">النشاط</option>
           </select>
-          
+
           <div id="activeFilters" class="chip-container"></div>
           <input id="filter-name" class="hidden" placeholder="أدخل الاسم..." onkeyup="filterTable()" autocomplete="off">
           <input id="filter-id" class="hidden" placeholder="أدخل المعرف..." onkeyup="filterTable()">
@@ -608,7 +608,7 @@ button.clear-btn {
         onclick="promptForPassword()">
   <i class="fas fa-paper-plane"></i> إرسال تقارير الأسبوع
 </button>
-        
+
 <div class="export-buttons">
   <button class="export" onclick="exportToExcel()">
     <span class="download-icon"></span> Excel
@@ -624,20 +624,20 @@ button.clear-btn {
 <button onclick="toggleHiddenColumns()" class="export" style="background: #555;">
   <i class="fas fa-eye"></i> عرض الأعمدة المخفية
 </button>
-        
+
       </div>
 
       <div class="summary-box">
         <span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
         <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
       </div>
-    
+
 <button id="showWeeklyMsgBtn" class="export" style="display:none; background:#f4e733; color:black; margin-top:10px;" onclick="openWeeklyMessage()">عرض ملخص الحضور الأسبوعي</button>
 
 <div id="weeklyMessagePopup" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:#222; color:white; border:2px solid #f4e733; border-radius:10px; padding:20px; z-index:1000; max-width:80%; max-height:70%; overflow:auto; text-align:right;">
   <h3 style="color:#f4e733;">ملخص الحضور الأسبوعي</h3>
   <div id="weeklyMessageContent"></div>
-  
+
 <div style="position: sticky; bottom: 0; background: #222; padding: 10px 0; text-align: center; border-top: 1px solid #f4e733;">
   <button onclick="promptTestEvaluation()" style="background:#d9534f; color:white; border:none; padding:5px 15px; border-radius:5px; margin:5px;">
     إرسال بريد اختباري
@@ -648,7 +648,7 @@ button.clear-btn {
 </div>
 
 </div>
-      
+
     </div>
 <h3 id="tableTitle" style="text-align:center; color:#f4e733; margin-top: 20px;"></h3>
     <table id="attendanceTable">
@@ -693,7 +693,7 @@ button.clear-btn {
 
   <div class="container" id="statsView" style="display: none;">
     <h2 style="color:#f4e733; text-align:center">إحصائيات الحضور</h2>
-    
+
     <div class="stats-container">
       <div class="stat-card">
         <h3 style="color:#f4e733;">توزيع الحضور حسب الموظفين</h3>
@@ -718,7 +718,7 @@ button.clear-btn {
   <h2 style="color:#f4e733; text-align:center">المنتسبون المميزون</h2>
   <div id="topParticipantsContainer" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 20px;"></div>
 </div>
-  
+
   <script>
     const scriptURL = 'https://script.google.com/macros/s/AKfycbxij6xIH_fypPRhklqQKURq-7xB5RJ3sC5dCBfwj4sJBjqnfXde1ncFrhCpDy04zuZW6g/exec';
     let currentPeriod = 'today';
@@ -745,17 +745,17 @@ button.clear-btn {
 
     function processRawData(rawData) {
       if (!Array.isArray(rawData)) return [];
-      
+
       const now = new Date();
-      
+
       return rawData
         .filter(item => {
           if (!item || typeof item !== 'object') return false;
           if (!item.ID || !item.Timestamp) return false;
-          
+
           const timestamp = new Date(item.Timestamp);
           if (isNaN(timestamp.getTime())) return false;
-          
+
           return timestamp <= now;
         })
         .map(item => {
@@ -763,7 +763,7 @@ button.clear-btn {
           return {
             ...item,
             isGeneral: isGeneral,
-            dateKey: new Date(item.Timestamp).toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' }),
+            dateKey: new Date(item.Timestamp).toISOString().split('T')[0],
             isDuplicate: false
           };
         });
@@ -777,42 +777,36 @@ function formatDisplayDate(dateString) {
     day: '2-digit',
     timeZone: 'Asia/Dubai'
   };
-  
+
   let formatted = date.toLocaleDateString('ar-EG', options);
-  
+
   formatted = formatted.replace(/[٠-٩]/g, d => "٠١٢٣٤٥٦٧٨٩".indexOf(d))
                       .replace(/\s+/g, ' ')
                       .trim();
-  
+
   return formatted;
 }
 
-function getActivityRecords(rawData) {
-  if (!Array.isArray(rawData)) return [];
+    function getActivityRecords(rawData) {
+      if (!Array.isArray(rawData)) return [];
 
-  const uniqueRecords = [];
-  const seen = new Set();
-
-  rawData.forEach(item => {
-    if (item && item.ID && item.Timestamp && item.Activity && item.Activity.trim() !== "" && item.Activity !== "عام") {
-      const key = `${item.ID}_${new Date(item.Timestamp).toISOString().split('T')[0]}_${item.Activity}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        uniqueRecords.push(item);
-      }
+      return rawData.filter(item => 
+        item && typeof item === 'object' && 
+        item.ID && item.Timestamp && 
+        item.Activity && item.Activity.trim() !== "" &&
+        item.Activity !== "عام"
+      );
     }
-  });
-
-  return uniqueRecords;
-}
 
     function updateTodayStats(data = filteredData) {
-const todayKey = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
-const todayData = data.filter(row => row.dateKey === todayKey);
+      const today = new Date().toDateString();
+      const todayData = data.filter(row => 
+        new Date(row.Timestamp).toDateString() === today
+      );
 
       const staffToday = {};
       let early = 0, late = 0;
-      
+
       todayData.forEach(row => {
         const name = row["Scanned By"] || "غير معروف";
         staffToday[name] = (staffToday[name] || 0) + 1;
@@ -854,7 +848,7 @@ function populateDropdowns() {
   populateDropdown('filter-activity', activities, 'اختر النشاط');
   populateDropdown('filter-staff', staff, 'اختر الموظف');
 }
-  
+
     function populateDropdown(id, values, defaultText) {
       const select = document.getElementById(id);
       select.innerHTML = `<option value="">${defaultText}</option>`;
@@ -872,29 +866,33 @@ function populateDropdowns() {
         if (loadingElement) {
           loadingElement.style.display = "block";
         }
-        
+
         const res = await fetch(scriptURL);
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
-        
+
         const rawData = await res.json();
         if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
-        
+
         allData = processRawData(rawData);
-        
+
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById("datePicker").value = today;
+        filteredData = allData.filter(row => row.dateKey === today);
+
         renderMainTable();
         updateSummary();
         populateDropdowns();
         updateTodayStats();
-        
+
         console.log("Data loaded successfully:", allData.length, "records");
-        
+
       } catch (error) {
         console.error("Error loading data:", error);
         const tbody = document.querySelector("#attendanceTable tbody");
         if (tbody) {
           tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
         }
-        
+
       } finally {
         const loadingElement = document.getElementById("loading");
         if (loadingElement) {
@@ -943,24 +941,39 @@ function setActiveNavButton(index) {
     btn.classList.toggle('active', i === index);
   });
 }
-    
-function filterByPeriod(period) {
-  currentPeriod = period;
-  localStorage.setItem("currentPeriod", period);
 
-  if (period === "today") {
-    const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Dubai" });
-    document.getElementById("datePicker").value = today;
-    filterByDate(); // Show today's data
+function filterByPeriod(period) {
+  currentPeriod = period; 
+
+  if (period === 'today') {
+    filterByDate();
     hideWeeklyControls();
-  } 
-  else if (period === "week") {
-    showWeekRangePicker(); // Let user pick Mon-Thu
-  } 
-  else {
-    filteredData = getFilteredDataByPeriod(period);
-    updateFilteredView(); // Refresh all tables/charts
+    return;
   }
+
+  if (period === 'week') {
+    showWeekRangePicker();
+    return;
+  }
+
+  filteredData = getFilteredDataByPeriod(period);
+  updatePeriodSummary(period);
+
+  if (document.getElementById("mainView").style.display !== "none") {
+    renderMainTable();
+  }
+  if (document.getElementById("activityView").style.display !== "none") {
+    renderActivityTable();
+  }
+  if (document.getElementById("statsView").style.display !== "none") {
+    renderCharts();
+  }
+  if (document.getElementById("topParticipantsView").style.display !== "none") {
+    renderTopParticipants();
+  }
+
+  updateTodayStats();
+  updateTitleAndControls(period);
 }
 
 function showWeeklyControls() {
@@ -976,7 +989,7 @@ function hideWeeklyControls() {
 
 function showWeekRangePicker() {
   let rangePicker = document.getElementById('weekRangePicker');
-  
+
   if (!rangePicker) {
     rangePicker = document.createElement('div');
     rangePicker.id = 'weekRangePicker';
@@ -989,7 +1002,7 @@ function showWeekRangePicker() {
     rangePicker.style.border = '2px solid #f4e733';
     rangePicker.style.borderRadius = '10px';
     rangePicker.style.zIndex = '1000';
-    
+
     rangePicker.innerHTML = `
       <h3 style="color:#f4e733; text-align:center; margin-top:0">اختر أسبوع (إثنين-خميس)</h3>
       <div style="display: flex; gap: 10px; margin-bottom: 15px;">
@@ -1002,9 +1015,9 @@ function showWeekRangePicker() {
         <button onclick="closeWeekRangePicker()" style="background:#555; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer">إلغاء</button>
       </div>
     `;
-    
+
     document.body.appendChild(rangePicker);
-    
+
     setCurrentWeekDates();
   } else {
     rangePicker.style.display = 'block';
@@ -1016,22 +1029,22 @@ function setCurrentWeekDates() {
   const today = new Date();
   const dayOfWeek = today.getDay(); 
   const diffToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1; 
-  
+
   const monday = new Date(today);
   monday.setDate(today.getDate() - diffToMonday);
-  
+
   const thursday = new Date(monday);
   thursday.setDate(monday.getDate() + 3); 
-  
+
   document.getElementById('weekStartDate').value = monday.toISOString().split('T')[0];
   document.getElementById('weekEndDate').value = thursday.toISOString().split('T')[0];
 }
-    
+
 function renderWeeklySummaryTable() {
   document.getElementById('tableTitle').textContent = 'الحضور الأسبوعي ';
   const tbody = document.querySelector("#attendanceTable tbody");
   tbody.innerHTML = "";
-  
+
   if (filteredData.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
     return;
@@ -1055,7 +1068,7 @@ function renderWeeklySummaryTable() {
   summaryData.forEach(row => {
     const tr = document.createElement("tr");
     if (row.isGeneral) tr.classList.add("general-attendance");
-    
+
     tr.innerHTML = `
       <td>${formatDate(row.Timestamp)}</td>
       <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
@@ -1079,11 +1092,7 @@ function renderWeeklySummaryTable() {
     </tr>
   `;
 }
-    // Always use Dubai time when checking dates
-function getDubaiDate(dateString) {
-  return new Date(dateString).toLocaleString("en-CA", { timeZone: "Asia/Dubai" });
-}
-    
+
 function updateSummary(isWeek = false) {
   if (isWeek) return;
 
@@ -1104,21 +1113,16 @@ function updateSummary(isWeek = false) {
     `;
   }
 }
-    
+
 function clearWeekFilter() {
-  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
+  const today = new Date().toISOString().split('T')[0];
   document.getElementById("datePicker").value = today;
   document.getElementById('datePicker').style.display = 'inline-block';
-
   filteredData = allData.filter(row => row.dateKey === today);
-
   updateFilteredView();
   updateSummary();
   hideWeeklyControls();
   document.getElementById('tableTitle').textContent = 'الحضور اليومي';
-
-  renderMainTable();
-  updateTodayStats();
 }
 
 function closeWeekRangePicker() {
@@ -1128,21 +1132,15 @@ function closeWeekRangePicker() {
   }
 }
 
-function filterByDate() {
-  currentPeriod = 'today';
-  let selectedDate = document.getElementById("datePicker").value;
-  if (!selectedDate) {
-    selectedDate = new Date().toISOString().split('T')[0];
-    document.getElementById("datePicker").value = selectedDate;
-  }
-  
-  filteredData = allData.filter(row => row.dateKey === selectedDate);
-  updateTitleAndControls('today');
-  renderMainTable();
-  updateSummary();
-  updateTodayStats();
-}
-    
+    function filterByDate() {
+      const selectedDate = document.getElementById("datePicker").value;
+      if (!selectedDate) return;
+
+      filteredData = allData.filter(row => row.dateKey === selectedDate);
+      updateFilteredView();
+      updateTitleAndControls('today');
+    }
+
 function filterTable() {
   $('#filter-name').attr('autocomplete', 'off');
   const name = $('#filter-name').val().toLowerCase().replace(/\s+/g, ' ').trim();
@@ -1150,7 +1148,8 @@ function filterTable() {
   const staffValues = $('#filter-staff').val() ? [].concat($('#filter-staff').val()) : [];
   const activityValues = $('#filter-activity').val() ? [].concat($('#filter-activity').val()) : [];
 
-let dataset;
+let dataset = [];
+
 if (currentPeriod === 'today') {
   const selectedDate = document.getElementById("datePicker").value;
   dataset = allData.filter(row => row.dateKey === selectedDate);
@@ -1223,36 +1222,32 @@ function removeFilterValue(filterId, value) {
   $(`#${filterId}`).val(updatedValues).trigger('change');
   filterTable();
 }
-    
-function getFirstAttendancePerPlayer(data) {
-  const players = {};
-  data.forEach(row => {
-    if (!row.ID) return;
-    if (!players[row.ID]) players[row.ID] = [];
-    players[row.ID].push(row);
-  });
 
-  return Object.values(players).map(playerRows => {
-    playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-    return playerRows.find(r => r.isGeneral) || playerRows[0];
-  });
-}
-    
 function clearFilters() {
-  // Clear search inputs
-  $("#filter-name, #filter-id").val("");
-  $("#filter-staff, #filter-activity").val(null).trigger("change");
+  document.getElementById("filter-name").value = "";
+  document.getElementById("filter-id").value = "";
+  document.getElementById("filter-staff").value = "";
+  document.getElementById("filter-activity").value = "";
+  document.getElementById("filterType").value = "";
 
-  // Reset to TODAY (Dubai time)
-  currentPeriod = "today";
-  const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Dubai" });
+  const today = new Date().toISOString().split('T')[0];
   document.getElementById("datePicker").value = today;
-  filteredData = allData.filter((row) => row.dateKey === today);
 
-  // Update UI
-  updateFilteredView();
+  showFilterOptions("");
+  filteredData = allData.filter(row => row.dateKey === today);
+  document.getElementById('datePicker').style.display = 'inline-block';
+  document.getElementById('viewToggle').style.display = 'none';
+  showWeeklySummary = false;
+
+  $('#filter-staff').val(null).trigger('change');
+  $('#filter-activity').val(null).trigger('change');
+
+  renderMainTable();
+  updateSummary();
   hideWeeklyControls();
-  document.getElementById("tableTitle").textContent = "الحضور اليومي";
+  document.getElementById('tableTitle').textContent = 'الحضور اليومي';
+
+  $('#activeFilters').empty();
 }
 
     function showFilterOptions(value) {
@@ -1267,64 +1262,99 @@ function clearFilters() {
       else if (value === "activity") document.getElementById("filter-activity").classList.remove("hidden");
     }
 
-function updateFilteredView() {
-  // Apply the current filter (today/week/month/all)
-  if (currentPeriod === "today") {
-    filterByDate();
-  } else {
-    filteredData = getFilteredDataByPeriod(currentPeriod);
-  }
+    function updateFilteredView() {
+      renderMainTable();
+      updateSummary();
+      updateTodayStats();
 
-  // Refresh the active view
-  if (document.getElementById("mainView").style.display !== "none") renderMainTable();
-  if (document.getElementById("activityView").style.display !== "none") renderActivityTable();
-  if (document.getElementById("statsView").style.display !== "none") renderCharts();
-  if (document.getElementById("topParticipantsView").style.display !== "none") renderTopParticipants();
-}
+      if (document.getElementById("activityView").style.display !== "none") {
+        renderActivityTable();
+      }
 
-function createAttendanceRow(row) {
-  const tr = document.createElement("tr");
-  if (row.isGeneral) tr.classList.add("general-attendance");
-
-  tr.innerHTML = `
-    <td>${formatDate(row.Timestamp)}</td>
-    <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-    <td>${row.ID || ""}</td>
-    <td>${row["Scanned By"] || ""}</td>
-    <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-    <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
-  `;
-  return tr;
-}
+      if (document.getElementById("statsView").style.display !== "none") {
+        renderCharts();
+      }
+    }
 
 function renderMainTable() {
   const tbody = document.querySelector("#attendanceTable tbody");
-  tbody.innerHTML = "";
-
   if (filteredData.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
     return;
   }
 
-  const playerRecords = getFirstAttendancePerPlayer(filteredData);
+  tbody.innerHTML = "";
 
-  playerRecords.forEach(row => tbody.appendChild(createAttendanceRow(row)));
+  if (showWeeklySummary) {
+    const players = {};
+    filteredData.forEach(row => {
+      if (!row.ID) return;
+      if (!players[row.ID]) players[row.ID] = [];
+      players[row.ID].push(row);
+    });
+
+    const playerRecords = Object.values(players).map(playerRows => {
+      playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+      const generalRecord = playerRows.find(row => row.isGeneral);
+      return generalRecord || playerRows[0];
+    });
+
+    playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+
+    playerRecords.forEach(row => {
+      const tr = document.createElement("tr");
+      if (row.isGeneral) tr.classList.add("general-attendance");
+
+      tr.innerHTML = `
+        <td>${formatDate(row.Timestamp)}</td>
+        <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+        <td>${row.ID || ""}</td>
+        <td>${row["Scanned By"] || ""}</td>
+        <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+        <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  } else {
+    const players = {};
+    filteredData.forEach(row => {
+      if (!row.ID) return;
+      if (!players[row.ID]) players[row.ID] = [];
+      players[row.ID].push(row);
+    });
+
+    const playerRecords = Object.values(players).map(playerRows => {
+      playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+      const generalRecord = playerRows.find(row => row.isGeneral);
+      return generalRecord || playerRows[0];
+    });
+
+    playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+
+    playerRecords.forEach(row => {
+      const tr = document.createElement("tr");
+      if (row.isGeneral) tr.classList.add("general-attendance");
+
+      tr.innerHTML = `
+        <td>${formatDate(row.Timestamp)}</td>
+        <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+        <td>${row.ID || ""}</td>
+        <td>${row["Scanned By"] || ""}</td>
+        <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+        <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
 }
 
 function renderActivityTable() {
   const tbody = document.querySelector("#activityTable tbody");
   const controls = document.getElementById("activityControls");
   tbody.innerHTML = "";
-  
-let dateRecords;
-if (currentPeriod === 'all') {
-  dateRecords = allData;
-} else if (currentPeriod === 'today') {
-  const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
-  dateRecords = allData.filter(row => row.dateKey === selectedDate);
-} else {
-  dateRecords = getFilteredDataByPeriod(currentPeriod);
-}
+
+const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
+let dateRecords = (currentPeriod === 'all') ? allData : allData.filter(row => row.dateKey === selectedDate);
 
   if (dateRecords.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
@@ -1455,22 +1485,6 @@ if (currentPeriod === 'all') {
   }
 }
 
-function renderCharts() {
-  if (charts.staff) charts.staff.destroy();
-  if (charts.timing) charts.timing.destroy();
-  
-  renderStaffChart();
-  renderTimingChart();
-  renderDailyStats();
-}
-
-function setActiveNavButton(index) {
-  document.querySelectorAll('nav button').forEach((btn, i) => {
-    btn.classList.toggle('active', i === index);
-    btn.setAttribute('aria-current', i === index ? 'page' : 'false');
-  });
-}    
-    
 function filterActivityTable() {
   const activity = document.getElementById("activityFilter").value;
   const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
@@ -1493,18 +1507,15 @@ function filterActivityTable() {
     return;
   }
 
-const filtered = [];
-const seenKeys = new Set();
-
-activityRecords
-  .filter(row => row.Activity === activity)
-  .forEach(item => {
-    const key = `${item.ID}_${item.dateKey}_${item.Activity}`;
-    if (!seenKeys.has(key)) {
-      seenKeys.add(key);
-      filtered.push(item);
-    }
-  });
+  const filtered = activityRecords
+    .filter(row => row.Activity === activity)
+    .reduce((unique, item) => {
+      const key = `${item.ID}_${item.dateKey}_${item.Activity}`;
+      if (!unique.some(u => `${u.ID}_${u.dateKey}_${u.Activity}` === key)) {
+        unique.push(item);
+      }
+      return unique;
+    }, []);
 
   if (filtered.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور لنشاط ${activity}</td></tr>`;
@@ -1528,7 +1539,7 @@ activityRecords
     tbody.appendChild(row);
   });
 }
-    
+
     function renderCharts() {
       renderStaffChart();
       renderTimingChart();
@@ -1543,7 +1554,7 @@ activityRecords
       });
 
       if (charts.staff) charts.staff.destroy();
-      
+
       const ctx = document.getElementById('pieStaff').getContext('2d');
       charts.staff = new Chart(ctx, {
         type: 'pie',
@@ -1570,7 +1581,7 @@ activityRecords
 function toggleHiddenColumns() {
   const mainView = document.getElementById("mainView");
   mainView.classList.toggle("show-hidden-columns");
-  
+
   const btn = document.querySelector('button[onclick="toggleHiddenColumns()"]');
   if (btn) {
     const isShowing = mainView.classList.contains("show-hidden-columns");
@@ -1589,7 +1600,7 @@ function toggleHiddenColumns() {
       });
 
       if (charts.timing) charts.timing.destroy();
-      
+
       const ctx = document.getElementById('earlyLate').getContext('2d');
       charts.timing = new Chart(ctx, {
         type: 'bar',
@@ -1615,7 +1626,7 @@ function toggleHiddenColumns() {
 
       const staffToday = {};
       let early = 0, late = 0;
-      
+
       todayData.forEach(row => {
         const name = row["Scanned By"] || "غير معروف";
         staffToday[name] = (staffToday[name] || 0) + 1;
@@ -1667,7 +1678,7 @@ function countUniqueDailyAttendances(data) {
 
 function countUniqueWeeklyAttendances(data) {
   const weeklyUniqueAttendees = new Set();
-  
+
   const recordsByDate = {};
   data.forEach(row => {
     if (!row.ID) return;
@@ -1677,19 +1688,19 @@ function countUniqueWeeklyAttendances(data) {
     }
     recordsByDate[dateKey].push(row);
   });
-  
+
   Object.entries(recordsByDate).forEach(([date, records]) => {
     const uniqueForDay = new Set();
-    
+
     records.forEach(row => {
       uniqueForDay.add(row.ID);
     });
-    
+
     uniqueForDay.forEach(id => {
       weeklyUniqueAttendees.add(`${id}_${date}`); 
     });
   });
-  
+
   return weeklyUniqueAttendees.size;
 }
 
@@ -1697,19 +1708,19 @@ function getFilteredDataByPeriod(period) {
   const now = new Date();
   return allData.filter(row => {
     const rowDate = new Date(row.Timestamp);
-    
+
     switch(period) {
       case 'week':
         const monday = new Date(now);
         monday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
         monday.setHours(0, 0, 0, 0);
-        
+
         const thursday = new Date(monday);
         thursday.setDate(monday.getDate() + 3);
         thursday.setHours(23, 59, 59, 999);
-        
+
         return rowDate >= monday && rowDate <= thursday;
-        
+
       case 'month':
         return rowDate.getMonth() === now.getMonth() && 
                rowDate.getFullYear() === now.getFullYear() &&
@@ -1726,27 +1737,27 @@ function updatePeriodSummary(period) {
     updateSummary();
     return;
   }
-  
+
   const periodData = getFilteredDataByPeriod(period);
   let uniqueCount;
-  
+
   if (period === 'week') {
     uniqueCount = countUniqueWeeklyAttendances(periodData);
   } else {
     uniqueCount = countUniqueDailyAttendances(periodData);
   }
-  
+
   document.getElementById("totalCount").textContent = uniqueCount;
   document.getElementById("filteredCount").textContent = uniqueCount;
-  
+
   if (period === 'week') {
     const now = new Date();
     const monday = new Date(now);
     monday.setDate(now.getDate() - (now.getDay() === 0 ? 6 : now.getDay() - 1));
-    
+
     const thursday = new Date(monday);
     thursday.setDate(monday.getDate() + 3);
-    
+
     const summaryElement = document.querySelector('.summary-box');
     summaryElement.innerHTML = `
       <span>إجمالي الحضور من ${formatDisplayDate(monday)} إلى ${formatDisplayDate(thursday)}: 
@@ -1762,9 +1773,9 @@ function updatePeriodSummary(period) {
 function renderPeriodTable(period) {
   const tbody = document.querySelector("#attendanceTable tbody");
   tbody.innerHTML = "";
-  
+
   const periodData = getFilteredDataByPeriod(period);
-  
+
   if (periodData.length === 0) {
     tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
     return;
@@ -1774,7 +1785,7 @@ function renderPeriodTable(period) {
   periodData.forEach(row => {
     if (!row.ID) return;
     const idDateKey = `${row.ID}_${row.dateKey}`;
-    
+
     if (!dailyAttendances[idDateKey]) {
       dailyAttendances[idDateKey] = row;
     } else {
@@ -1792,7 +1803,7 @@ function renderPeriodTable(period) {
   records.forEach(row => {
     const tr = document.createElement("tr");
     if (row.isGeneral) tr.classList.add("general-attendance");
-    
+
     tr.innerHTML = `
       <td>${formatDate(row.Timestamp)}</td>
       <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
@@ -1827,25 +1838,15 @@ function renderTopParticipants() {
   const container = document.getElementById('topParticipantsContainer');
   container.innerHTML = '';
 
-  // Get the correct dataset based on current period
-  let records;
-  if (currentPeriod === 'today') {
-    const selectedDate = document.getElementById("datePicker").value || 
-                        new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
-    records = allData.filter(r => r.dateKey === selectedDate);
-  } else {
-    records = filteredData; // Use already filtered data for week/month/all
-  }
+  const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
+  const selectedRecords = allData.filter(r => r.dateKey === selectedDate && !r.isGeneral && r.Activity);
 
-  // Filter only activity records (non-general)
-  const activityRecords = records.filter(r => !r.isGeneral && r.Activity && r.Activity.trim() !== "");
-
-  // Count participation per child
   const participationCounts = {};
 
-  activityRecords.forEach(row => {
+  selectedRecords.forEach(row => {
     if (!row.ID) return;
-    
+    const activityKey = `${row.ID}_${row.Activity}`;
+
     if (!participationCounts[row.ID]) {
       participationCounts[row.ID] = {
         name: `${row["Child Name"] || ""} ${row.Parent || ""}`.trim(),
@@ -1853,34 +1854,28 @@ function renderTopParticipants() {
         activities: new Set()
       };
     }
-    participationCounts[row.ID].activities.add(row.Activity);
+
+    participationCounts[row.ID].activities.add(activityKey);
   });
 
-  // Sort by participation count (descending)
   const sorted = Object.values(participationCounts)
     .map(p => ({ ...p, count: p.activities.size }))
     .sort((a, b) => b.count - a.count)
-    .slice(0, 5); // Top 5
+    .slice(0, 5);
 
-  // Handle empty state
   if (sorted.length === 0) {
-    let message = "لا يوجد مشاركين في الأنشطة";
-    if (currentPeriod === 'today') {
-      message += " لهذا اليوم";
-    } else if (currentPeriod === 'week') {
-      message += " هذا الأسبوع";
-    } else if (currentPeriod === 'month') {
-      message += " هذا الشهر";
-    }
-    container.innerHTML = `<p>${message}</p>`;
+    container.innerHTML = `<p>لا يوجد مشاركين في الأنشطة لهذا التاريخ</p>`;
     return;
   }
 
-  // Render participant cards
   sorted.forEach((participant, index) => {
     const card = document.createElement('div');
-    
-    // Card styling with emoji ranking
+
+    let order = 0;
+    if (index === 0) order = 0;
+    else if (index % 2 !== 0) order = index;  
+    else order = -index;                    
+
     card.style = `
       background: #222;
       border: 2px solid ${index === 0 ? '#f4e733' : '#555'};
@@ -1888,9 +1883,11 @@ function renderTopParticipants() {
       padding: 12px;
       text-align: center;
       width: ${index === 0 ? '180px' : '140px'};
+      position: relative;
       transform: scale(${index === 0 ? 1.1 : 1});
       box-shadow: ${index === 0 ? '0 0 15px #f4e733aa' : 'none'};
       animation: pop 0.5s ease;
+      order: ${order};
     `;
 
     const emoji = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
@@ -1908,22 +1905,36 @@ function renderTopParticipants() {
     container.appendChild(card);
   });
 
-  // Container styling
   container.style.display = 'flex';
   container.style.flexWrap = 'wrap';
   container.style.justifyContent = 'center';
   container.style.gap = '20px';
 }
-    
+
 function applyWeekFilter() {
-  const startDate = document.getElementById("weekStartDate").value;
-  const endDate = document.getElementById("weekEndDate").value;
+  const startDate = document.getElementById('weekStartDate').value;
+  const endDate = document.getElementById('weekEndDate').value;
+
   if (!startDate || !endDate) return;
 
   filteredData = allData.filter(row => row.dateKey >= startDate && row.dateKey <= endDate);
-  updateFilteredView(); // Force-refresh all views
+
+  showWeeklySummary = true;
+  document.getElementById('viewToggle').style.display = 'inline-block';
+  document.getElementById('viewToggle').innerHTML = '<i class="fas fa-exchange-alt"></i> الاسماء';
+
+  renderWeeklySummaryTable();
+  updateWeekSummary(startDate, endDate);
+  showWeeklyControls();
+  closeWeekRangePicker();
+  document.getElementById('datePicker').style.display = 'none';
+  updateTitleAndControls('week');
+
+  if (document.getElementById("activityView").style.display !== "none") renderActivityTable();
+  if (document.getElementById("statsView").style.display !== "none") renderCharts();
+  if (document.getElementById("topParticipantsView").style.display !== "none") renderTopParticipants();
 }
-    
+
     function exportToExcel() {
       const wb = XLSX.utils.book_new();
       const ws = XLSX.utils.json_to_sheet(prepareExportData());
@@ -1961,7 +1972,7 @@ function applyWeekFilter() {
         "النوع": row.isGeneral ? "عام" : "نشاط"
       }));
     }
-    
+
 function showWeeklyPlayerAttendance() {
   const attendanceMap = {};
 
@@ -1999,7 +2010,7 @@ function showWeeklyPlayerAttendance() {
   document.getElementById('weeklyMessageContent').innerHTML = message || "لا يوجد حضور لهذا الأسبوع.";
   document.getElementById('showWeeklyMsgBtn').style.display = 'inline-block';
 }
-    
+
 function openWeeklyMessage() {
   document.getElementById('weeklyMessagePopup').style.display = 'block';
 }
@@ -2033,7 +2044,7 @@ function testSendFirstKidEvaluation() {
 
     filteredData.forEach(row => {
       if (!row.ID) return;
-      
+
       if (!attendanceMap[row.ID]) {
         attendanceMap[row.ID] = {
           name: `${row["Child Name"] || ""} ${row.Parent || ""}`.trim(),
@@ -2094,18 +2105,17 @@ function testSendFirstKidEvaluation() {
     alert(`حدث خطأ غير متوقع: ${error.message}`);
   }
 }
-    
+
 function checkMobileView() {
   const isMobile = window.innerWidth <= 768;
   const btn = document.querySelector('button[onclick="toggleHiddenColumns()"]');
   if (btn) {
-    btn.innerHTML = isMobile ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye"></i> عرض الأعمدة';
+    btn.style.display = isMobile ? 'none' : 'inline-block';
   }
 }
 
 function initialize() {
-  currentPeriod = localStorage.getItem('currentPeriod') || 'today';
-  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
+  const today = new Date().toISOString().split('T')[0];
   document.getElementById("datePicker").value = today;
 
   document.getElementById("filter-name").value = "";
@@ -2116,8 +2126,7 @@ function initialize() {
 
   fetchData().then(() => {
     setupAutocomplete();
-    currentPeriod = 'today';
-    filterByDate();  // Filter data by today's date after fetching
+    filterByDate();
   });
 
   document.getElementById('tableTitle').textContent = 'السجلات اليومية';
@@ -2142,7 +2151,7 @@ function setupAutocomplete() {
   }, 100);
 }
 
-    
+
 function updateTitleAndControls(period) {
   const tableTitle = document.getElementById('tableTitle');
   const datePicker = document.getElementById('datePicker');
@@ -2167,7 +2176,7 @@ function updateTitleAndControls(period) {
 
   </script>
   </main>
-  
+
 <div class="footer-container">
   <footer>
     <p>© 2025 نادي كلباء الرياضي الثقافي - جميع الحقوق محفوظة</p>
