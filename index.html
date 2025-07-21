@@ -946,22 +946,21 @@ function setActiveNavButton(index) {
     
 function filterByPeriod(period) {
   currentPeriod = period;
-  localStorage.setItem('currentPeriod', period);
+  localStorage.setItem("currentPeriod", period);
 
-  if (period === 'today') {
-    filterByDate(); // Reset to today
+  if (period === "today") {
+    const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Dubai" });
+    document.getElementById("datePicker").value = today;
+    filterByDate(); // Show today's data
     hideWeeklyControls();
-    return;
+  } 
+  else if (period === "week") {
+    showWeekRangePicker(); // Let user pick Mon-Thu
+  } 
+  else {
+    filteredData = getFilteredDataByPeriod(period);
+    updateFilteredView(); // Refresh all tables/charts
   }
-
-  if (period === 'week') {
-    showWeekRangePicker(); // Let user pick dates
-    return;
-  }
-
-  // Force-update all views with the new filter
-  filteredData = getFilteredDataByPeriod(period);
-  updateFilteredView(); // Refresh all tables/charts
 }
 
 function showWeeklyControls() {
@@ -1079,6 +1078,10 @@ function renderWeeklySummaryTable() {
       <th class="hidden-column">النوع</th>
     </tr>
   `;
+}
+    // Always use Dubai time when checking dates
+function getDubaiDate(dateString) {
+  return new Date(dateString).toLocaleString("en-CA", { timeZone: "Asia/Dubai" });
 }
     
 function updateSummary(isWeek = false) {
@@ -1240,16 +1243,16 @@ function clearFilters() {
   $("#filter-name, #filter-id").val("");
   $("#filter-staff, #filter-activity").val(null).trigger("change");
 
-  // Reset to today's data (like page load)
+  // Reset to TODAY (Dubai time)
   currentPeriod = "today";
   const today = new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Dubai" });
   document.getElementById("datePicker").value = today;
   filteredData = allData.filter((row) => row.dateKey === today);
 
-  // Update all views
+  // Update UI
   updateFilteredView();
-  updateSummary();
   hideWeeklyControls();
+  document.getElementById("tableTitle").textContent = "الحضور اليومي";
 }
 
     function showFilterOptions(value) {
@@ -1265,27 +1268,18 @@ function clearFilters() {
     }
 
 function updateFilteredView() {
-  if (currentPeriod === 'today') {
-    filterByDate(); // Respect the selected date
+  // Apply the current filter (today/week/month/all)
+  if (currentPeriod === "today") {
+    filterByDate();
   } else {
     filteredData = getFilteredDataByPeriod(currentPeriod);
   }
 
-  // Refresh the currently active view
-  if (document.getElementById("mainView").style.display !== "none") {
-    renderMainTable();
-  }
-  if (document.getElementById("activityView").style.display !== "none") {
-    renderActivityTable();
-  }
-  if (document.getElementById("statsView").style.display !== "none") {
-    renderCharts();
-  }
-  if (document.getElementById("topParticipantsView").style.display !== "none") {
-    renderTopParticipants();
-  }
-
-  updateSummary();
+  // Refresh the active view
+  if (document.getElementById("mainView").style.display !== "none") renderMainTable();
+  if (document.getElementById("activityView").style.display !== "none") renderActivityTable();
+  if (document.getElementById("statsView").style.display !== "none") renderCharts();
+  if (document.getElementById("topParticipantsView").style.display !== "none") renderTopParticipants();
 }
 
 function createAttendanceRow(row) {
@@ -1906,21 +1900,23 @@ function renderTopParticipants() {
 }
 
 function applyWeekFilter() {
-  const startDate = document.getElementById('weekStartDate').value;
-  const endDate = document.getElementById('weekEndDate').value;
-  
+  const startDate = document.getElementById("weekStartDate").value;
+  const endDate = document.getElementById("weekEndDate").value;
+
   if (!startDate || !endDate) return;
 
-  // Filter data for the selected range
-  filteredData = allData.filter(row => row.dateKey >= startDate && row.dateKey <= endDate);
+  // Filter data for the selected range (Dubai time)
+  filteredData = allData.filter((row) => {
+    const rowDate = row.dateKey; // Already in YYYY-MM-DD (Dubai time)
+    return rowDate >= startDate && rowDate <= endDate;
+  });
 
   // Update UI
-  document.getElementById('tableTitle').textContent = `الحضور من ${startDate} إلى ${endDate}`;
+  document.getElementById("tableTitle").textContent = 
+    `الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}`;
   showWeeklyControls();
   closeWeekRangePicker();
-
-  // Refresh all views
-  updateFilteredView();
+  updateFilteredView(); // Refresh all views
 }
     
     function exportToExcel() {
