@@ -1352,8 +1352,6 @@ function renderActivityTable() {
   const tbody = document.querySelector("#activityTable tbody");
   const controls = document.getElementById("activityControls");
   tbody.innerHTML = "";
-
-let dateRecords;
   
 const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
 let dateRecords = (currentPeriod === 'all') ? allData : allData.filter(row => row.dateKey === selectedDate);
