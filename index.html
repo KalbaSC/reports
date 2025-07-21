@@ -2124,12 +2124,6 @@ function checkMobileView() {
     btn.style.display = isMobile ? 'none' : 'inline-block';
   }
 }
-    
-  const hiddenColumns = document.querySelectorAll('.hidden-column');
-  hiddenColumns.forEach(col => {
-    col.style.display = isMobile ? 'none' : 'table-cell';
-  });
-}
 
 function initialize() {
   const today = new Date().toISOString().split('T')[0];
