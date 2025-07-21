@@ -881,7 +881,7 @@ function populateDropdowns() {
         
         allData = processRawData(rawData);
         
-        const today = new Date().toISOString().split('T')[0];
+        const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
         document.getElementById("datePicker").value = today;
         filteredData = allData.filter(row => row.dateKey === today);
         
@@ -1122,7 +1122,7 @@ function updateSummary(isWeek = false) {
 }
     
 function clearWeekFilter() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
   document.getElementById("datePicker").value = today;
   document.getElementById('datePicker').style.display = 'inline-block';
   filteredData = allData.filter(row => row.dateKey === today);
@@ -1233,7 +1233,7 @@ function clearFilters() {
   document.getElementById("filter-activity").value = "";
   document.getElementById("filterType").value = "";
   
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
   document.getElementById("datePicker").value = today;
   
   showFilterOptions("");
@@ -2122,7 +2122,7 @@ function checkMobileView() {
 }
 
 function initialize() {
-  const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
   document.getElementById("datePicker").value = today;
   
   document.getElementById("filter-name").value = "";
