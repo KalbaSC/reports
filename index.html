@@ -958,21 +958,16 @@ function filterByPeriod(period) {
 
   filteredData = getFilteredDataByPeriod(period);
   updatePeriodSummary(period);
-  
-  if (document.getElementById("mainView").style.display !== "none") {
-    renderMainTable();
-  }
-  
+  renderPeriodTable(period);
+  updateTodayStats();
+
   if (document.getElementById("activityView").style.display !== "none") {
     renderActivityTable();
   }
 
-  updateTodayStats();
-
   if (document.getElementById("statsView").style.display !== "none") {
     renderCharts();
   }
-  
   updateTitleAndControls(period);
 }
 
@@ -1352,21 +1347,22 @@ function renderMainTable() {
   }
 }
 
-function renderActivityTable() {
-  const tbody = document.querySelector("#activityTable tbody");
-  const controls = document.getElementById("activityControls");
-  tbody.innerHTML = "";
-  
-  const dataToUse = currentPeriod !== 'today' ? filteredData : 
-    allData.filter(row => row.dateKey === (document.getElementById("datePicker").value || 
-                          new Date().toISOString().split('T')[0]));
+    function renderActivityTable() {
+      const tbody = document.querySelector("#activityTable tbody");
+      const controls = document.getElementById("activityControls");
+      tbody.innerHTML = "";
+      
+      const selectedDate = document.getElementById("datePicker").value || 
+                          new Date().toISOString().split('T')[0];
 
-  if (dataToUse.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
-    return;
-  }
+      const dateRecords = allData.filter(row => row.dateKey === selectedDate);
+      
+      if (dateRecords.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
+        return;
+      }
 
-  const activityRecords = getActivityRecords(dataToUse);
+      const activityRecords = getActivityRecords(dateRecords);
       
       const generalRecords = dateRecords.filter(row => 
         row.isGeneral && 
@@ -1500,17 +1496,15 @@ function renderActivityTable() {
       }
     }
     
-function filterActivityTable() {
-  const activity = document.getElementById("activityFilter").value;
-  
-  const dataToUse = currentPeriod !== 'today' ? filteredData : 
-    allData.filter(row => row.dateKey === (document.getElementById("datePicker").value || 
-                          new Date().toISOString().split('T')[0]);
-
-  const tbody = document.querySelector("#activityTable tbody");
-  tbody.innerHTML = "";
-  
-  const activityRecords = getActivityRecords(dataToUse);
+    function filterActivityTable() {
+      const activity = document.getElementById("activityFilter").value;
+      const selectedDate = document.getElementById("datePicker").value || 
+                          new Date().toISOString().split('T')[0];
+      
+      const tbody = document.querySelector("#activityTable tbody");
+      tbody.innerHTML = "";
+      
+      const activityRecords = getActivityRecords(allData)
         .filter(row => row.dateKey === selectedDate);
       
       const generalOnlyRecords = allData.filter(row => 
@@ -1719,10 +1713,7 @@ function countUniqueWeeklyAttendances(data) {
 
 function getFilteredDataByPeriod(period) {
   const now = new Date();
-  const dataToFilter = document.getElementById("activityView").style.display !== "none" ? 
-    getActivityRecords(allData) : allData;
-  
-  return dataToFilter.filter(row => {
+  return allData.filter(row => {
     const rowDate = new Date(row.Timestamp);
     
     switch(period) {
@@ -1741,13 +1732,12 @@ function getFilteredDataByPeriod(period) {
         return rowDate.getMonth() === now.getMonth() && 
                rowDate.getFullYear() === now.getFullYear() &&
                rowDate <= now;
-      case 'all':
-        return true;
       default:
         return true;
     }
   });
 }
+
 
 function updatePeriodSummary(period) {
   if (period === 'today') {
