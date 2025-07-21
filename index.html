@@ -1473,13 +1473,13 @@ function renderMainTable() {
             
             data.items.forEach(entry => {
               const row = document.createElement("tr");
-row.innerHTML = `
-  <td>${formatDate(entry.Timestamp)}</td>
-  <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
-  <td>${entry.ID || ""}</td>
-  ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ''}
-  <td>${entry.Activity || ""}</td>
-`;
+          row.innerHTML = `
+            <td>${formatDate(player.info.Timestamp)}</td>
+            <td>${player.info["Child Name"] || ""} ${entry.Parent || ""}</td>
+            <td>${player.info.ID || ""}</td>
+            <td>${player.info["Scanned By"] || ""}</td>
+            <td>${Array.from(player.activities).join("، ")}</td>
+          `;
               
   const isMobile = window.innerWidth <= 768;
   
