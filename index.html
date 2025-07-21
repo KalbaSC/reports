@@ -763,7 +763,7 @@ button.clear-btn {
           return {
             ...item,
             isGeneral: isGeneral,
-            dateKey: new Date(item.Timestamp).toISOString().split('T')[0],
+            dateKey: new Date(item.Timestamp).toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' }),
             isDuplicate: false
           };
         });
@@ -807,10 +807,8 @@ function getActivityRecords(rawData) {
 }
 
     function updateTodayStats(data = filteredData) {
-      const today = new Date().toDateString();
-      const todayData = data.filter(row => 
-        new Date(row.Timestamp).toDateString() === today
-      );
+const todayKey = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
+const todayData = data.filter(row => row.dateKey === todayKey);
 
       const staffToday = {};
       let early = 0, late = 0;
