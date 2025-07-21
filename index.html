@@ -1122,11 +1122,16 @@ function clearWeekFilter() {
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
   document.getElementById("datePicker").value = today;
   document.getElementById('datePicker').style.display = 'inline-block';
+  
   filteredData = allData.filter(row => row.dateKey === today);
+  
   updateFilteredView();
   updateSummary();
   hideWeeklyControls();
   document.getElementById('tableTitle').textContent = 'الحضور اليومي';
+
+  renderMainTable();
+  updateTodayStats();
 }
 
 function closeWeekRangePicker() {
@@ -1253,6 +1258,11 @@ function clearFilters() {
   filteredData = getFilteredDataByPeriod(currentPeriod);
   updateFilteredView();
   updateFilterChips();
+
+  renderMainTable();
+  updateSummary();
+  updateTodayStats();
+  document.getElementById('tableTitle').textContent = 'الحضور اليومي';
 }
 
     function showFilterOptions(value) {
