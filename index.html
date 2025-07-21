@@ -1122,9 +1122,9 @@ function clearWeekFilter() {
   const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
   document.getElementById("datePicker").value = today;
   document.getElementById('datePicker').style.display = 'inline-block';
-  
+
   filteredData = allData.filter(row => row.dateKey === today);
-  
+
   updateFilteredView();
   updateSummary();
   hideWeeklyControls();
@@ -1252,17 +1252,20 @@ function getFirstAttendancePerPlayer(data) {
 }
     
 function clearFilters() {
-  ["filter-name", "filter-id", "filter-staff", "filter-activity", "filterType"].forEach(id => document.getElementById(id).value = "");
+  ["filter-name", "filter-id", "filter-staff", "filter-activity", "filterType"].forEach(id => {
+    const element = document.getElementById(id);
+    if (element) element.value = "";
+  });
+
   $('#filter-staff, #filter-activity').val(null).trigger('change');
 
-  filteredData = getFilteredDataByPeriod(currentPeriod);
+  filteredData = [];
   updateFilteredView();
-  updateFilterChips();
+  updateSummary();
+  document.getElementById('tableTitle').textContent = 'الحضور اليومي';
 
   renderMainTable();
-  updateSummary();
   updateTodayStats();
-  document.getElementById('tableTitle').textContent = 'الحضور اليومي';
 }
 
     function showFilterOptions(value) {
