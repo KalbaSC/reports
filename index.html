@@ -1488,11 +1488,9 @@ let dateRecords = (currentPeriod === 'all') ? allData : allData.filter(row => ro
 function filterActivityTable() {
   const activity = document.getElementById("activityFilter").value;
   const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
-
   const tbody = document.querySelector("#activityTable tbody");
   tbody.innerHTML = "";
 
-  // Select correct dataset based on period
   let dataset = [];
   if (currentPeriod === 'all') {
     dataset = allData;
@@ -1516,12 +1514,22 @@ function filterActivityTable() {
     return;
   }
 
+  const uniquePerDay = {};
+  filtered.forEach(entry => {
+    const key = `${entry.ID}_${entry.dateKey}_${entry.Activity}`;
+    if (!uniquePerDay[key]) {
+      uniquePerDay[key] = entry;
+    }
+  });
+
+  const uniqueRecords = Object.values(uniquePerDay);
+
   const headerRow = document.createElement("tr");
   headerRow.className = "activity-group";
-  headerRow.innerHTML = `<td colspan="5">${activity} (${filtered.length} لاعب)</td>`;
+  headerRow.innerHTML = `<td colspan="5">${activity} (${uniqueRecords.length} لاعب)</td>`;
   tbody.appendChild(headerRow);
 
-  filtered.forEach(entry => {
+  uniqueRecords.forEach(entry => {
     const completePlayer = allData.find(d => d.ID === entry.ID && d["Child Name"] && d.Parent)
                        || allData.find(d => d.ID === entry.ID && d["Child Name"])
                        || entry;
