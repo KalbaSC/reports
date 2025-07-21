@@ -1485,7 +1485,6 @@ let dateRecords = (currentPeriod === 'all') ? allData : allData.filter(row => ro
   }
 }
 
-    
 function filterActivityTable() {
   const activity = document.getElementById("activityFilter").value;
   const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
@@ -1493,7 +1492,17 @@ function filterActivityTable() {
   const tbody = document.querySelector("#activityTable tbody");
   tbody.innerHTML = "";
 
-  const activityRecords = getActivityRecords(allData).filter(row => row.dateKey === selectedDate);
+  // Select correct dataset based on period
+  let dataset = [];
+  if (currentPeriod === 'all') {
+    dataset = allData;
+  } else if (currentPeriod === 'week' || currentPeriod === 'month') {
+    dataset = getFilteredDataByPeriod(currentPeriod);
+  } else {
+    dataset = allData.filter(row => row.dateKey === selectedDate);
+  }
+
+  const activityRecords = getActivityRecords(dataset);
 
   if (!activity) {
     renderActivityTable();
@@ -1531,8 +1540,7 @@ function filterActivityTable() {
     tbody.appendChild(row);
   });
 }
-
-
+    
     function renderCharts() {
       renderStaffChart();
       renderTimingChart();
