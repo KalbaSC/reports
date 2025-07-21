@@ -1265,20 +1265,20 @@ function clearFilters() {
       else if (value === "activity") document.getElementById("filter-activity").classList.remove("hidden");
     }
 
-    function updateFilteredView() {
-      filteredData = getFilteredDataByPeriod(currentPeriod);
-      renderMainTable();
-      updateSummary();
-      updateTodayStats();
-      
-      if (document.getElementById("activityView").style.display !== "none") {
-        renderActivityTable();
-      }
-      
-      if (document.getElementById("statsView").style.display !== "none") {
-        renderCharts();
-      }
-    }
+function updateFilteredView() {
+  filteredData = getFilteredDataByPeriod(currentPeriod);
+  renderMainTable();
+  updateSummary();
+  updateTodayStats();
+
+  if (document.getElementById("activityView").style.display !== "none") {
+    renderActivityTable();
+  }
+  
+  if (document.getElementById("statsView").style.display !== "none") {
+    renderCharts();
+  }
+}
 
 function renderMainTable() {
   const tbody = document.querySelector("#attendanceTable tbody");
