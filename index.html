@@ -1143,8 +1143,10 @@ function filterByDate() {
   }
   
   filteredData = allData.filter(row => row.dateKey === selectedDate);
-  updateFilteredView();
   updateTitleAndControls('today');
+  renderMainTable();
+  updateSummary();
+  updateTodayStats();
 }
     
 function filterTable() {
@@ -1262,7 +1264,9 @@ function clearFilters() {
     }
 
 function updateFilteredView() {
-  filteredData = getFilteredDataByPeriod(currentPeriod);
+  if (currentPeriod !== 'today') {
+    filteredData = getFilteredDataByPeriod(currentPeriod);
+  }
   renderMainTable();
   updateSummary();
   updateTodayStats();
