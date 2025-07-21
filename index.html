@@ -1475,7 +1475,7 @@ function renderMainTable() {
               const row = document.createElement("tr");
               row.innerHTML = `
                 <td>${formatDate(entry.Timestamp)}</td>
-                <td>${entry["Child Name"] || ""}</td>
+                <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
                 <td>${entry.ID || ""}</td>
                 <td>${entry["Scanned By"] || ""}</td>
                 <td>${activity}</td>
@@ -1485,7 +1485,7 @@ function renderMainTable() {
   
   row.innerHTML = `
     <td>${formatDate(entry.Timestamp)}</td>
-    <td>${entry["Child Name"] || ""}</td>
+    <td>${player.info["Child Name"] || ""} ${player.info.Parent || ""}</td>
     <td>${entry.ID || ""}</td>
     ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ''}
     <td>${entry.Activity || ""}</td>
@@ -1538,7 +1538,7 @@ function renderMainTable() {
         const row = document.createElement("tr");
         row.innerHTML = `
           <td>${formatDate(entry.Timestamp)}</td>
-          <td>${entry["Child Name"] || ""}</td>
+          <td>${player.info["Child Name"] || ""} ${player.info.Parent || ""}</td>
           <td>${entry.ID || ""}</td>
           <td>${entry["Scanned By"] || ""}</td>
           <td>${entry.Activity || ""}</td>
