@@ -1456,11 +1456,12 @@ if (currentPeriod === 'all') {
 }
 
 function renderCharts() {
-  document.getElementById('pieStaff').parentNode.innerHTML += '<div id="statsLoading">جاري تحميل الإحصائيات...</div>';
+  if (charts.staff) charts.staff.destroy();
+  if (charts.timing) charts.timing.destroy();
+  
   renderStaffChart();
   renderTimingChart();
   renderDailyStats();
-  document.getElementById('statsLoading').remove();
 }
 
 function setActiveNavButton(index) {
@@ -1826,14 +1827,24 @@ function renderTopParticipants() {
   const container = document.getElementById('topParticipantsContainer');
   container.innerHTML = '';
 
-  const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
-  const selectedRecords = allData.filter(r => r.dateKey === selectedDate && !r.isGeneral && r.Activity);
+  // Get the correct dataset based on current period
+  let records;
+  if (currentPeriod === 'today') {
+    const selectedDate = document.getElementById("datePicker").value || 
+                        new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
+    records = allData.filter(r => r.dateKey === selectedDate);
+  } else {
+    records = filteredData; // Use already filtered data for week/month/all
+  }
 
+  // Filter only activity records (non-general)
+  const activityRecords = records.filter(r => !r.isGeneral && r.Activity && r.Activity.trim() !== "");
+
+  // Count participation per child
   const participationCounts = {};
 
-  selectedRecords.forEach(row => {
+  activityRecords.forEach(row => {
     if (!row.ID) return;
-    const activityKey = `${row.ID}_${row.Activity}`;
     
     if (!participationCounts[row.ID]) {
       participationCounts[row.ID] = {
@@ -1842,28 +1853,34 @@ function renderTopParticipants() {
         activities: new Set()
       };
     }
-    
-    participationCounts[row.ID].activities.add(activityKey);
+    participationCounts[row.ID].activities.add(row.Activity);
   });
 
+  // Sort by participation count (descending)
   const sorted = Object.values(participationCounts)
     .map(p => ({ ...p, count: p.activities.size }))
     .sort((a, b) => b.count - a.count)
-    .slice(0, 5);
+    .slice(0, 5); // Top 5
 
+  // Handle empty state
   if (sorted.length === 0) {
-    container.innerHTML = `<p>لا يوجد مشاركين في الأنشطة لهذا التاريخ</p>`;
+    let message = "لا يوجد مشاركين في الأنشطة";
+    if (currentPeriod === 'today') {
+      message += " لهذا اليوم";
+    } else if (currentPeriod === 'week') {
+      message += " هذا الأسبوع";
+    } else if (currentPeriod === 'month') {
+      message += " هذا الشهر";
+    }
+    container.innerHTML = `<p>${message}</p>`;
     return;
   }
 
+  // Render participant cards
   sorted.forEach((participant, index) => {
     const card = document.createElement('div');
-
-    let order = 0;
-    if (index === 0) order = 0;
-    else if (index % 2 !== 0) order = index;  
-    else order = -index;                    
-
+    
+    // Card styling with emoji ranking
     card.style = `
       background: #222;
       border: 2px solid ${index === 0 ? '#f4e733' : '#555'};
@@ -1871,11 +1888,9 @@ function renderTopParticipants() {
       padding: 12px;
       text-align: center;
       width: ${index === 0 ? '180px' : '140px'};
-      position: relative;
       transform: scale(${index === 0 ? 1.1 : 1});
       box-shadow: ${index === 0 ? '0 0 15px #f4e733aa' : 'none'};
       animation: pop 0.5s ease;
-      order: ${order};
     `;
 
     const emoji = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
@@ -1893,30 +1908,20 @@ function renderTopParticipants() {
     container.appendChild(card);
   });
 
+  // Container styling
   container.style.display = 'flex';
   container.style.flexWrap = 'wrap';
   container.style.justifyContent = 'center';
   container.style.gap = '20px';
 }
-
+    
 function applyWeekFilter() {
   const startDate = document.getElementById("weekStartDate").value;
   const endDate = document.getElementById("weekEndDate").value;
-
   if (!startDate || !endDate) return;
 
-  // Filter data for the selected range (Dubai time)
-  filteredData = allData.filter((row) => {
-    const rowDate = row.dateKey; // Already in YYYY-MM-DD (Dubai time)
-    return rowDate >= startDate && rowDate <= endDate;
-  });
-
-  // Update UI
-  document.getElementById("tableTitle").textContent = 
-    `الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}`;
-  showWeeklyControls();
-  closeWeekRangePicker();
-  updateFilteredView(); // Refresh all views
+  filteredData = allData.filter(row => row.dateKey >= startDate && row.dateKey <= endDate);
+  updateFilteredView(); // Force-refresh all views
 }
     
     function exportToExcel() {
@@ -2094,7 +2099,7 @@ function checkMobileView() {
   const isMobile = window.innerWidth <= 768;
   const btn = document.querySelector('button[onclick="toggleHiddenColumns()"]');
   if (btn) {
-    btn.style.display = isMobile ? 'none' : 'inline-block';
+    btn.innerHTML = isMobile ? '<i class="fas fa-eye"></i>' : '<i class="fas fa-eye"></i> عرض الأعمدة';
   }
 }
 
