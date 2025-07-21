@@ -787,16 +787,24 @@ function formatDisplayDate(dateString) {
   return formatted;
 }
 
-    function getActivityRecords(rawData) {
-      if (!Array.isArray(rawData)) return [];
-      
-      return rawData.filter(item => 
-        item && typeof item === 'object' && 
-        item.ID && item.Timestamp && 
-        item.Activity && item.Activity.trim() !== "" &&
-        item.Activity !== "عام"
-      );
+function getActivityRecords(rawData) {
+  if (!Array.isArray(rawData)) return [];
+
+  const uniqueRecords = [];
+  const seen = new Set();
+
+  rawData.forEach(item => {
+    if (item && item.ID && item.Timestamp && item.Activity && item.Activity.trim() !== "" && item.Activity !== "عام") {
+      const key = `${item.ID}_${new Date(item.Timestamp).toISOString().split('T')[0]}_${item.Activity}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniqueRecords.push(item);
+      }
     }
+  });
+
+  return uniqueRecords;
+}
 
     function updateTodayStats(data = filteredData) {
       const today = new Date().toDateString();
@@ -1507,15 +1515,18 @@ function filterActivityTable() {
     return;
   }
 
-  const filtered = activityRecords
-    .filter(row => row.Activity === activity)
-    .reduce((unique, item) => {
-      const key = `${item.ID}_${item.dateKey}_${item.Activity}`;
-      if (!unique.some(u => `${u.ID}_${u.dateKey}_${u.Activity}` === key)) {
-        unique.push(item);
-      }
-      return unique;
-    }, []);
+const filtered = [];
+const seenKeys = new Set();
+
+activityRecords
+  .filter(row => row.Activity === activity)
+  .forEach(item => {
+    const key = `${item.ID}_${item.dateKey}_${item.Activity}`;
+    if (!seenKeys.has(key)) {
+      seenKeys.add(key);
+      filtered.push(item);
+    }
+  });
 
   if (filtered.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور لنشاط ${activity}</td></tr>`;
