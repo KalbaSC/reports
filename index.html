@@ -542,7 +542,7 @@ button.clear-btn {
         margin: 0 5px;
       }
     }
-  </style>
+</style>
 </head>
 <body>
  
@@ -2121,11 +2121,10 @@ function checkMobileView() {
   const isMobile = window.innerWidth <= 768;
   const btn = document.querySelector('button[onclick="toggleHiddenColumns()"]');
   if (btn) {
-    btn.style.display = isMobile ? 'inline-block' : 'inline-block';
-    btn.style.fontSize = isMobile ? '12px' : '14px';
-    btn.style.padding = isMobile ? '8px 12px' : '10px 15px';
+    btn.style.display = isMobile ? 'none' : 'inline-block';
   }
-  
+}
+    
   const hiddenColumns = document.querySelectorAll('.hidden-column');
   hiddenColumns.forEach(col => {
     col.style.display = isMobile ? 'none' : 'table-cell';
