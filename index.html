@@ -1525,16 +1525,21 @@ let dateRecords = (currentPeriod === 'all') ? allData : allData.filter(row => ro
       tbody.appendChild(headerRow);
       
 filtered.forEach(entry => {
+  const completePlayer = allData.find(d => d.ID === entry.ID && d["Child Name"]);
+  const childName = completePlayer ? completePlayer["Child Name"] : (entry["Child Name"] || "");
+  const parentName = completePlayer ? completePlayer.Parent : (entry.Parent || "");
+
   const row = document.createElement("tr");
   row.innerHTML = `
     <td>${formatDate(entry.Timestamp)}</td>
-    <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
+    <td>${childName} ${parentName}</td>
     <td>${entry.ID || ""}</td>
     <td>${entry["Scanned By"] || ""}</td>
     <td>${entry.Activity || ""}</td>
   `;
   tbody.appendChild(row);
 });
+
     }
 
     function renderCharts() {
