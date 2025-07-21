@@ -1259,12 +1259,17 @@ function clearFilters() {
 
   $('#filter-staff, #filter-activity').val(null).trigger('change');
 
-  filteredData = [];
+  if (currentPeriod === 'today') {
+    const today = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Dubai' });
+    document.getElementById("datePicker").value = today;
+    filteredData = allData.filter(row => row.dateKey === today);
+  } else {
+    filteredData = getFilteredDataByPeriod(currentPeriod);
+  }
+
+  updateFilterChips();
   updateFilteredView();
   updateSummary();
-  document.getElementById('tableTitle').textContent = 'الحضور اليومي';
-
-  renderMainTable();
   updateTodayStats();
 }
 
