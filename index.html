@@ -2492,25 +2492,28 @@ function exportStatsToPDF(doc) {
     }))
   ];
   
-  doc.autoTable({
-    columns: statsColumns,
-    body: statsRows,
-    startY: 120,
-    styles: {
-      font: "NotoKufiArabic",
-      fontSize: 10,
-      cellPadding: 4
-    },
-    headStyles: {
-      fillColor: [244, 231, 51],
-      textColor: [0, 0, 0],
-      fontStyle: 'bold'
-    },
-    bodyStyles: {
-      textColor: [255, 255, 255],
-      fillColor: [30, 30, 30]
-    }
-  });
+doc.autoTable({
+  columns: statsColumns,
+  body: statsRows,
+  startY: 120,
+  styles: {
+    font: 'Arial Unicode MS', // Changed
+    fontSize: 10,
+    cellPadding: 4,
+    halign: 'right' // Added
+  },
+  headStyles: {
+    fillColor: [244, 231, 51],
+    textColor: [0, 0, 0],
+    fontStyle: 'bold',
+    halign: 'right' // Added
+  },
+  bodyStyles: {
+    textColor: [255, 255, 255],
+    fillColor: [30, 30, 30],
+    halign: 'right' // Added
+  }
+});
 }
 
 function getCurrentTitle() {
