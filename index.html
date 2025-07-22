@@ -2151,7 +2151,7 @@ function exportToPDF() {
   
   // Register Arabic font if needed
   try {
-    doc.setFont('NotoKufiArabic', 'normal');
+doc.setFont('helvetica', 'bold');
   } catch (e) {
     // Fallback to a standard font if Arabic font not available
     doc.setFont('helvetica', 'normal');
