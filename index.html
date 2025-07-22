@@ -2176,19 +2176,18 @@ function renderTopParticipants() {
   });
 
   const cards = container.querySelectorAll('div');
-  cards.forEach((card, index) => {
-    card.style.alignSelf = ''; 
-
-    if (index === 0) {
-      card.style.alignSelf = 'center';
-    } else if (index === 1) {
-      card.style.alignSelf = 'flex-end';
-    } else if (index === 2) {
-      card.style.alignSelf = 'flex-start';
-    } else {
-      card.style.alignSelf = (index % 2 === 0) ? 'flex-start' : 'flex-end';
-    }
-  });
+cards.forEach((card, index) => {
+  if (index === 0) {
+    card.style.marginLeft = 'auto';
+    card.style.marginRight = 'auto';
+  } else if (index % 2 === 1) {
+    card.style.marginLeft = 'auto';
+    card.style.marginRight = '0';
+  } else {
+    card.style.marginLeft = '0';
+    card.style.marginRight = 'auto';
+  }
+});
 
   container.style.display = 'flex';
   container.style.flexDirection = 'column';
