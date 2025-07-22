@@ -339,46 +339,6 @@ gap: 20px;
 #mainView.show-hidden-columns .hidden-column {
 display: table-cell;
 }
-.select2-container--default .select2-selection--single,
-.select2-container--default .select2-selection--multiple {
-    background-color: #111;
-    border: 1px solid #f4e733;
-    border-radius: 8px;
-    color: white;
-    min-height: 40px;
-}
-.select2-container--default .select2-selection--single .select2-selection__rendered {
-    color: white;
-    line-height: 38px;
-}
-
-.select2-container--default .select2-selection--multiple .select2-selection__choice {
-    background-color: #f4e733;
-    color: #000;
-    border: none;
-    border-radius: 4px;
-    margin: 3px 5px 3px 0;
-    padding: 3px 8px;
-    font-size: 13px;
-}
-.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
-    color: red;
-    margin-right: 5px;
-}
-.select2-dropdown {
-    background-color: #222;
-    border: 1px solid #f4e733;
-    color: white;
-}
-.select2-container--default .select2-search--dropdown .select2-search__field {
-    background-color: #111;
-    color: white;
-    border: 1px solid #f4e733;
-}
-.select2-container--default .select2-results__option--highlighted {
-    background-color: #f4e733;
-    color: black;
-}
 
 
 @media (max-width: 768px) {
@@ -876,21 +836,21 @@ document.getElementById("todayStats").innerHTML = `
 }
 
 function populateDropdowns(data = allData) {
-const activities = new Set(['عام']);
-const staff = new Set();
+  const activities = new Set(['عام']);
+  const staff = new Set();
+    
+  data.forEach(row => {
+    if (row.Activity && row.Activity.trim() !== "") activities.add(row.Activity);
+    if (row["Scanned By"]) staff.add(row["Scanned By"]);
+  });
+    
+  populateDropdown('filter-activity', activities, 'اختر النشاط');
+  populateDropdown('filter-staff', staff, 'اختر الموظف');
 
-data.forEach(row => {
-if (row.Activity && row.Activity.trim() !== "") activities.add(row.Activity);
-if (row["Scanned By"]) staff.add(row["Scanned By"]);
-});
-
-populateDropdown('filter-activity', activities, 'اختر النشاط');
-populateDropdown('filter-staff', staff, 'اختر الموظف');
-
-$('#filter-staff, #filter-activity').select2({
-placeholder: "اختر متعدد",
-allowClear: true
-});
+  $('#filter-staff, #filter-activity').select2({
+    placeholder: "اختر متعدد",
+    allowClear: true
+  });
 }
 
 function populateDropdown(id, values, defaultText) {
@@ -905,44 +865,44 @@ select.appendChild(opt);
 }
 
 async function fetchData() {
-try {
-const loadingElement = document.getElementById("loading");
-if (loadingElement) {
-loadingElement.style.display = "block";
-}
+  try {
+    const loadingElement = document.getElementById("loading");
+    if (loadingElement) {
+      loadingElement.style.display = "block";
+    }
 
-const res = await fetch(scriptURL);
-if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    const res = await fetch(scriptURL);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
-const rawData = await res.json();
-if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
+    const rawData = await res.json();
+    if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
 
-allData = processRawData(rawData);
+    allData = processRawData(rawData);
 
-const today = new Date().toISOString().split('T')[0];
-document.getElementById("datePicker").value = today;
-filteredData = allData.filter(row => row.dateKey === today);
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById("datePicker").value = today;
+    filteredData = allData.filter(row => row.dateKey === today);
 
-renderMainTable();
-updateSummary();
-populateDropdowns(filteredData);
-updateTodayStats();
+    renderMainTable();
+    updateSummary();
+    populateDropdowns(filteredData);
+    updateTodayStats();
 
-console.log("Data loaded successfully:", allData.length, "records");
+    console.log("Data loaded successfully:", allData.length, "records");
 
-} catch (error) {
-console.error("Error loading data:", error);
-const tbody = document.querySelector("#attendanceTable tbody");
-if (tbody) {
-tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
-}
+  } catch (error) {
+    console.error("Error loading data:", error);
+    const tbody = document.querySelector("#attendanceTable tbody");
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
+    }
 
-} finally {
-const loadingElement = document.getElementById("loading");
-if (loadingElement) {
-loadingElement.style.display = "none";
-}
-}
+  } finally {
+    const loadingElement = document.getElementById("loading");
+    if (loadingElement) {
+      loadingElement.style.display = "none";
+    }
+  }
 }
 
 function showMainView() {
@@ -1015,7 +975,8 @@ renderCharts();
 }
 if (document.getElementById("topParticipantsView").style.display !== "none") {
 renderTopParticipants();
-} 
+}
+
 updateTodayStats();
 updateTitleAndControls(period);
 }
@@ -1180,8 +1141,10 @@ filteredData = allData.filter(row => row.dateKey === today);
 
 hideWeeklyControls();
 document.getElementById('tableTitle').textContent = 'الحضور اليومي';
-populateDropdowns(filteredData);
-filterTable();
+
+  updateFilteredView();
+  populateDropdowns(filteredData);
+  filterTable();
 updateSummary();
 updateTodayStats();
 }
@@ -1307,8 +1270,10 @@ document.getElementById('viewToggle').style.display = 'none';
 hideWeeklyControls();
 
 $('#activeFilters').empty();
-populateDropdowns(filteredData);
-filterTable();
+
+  renderMainTable();
+  populateDropdowns(filteredData);
+  filterTable();
 updateSummary();
 updateTodayStats();
 
@@ -1365,8 +1330,6 @@ return;
 
 tbody.innerHTML = "";
 
-let playerRecords = [];
-
 if (showWeeklySummary) {
 const players = {};
 filteredData.forEach(row => {
@@ -1375,34 +1338,11 @@ if (!players[row.ID]) players[row.ID] = [];
 players[row.ID].push(row);
 });
 
-playerRecords = Object.values(players).map(playerRows => {
+const playerRecords = Object.values(players).map(playerRows => {
 playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-const generalRecord = playerRows.find(r => r.isGeneral);
+const generalRecord = playerRows.find(row => row.isGeneral);
 return generalRecord || playerRows[0];
 });
-
-  } else if (currentPeriod === 'all' || currentPeriod === 'month') {
-const dailyMap = {};
-filteredData.forEach(row => {
-if (!row.ID || !row.dateKey) return;
-const key = `${row.ID}_${row.dateKey}`;
-if (!dailyMap[key]) {
-dailyMap[key] = row;
-} else {
-const existing = dailyMap[key];
-if (row.isGeneral && !existing.isGeneral) {
-dailyMap[key] = row;
-} else if (!existing.isGeneral && new Date(row.Timestamp) < new Date(existing.Timestamp)) {
-dailyMap[key] = row;
-}
-}
-});
-
-playerRecords = Object.values(dailyMap);
-
-} else {
-playerRecords = [...filteredData];
-}
 
 playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
 
@@ -1411,15 +1351,46 @@ const tr = document.createElement("tr");
 if (row.isGeneral) tr.classList.add("general-attendance");
 
 tr.innerHTML = `
-     <td>${formatDate(row.Timestamp)}</td>
-     <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-     <td>${row.ID || ""}</td>
-     <td>${row["Scanned By"] || ""}</td>
-     <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-     <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
-   `;
+      <td>${formatDate(row.Timestamp)}</td>
+      <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+      <td>${row.ID || ""}</td>
+      <td>${row["Scanned By"] || ""}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+    `;
 tbody.appendChild(tr);
 });
+} else {
+const players = {};
+filteredData.forEach(row => {
+if (!row.ID) return;
+if (!players[row.ID]) players[row.ID] = [];
+players[row.ID].push(row);
+});
+
+const playerRecords = Object.values(players).map(playerRows => {
+playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+const generalRecord = playerRows.find(row => row.isGeneral);
+return generalRecord || playerRows[0];
+});
+
+playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+
+playerRecords.forEach(row => {
+const tr = document.createElement("tr");
+if (row.isGeneral) tr.classList.add("general-attendance");
+
+tr.innerHTML = `
+      <td>${formatDate(row.Timestamp)}</td>
+      <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+      <td>${row.ID || ""}</td>
+      <td>${row["Scanned By"] || ""}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+    `;
+tbody.appendChild(tr);
+});
+}
 }
 
 function renderActivityTable() {
@@ -1905,7 +1876,7 @@ tbody.appendChild(tr);
 }
 
 let showWeeklySummary = false;
-  
+
 function toggleView() {
 showWeeklySummary = !showWeeklySummary;
 const toggleBtn = document.getElementById('viewToggle');
@@ -2022,7 +1993,7 @@ if (document.getElementById("activityView").style.display !== "none") renderActi
 if (document.getElementById("statsView").style.display !== "none") renderCharts();
 if (document.getElementById("topParticipantsView").style.display !== "none") renderTopParticipants();
 }
-  
+
 function exportToExcel() {
 const wb = XLSX.utils.book_new();
 const ws = XLSX.utils.json_to_sheet(prepareExportData());
