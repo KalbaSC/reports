@@ -1261,15 +1261,15 @@ function updateSummary(isWeek = false) {
     total = Object.keys(uniquePerDay).length;
     uniqueIDs = new Set(Object.values(uniquePerDay).map(r => r.ID));
 
-} else {
+  } else {
     const uniqueDailyAttendances = new Set();
-    filteredData.forEach(row => {  // <--- was allData before
+    allData.forEach(row => {
       if (period === 'today' && selectedDate && row.dateKey !== selectedDate) return;
       uniqueDailyAttendances.add(`${row.ID}_${row.dateKey}`);
       uniqueIDs.add(row.ID);
     });
     total = uniqueDailyAttendances.size;
-}
+  }
 
   const summaryElement = document.querySelector('.summary-box');
   if (summaryElement) {
