@@ -1376,7 +1376,6 @@ function renderMainTable() {
       const generalRecord = playerRows.find(r => r.isGeneral);
       return generalRecord || playerRows[0];
     });
-
   } else if ((currentPeriod === 'all' || currentPeriod === 'month') && showGroupedSummary) {
     const dailyMap = {};
     filteredData.forEach(row => {
@@ -1393,19 +1392,33 @@ function renderMainTable() {
         }
       }
     });
-
     playerRecords = Object.values(dailyMap);
-
-  } else {
-    playerRecords = [...filteredData];
-  }
+  } else if (currentPeriod === 'today') {
+  const todayMap = {};
+  filteredData.forEach(row => {
+    if (!row.ID || !row.dateKey) return;
+    const key = `${row.ID}_${row.dateKey}`;
+    if (!todayMap[key]) {
+      todayMap[key] = row;
+    } else {
+      const existing = todayMap[key];
+      if (row.isGeneral && !existing.isGeneral) {
+        todayMap[key] = row;
+      } else if (!existing.isGeneral && new Date(row.Timestamp) < new Date(existing.Timestamp)) {
+        todayMap[key] = row;
+      }
+    }
+  });
+  playerRecords = Object.values(todayMap);
+} 
+else {
+  playerRecords = [...filteredData];
+}
 
   playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-
   playerRecords.forEach(row => {
     const tr = document.createElement("tr");
     if (row.isGeneral) tr.classList.add("general-attendance");
-
     tr.innerHTML = `
       <td>${formatDate(row.Timestamp)}</td>
       <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
