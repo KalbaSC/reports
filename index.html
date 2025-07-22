@@ -1248,45 +1248,11 @@ thead.innerHTML = `
 `;
 }
 
-function updateSummary(isWeek = false) {
+function updateSummary(dataSet = filteredData, isWeek = false) {
   if (isWeek) return;
 
-  let total = 0;
-  let filteredCount = 0;
-
-  if (displayAllRecords) {
-    // Unique per ID + dateKey
-    const uniquePerDay = {};
-
-    filteredData.forEach(row => {
-      const key = `${row.ID}_${row.dateKey}`;
-      if (!uniquePerDay[key]) {
-        uniquePerDay[key] = row;
-      } else {
-        if (!uniquePerDay[key].isGeneral && row.isGeneral) {
-          uniquePerDay[key] = row;
-        } else if (uniquePerDay[key].isGeneral === row.isGeneral) {
-          if (new Date(row.Timestamp) < new Date(uniquePerDay[key].Timestamp)) {
-            uniquePerDay[key] = row;
-          }
-        }
-      }
-    });
-
-    total = Object.keys(uniquePerDay).length;
-    filteredCount = new Set(Object.values(uniquePerDay).map(r => r.ID)).size;
-
-  } else {
-    // Unique per ID
-    const players = {};
-    filteredData.forEach(row => {
-      if (!players[row.ID]) players[row.ID] = [];
-      players[row.ID].push(row);
-    });
-
-    total = Object.keys(players).length;
-    filteredCount = total;
-  }
+  const total = dataSet.length;
+  const filteredCount = new Set(dataSet.map(r => r.ID)).size;
 
   const summaryElement = document.querySelector('.summary-box');
   if (summaryElement) {
@@ -1296,6 +1262,7 @@ function updateSummary(isWeek = false) {
     `;
   }
 }
+
 
 
 function clearWeekFilter() {
@@ -1613,6 +1580,7 @@ function renderMainTable() {
         `;
         tbody.appendChild(tr);
     });
+updateSummary(recordsToRender);
 }
 
 function renderActivityTable() {
