@@ -1407,13 +1407,19 @@ document.getElementById('tableTitle').textContent = 'الحضور اليومي';
 
 function renderDailyStats() {
   const dailyCounts = {};
+  const uniqueDailyAttendances = new Set();
 
   filteredData.forEach(row => {
-    const dateKey = row.dateKey;
-    if (!dailyCounts[dateKey]) {
-      dailyCounts[dateKey] = 0;
+    if (!row.ID || !row.dateKey) return;
+    const uniqueKey = `${row.ID}_${row.dateKey}`;
+
+    if (!uniqueDailyAttendances.has(uniqueKey)) {
+      uniqueDailyAttendances.add(uniqueKey);
+      if (!dailyCounts[row.dateKey]) {
+        dailyCounts[row.dateKey] = 0;
+      }
+      dailyCounts[row.dateKey]++;
     }
-    dailyCounts[dateKey]++;
   });
 
   const labels = Object.keys(dailyCounts).sort();
