@@ -1233,24 +1233,24 @@ thead.innerHTML = `
 }
 
 function updateSummary(isWeek = false) {
-if (isWeek) return;
+  if (isWeek) return;
 
-const selectedDate = document.getElementById("datePicker").value;
-const uniquePlayers = new Set();
-allData
-.filter(row => selectedDate ? row.dateKey === selectedDate : true)
-.forEach(row => uniquePlayers.add(row.ID));
+  const selectedDate = document.getElementById("datePicker").value;
+  const uniquePlayers = new Set();
+  allData
+    .filter(row => selectedDate ? row.dateKey === selectedDate : true)
+    .forEach(row => uniquePlayers.add(row.ID));
 
-const filteredUniquePlayers = new Set();
-filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
+  const activityRecords = getActivityRecords(filteredData);
+  const filteredUniquePlayers = new Set(activityRecords.map(r => r.ID));
 
-const summaryElement = document.querySelector('.summary-box');
-if (summaryElement) {
-summaryElement.innerHTML = `
-    <span id="summary">إجمالي الحضور: <span id="totalCount">${uniquePlayers.size}</span></span>
-    <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
-  `;
-}
+  const summaryElement = document.querySelector('.summary-box');
+  if (summaryElement) {
+    summaryElement.innerHTML = `
+      <span id="summary">إجمالي الحضور: <span id="totalCount">${uniquePlayers.size}</span></span>
+      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
+    `;
+  }
 }
 
 function clearWeekFilter() {
