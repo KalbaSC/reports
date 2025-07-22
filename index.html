@@ -2172,20 +2172,27 @@ function renderTopParticipants() {
       <p style="color:#aaa; font-size: 14px;">أنشطة: ${participant.count}</p>
     `;
 
-    if(index === 0) {
-      container.insertBefore(card, container.firstChild);
-    } else if(index === 1) {
-      container.appendChild(card);
-    } else if(index === 2) {
-      container.insertBefore(card, container.children[1] || null);
+    container.appendChild(card);
+  });
+
+  const cards = container.querySelectorAll('div');
+  cards.forEach((card, index) => {
+    card.style.alignSelf = ''; 
+
+    if (index === 0) {
+      card.style.alignSelf = 'center';
+    } else if (index === 1) {
+      card.style.alignSelf = 'flex-end';
+    } else if (index === 2) {
+      card.style.alignSelf = 'flex-start';
     } else {
-      container.appendChild(card);
+      card.style.alignSelf = (index % 2 === 0) ? 'flex-start' : 'flex-end';
     }
   });
 
   container.style.display = 'flex';
-  container.style.flexWrap = 'wrap';
-  container.style.justifyContent = 'center';
+  container.style.flexDirection = 'column';
+  container.style.alignItems = 'center';
   container.style.gap = '20px';
 }
 
