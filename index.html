@@ -1890,7 +1890,7 @@ function renderActivityChart() {
             labels: Object.keys(activityCounts),
             datasets: [{
                 data: Object.values(activityCounts),
-                backgroundColor: ['#4caf50', '#ffeb3b', '#f44336', '#2196f3', '#ff9800', '#9c27b0'] // Customize as needed
+                backgroundColor: ['#4caf50', '#ffeb3b', '#f44336', '#2196f3', '#ff9800', '#9c27b0'] 
             }]
         },
    options: {
@@ -1909,7 +1909,7 @@ function renderActivityChart() {
     responsive: true
     }
 }
-    
+ }   
 function updateWeekSummary(startDate, endDate) {
 const uniqueCount = countUniqueWeeklyAttendances(filteredData);
 
