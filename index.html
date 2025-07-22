@@ -1509,48 +1509,32 @@ renderActivityTable();
 return;
 }
 
-const filtered = activityRecords
-  .filter(row => row.Activity === activity)
-  .reduce((unique, item) => {
-    const key = `${item.ID}_${item.dateKey}`;
-    if (!unique.some(u => `${u.ID}_${u.dateKey}` === key)) {
-      unique.push(item);
-    }
-    return unique;
-  }, []);
+  const filtered = activityRecords
+    .filter(row => row.Activity === activity)
+    .reduce((unique, item) => {
+      const key = `${item.ID}_${item.dateKey}_${item.Activity}`;
+      if (!unique.some(u => `${u.ID}_${u.dateKey}_${u.Activity}` === key)) {
+        unique.push(item);
+      }
+      return unique;
+    }, []);
        
 if (filtered.length === 0) {
 tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور لنشاط ${activity}</td></tr>`;
 return;
 }
 
-  const uniquePerDay = {};
-  filtered.forEach(entry => {
-    const key = `${entry.ID}_${entry.dateKey}_${entry.Activity}`;
-    if (!uniquePerDay[key]) {
-      uniquePerDay[key] = entry;
-    }
-  });
-
-  const uniqueRecords = Object.values(uniquePerDay);
-
 const headerRow = document.createElement("tr");
 headerRow.className = "activity-group";
-  headerRow.innerHTML = `<td colspan="5">${activity} (${uniqueRecords.length} لاعب)</td>`;
+headerRow.innerHTML = `<td colspan="5">${activity} (${filtered.length} لاعب)</td>`;
 tbody.appendChild(headerRow);
-
-  uniqueRecords.forEach(entry => {
-const completePlayer = allData.find(d => d.ID === entry.ID && d["Child Name"] && d.Parent)
-|| allData.find(d => d.ID === entry.ID && d["Child Name"])
-|| entry;
-
-const childName = completePlayer["Child Name"] || "غير معروف";
-const parentName = completePlayer.Parent || "غير معروف";
-
+       
+filtered.forEach(entry => {
+       
 const row = document.createElement("tr");
 row.innerHTML = `
      <td>${formatDate(entry.Timestamp)}</td>
-     <td>${childName} ${parentName}</td>
+     <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
      <td>${entry.ID || ""}</td>
      <td>${entry["Scanned By"] || ""}</td>
      <td>${entry.Activity || ""}</td>
