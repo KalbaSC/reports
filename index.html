@@ -207,20 +207,6 @@ clip-path: polygon(50% 0%, 100% 50%, 75% 50%, 75% 100%, 25% 100%, 25% 50%, 0% 50
 margin-left: 5px;
 vertical-align: middle;
 }
-#allMonthToggleBtn {
-  background-color: #555;
-  color: white;
-  border: 1px solid #f4e733;
-  padding: 8px 14px;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-  transition: background 0.3s, color 0.3s;
-}
-#allMonthToggleBtn:hover {
-  background-color: #f4e733;
-  color: black;
-}  
 .hidden {
 display: none;
 }
@@ -341,6 +327,7 @@ color: #aaa;
 #mainView .hidden-column {
 display: none;
 }
+
 #topParticipantsContainer {
 display: flex;
 flex-wrap: wrap;
@@ -348,6 +335,7 @@ justify-content: center;
 align-items: flex-start;
 gap: 20px;
 }
+
 #mainView.show-hidden-columns .hidden-column {
 display: table-cell;
 }
@@ -395,182 +383,205 @@ display: table-cell;
 
 @media (max-width: 768px) {
 .header-right {
-  padding: 10px 10px;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-  gap: 10px;
+padding: 10px 10px;
+flex-direction: row;
+justify-content: center;
+align-items: center;
+gap: 10px;
 }
+
 .header-info {
-  display: block;
-  text-align: center;
+display: block;
+text-align: center;
 }
+
 .header-info .arabic-name {
-  font-size: 16px;
+font-size: 16px;
 }
+
 .header-info .english-name {
-  font-size: 12px;
+font-size: 12px;
 }
+
 .header-right .divider {
-  height: 45px;
-  width: 1.5px;
-  background-color: #f4e733;
+height: 45px;
+width: 1.5px;
+background-color: #f4e733;
 }
+
 img.logo {
-  height: 50px !important;
-  max-height: 50px !important;
+height: 50px !important;
+max-height: 50px !important;
 }
+
 .hidden-column {
 display: none !important;
 }
+
 .container {
-  width: 90%;
-  margin: 20px auto;
-  padding: 20px 20px; 
-  box-sizing: border-box;
-  font-size: 12px;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+width: 90%;
+margin: 20px auto;
+padding: 20px 20px; 
+box-sizing: border-box;
+font-size: 12px;
+overflow-x: auto;
+-webkit-overflow-scrolling: touch;
 }
+
 nav {
-  flex-direction: row;
-  flex-wrap: wrap;
-  padding: 5px;
+flex-direction: row;
+flex-wrap: wrap;
+padding: 5px;
 }
+
 nav button, .dropdown > button {
-  font-size: 10px;
-  padding: 6px 8px;
-  margin: 2px;
-  min-width: auto;
-  flex: 1;
+font-size: 10px;
+padding: 6px 8px;
+margin: 2px;
+min-width: auto;
+flex: 1;
 }
+
 .dropdown-content {
-  min-width: 100px;
-  right: 0;
+min-width: 100px;
+right: 0;
 }
+
 .container {
-  width: 100%;
-  padding: 10px;
-  margin: 10px auto;
-  overflow-x: auto;
+width: 100%;
+padding: 10px;
+margin: 10px auto;
+overflow-x: auto;
 }
+
 .controls {
-  padding: 10px;
+padding: 10px;
 }
+
 .filter-bar {
-  flex-direction: column;
-  align-items: stretch;
-  gap: 12px;
+flex-direction: column;
+align-items: stretch;
+gap: 12px;
 }
+
 .search-group {
-  width: 100%;
+width: 100%;
 }
+
 .search-group select,
 .search-group input,
 .search-group button.clear-btn,
 #datePicker {
-  width: 100%;
-  margin-bottom: 8px;
-  font-size: 10px;
-  height: 36px;
+width: 100%;
+margin-bottom: 8px;
+font-size: 10px;
+height: 36px;
 }
+
 .filter-type-selector {
-  width: 100%;
+width: 100%;
 }
+
 .export-buttons {
-  flex-direction: row !important;
-  justify-content: center;
-  width: 100%;
+flex-direction: row !important;
+justify-content: center;
+width: 100%;
 }
+
 .export-buttons button {
-  flex: 1;
-  padding: 8px;
-  font-size: 12px;
-  min-width: 120px;
-  min-width: 120px;
+flex: 1;
+padding: 8px;
+font-size: 12px;
+min-width: 120px;
+min-width: 120px;
 }
-.select2-container .select2-selection--single,
-.select2-container .select2-selection--multiple {
-  font-size: 10px;
-  padding: 4px 8px;
-  border-radius: 6px;
-}
-.select2-container--default .select2-selection--multiple .select2-selection__choice {
-  font-size: 9px;
-  padding: 1px 6px;
-  border-radius: 4px;
-}
-.select2-search__field {
-  font-size: 10px;
+
+.select2-container {
+width: 100% !important;
 }
 #datePicker,
 .search-group select {
-  padding: 8px 12px;
+padding: 8px 12px;
 }
+
 #datePicker {
-  width: 100% !important;
+width: 100% !important;
 }
+
 .filter-type-selector {
-  width: 100%;
-  margin-bottom: 8px;
+width: 100%;
+margin-bottom: 8px;
 }
+
 .chip {
-  font-size: 10px;
-  padding: 4px 8px;
+font-size: 10px;
+padding: 4px 8px;
 }
+
 th, td {
-  padding: 4px 6px;
-  font-size: 10px;
+padding: 4px 6px;
+font-size: 10px;
 }
+
 .hidden-column {
-  display: none !important;
+display: none !important;
 }      
 #attendanceTable, #activityTable {
-  font-size: 10px;
+font-size: 10px;
 }
+
 table {
-  font-size: 10px;
+font-size: 10px;
 }
+
 #activityTable td:nth-child(3), 
 #activityTable th:nth-child(3),
 #activityTable td:nth-child(4), 
 #activityTable th:nth-child(4) {
-  display: none;
+display: none;
 }
+
 #activityTable td, #activityTable th {
-  font-size: 10px;
-  padding: 6px 8px;
+font-size: 10px;
+padding: 6px 8px;
 }
+
 .stats-container {
-  grid-template-columns: 1fr;
-  gap: 10px;
+grid-template-columns: 1fr;
+gap: 10px;
 }
+
 .stat-card {
-  padding: 10px;
+padding: 10px;
 }
+
 .title {
-  font-size: 18px;
-  margin-bottom: 15px;
+font-size: 18px;
+margin-bottom: 15px;
 }
+
 .summary-box {
-  font-size: 12px;
-  margin-top: 5px;
-  text-align: center;
-  width: 100%;
+font-size: 12px;
+margin-top: 5px;
+text-align: center;
+width: 100%;
 }
+
 .activity-group td {
-  font-size: 10px;
-  padding: 3px;
+font-size: 10px;
+padding: 3px;
 }
+
 footer {
-  padding: 10px;
-  font-size: 12px;
+padding: 10px;
+font-size: 12px;
 }
+
 .social-icons a {
-  font-size: 16px;
-  margin: 0 5px;
+font-size: 16px;
+margin: 0 5px;
 }
- }
+}
 </style>
 </head>
 <body>
@@ -630,9 +641,6 @@ footer {
 
 <input type="date" id="datePicker" onchange="filterByDate()">
 <button onclick="clearFilters()" class="clear-btn">مسح الفلاتر</button>
-<button id="allMonthToggleBtn" onclick="toggleAllMonthView()" style="display:none;">
-  <i class="fas fa-exchange-alt"></i> الاسماء
-</button>
 </div>
 
 <button id="weeklyEmailBtn" class="export" 
@@ -820,22 +828,22 @@ return formatted;
 }
 
 function getActivityRecords(rawData) {
-  if (!Array.isArray(rawData)) return [];
+if (!Array.isArray(rawData)) return [];
 
-  const uniqueRecords = [];
-  const seen = new Set();
+const uniqueRecords = [];
+const seen = new Set();
 
-  rawData.forEach(item => {
-    if (item && item.ID && item.Timestamp && item.Activity && item.Activity.trim() !== "" && item.Activity !== "عام") {
-      const key = `${item.ID}_${new Date(item.Timestamp).toISOString().split('T')[0]}_${item.Activity}`;
-      if (!seen.has(key)) {
-        seen.add(key);
-        uniqueRecords.push(item);
-      }
+rawData.forEach(item => {
+if (item && item.ID && item.Timestamp && item.Activity && item.Activity.trim() !== "" && item.Activity !== "عام") {
+const key = `${item.ID}_${new Date(item.Timestamp).toISOString().split('T')[0]}_${item.Activity}`;
+if (!seen.has(key)) {
+seen.add(key);
+uniqueRecords.push(item);
 }
-  });
+}
+});
 
-  return uniqueRecords;
+return uniqueRecords;
 }
 
 function updateTodayStats(data = filteredData) {
@@ -861,28 +869,28 @@ const staffList = Object.entries(staffToday)
 .join("<br>");
 
 document.getElementById("todayStats").innerHTML = `
-       <p><strong>حسب الموظف:</strong><br>${staffList || "لا يوجد بيانات"}</p>
-       <p><strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}</p>
-       <p><strong>إجمالي اليوم:</strong> ${todayData.length}</p>
-     `;
+      <p><strong>حسب الموظف:</strong><br>${staffList || "لا يوجد بيانات"}</p>
+      <p><strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}</p>
+      <p><strong>إجمالي اليوم:</strong> ${todayData.length}</p>
+    `;
 }
 
 function populateDropdowns(data = allData) {
-  const activities = new Set(['عام']);
-  const staff = new Set();
+const activities = new Set(['عام']);
+const staff = new Set();
 
-  data.forEach(row => {
-    if (row.Activity && row.Activity.trim() !== "") activities.add(row.Activity);
-    if (row["Scanned By"]) staff.add(row["Scanned By"]);
-  });
+data.forEach(row => {
+if (row.Activity && row.Activity.trim() !== "") activities.add(row.Activity);
+if (row["Scanned By"]) staff.add(row["Scanned By"]);
+});
 
-  populateDropdown('filter-activity', activities, 'اختر النشاط');
-  populateDropdown('filter-staff', staff, 'اختر الموظف');
+populateDropdown('filter-activity', activities, 'اختر النشاط');
+populateDropdown('filter-staff', staff, 'اختر الموظف');
 
-  $('#filter-staff, #filter-activity').select2({
-    placeholder: "اختر متعدد",
-    allowClear: true
-  });
+$('#filter-staff, #filter-activity').select2({
+placeholder: "اختر متعدد",
+allowClear: true
+});
 }
 
 function populateDropdown(id, values, defaultText) {
@@ -897,44 +905,44 @@ select.appendChild(opt);
 }
 
 async function fetchData() {
-  try {
-    const loadingElement = document.getElementById("loading");
-    if (loadingElement) {
-      loadingElement.style.display = "block";
-    }
+try {
+const loadingElement = document.getElementById("loading");
+if (loadingElement) {
+loadingElement.style.display = "block";
+}
 
-    const res = await fetch(scriptURL);
-    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+const res = await fetch(scriptURL);
+if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
-    const rawData = await res.json();
-    if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
+const rawData = await res.json();
+if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
 
-    allData = processRawData(rawData);
+allData = processRawData(rawData);
 
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById("datePicker").value = today;
-    filteredData = allData.filter(row => row.dateKey === today);
+const today = new Date().toISOString().split('T')[0];
+document.getElementById("datePicker").value = today;
+filteredData = allData.filter(row => row.dateKey === today);
 
-    renderMainTable();
-    updateSummary();
-    populateDropdowns(filteredData);
-    updateTodayStats();
+renderMainTable();
+updateSummary();
+populateDropdowns(filteredData);
+updateTodayStats();
 
-    console.log("Data loaded successfully:", allData.length, "records");
+console.log("Data loaded successfully:", allData.length, "records");
 
-  } catch (error) {
-    console.error("Error loading data:", error);
-    const tbody = document.querySelector("#attendanceTable tbody");
-    if (tbody) {
-      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
-    }
+} catch (error) {
+console.error("Error loading data:", error);
+const tbody = document.querySelector("#attendanceTable tbody");
+if (tbody) {
+tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
+}
 
-  } finally {
-    const loadingElement = document.getElementById("loading");
-    if (loadingElement) {
-      loadingElement.style.display = "none";
-    }
-  }
+} finally {
+const loadingElement = document.getElementById("loading");
+if (loadingElement) {
+loadingElement.style.display = "none";
+}
+}
 }
 
 function showMainView() {
@@ -993,7 +1001,6 @@ return;
 }
 
 filteredData = getFilteredDataByPeriod(period);
-showGroupedSummary = false; 
 populateDropdowns();  
 updatePeriodSummary(period);
 
@@ -1008,10 +1015,7 @@ renderCharts();
 }
 if (document.getElementById("topParticipantsView").style.display !== "none") {
 renderTopParticipants();
-}
-
-document.getElementById('allMonthToggleBtn').style.display = 
-  (period === 'all' || period === 'month') ? 'inline-block' : 'none';  
+} 
 updateTodayStats();
 updateTitleAndControls(period);
 }
@@ -1044,17 +1048,17 @@ rangePicker.style.borderRadius = '10px';
 rangePicker.style.zIndex = '1000';
 
 rangePicker.innerHTML = `
-     <h3 style="color:#f4e733; text-align:center; margin-top:0">اختر أسبوع (إثنين-خميس)</h3>
-     <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-       <input type="date" id="weekStartDate" style="flex:1; padding:8px; border-radius:5px;">
-       <span style="color:white; align-self:center">إلى</span>
-       <input type="date" id="weekEndDate" style="flex:1; padding:8px; border-radius:5px;">
-     </div>
-     <div style="display: flex; justify-content: center; gap: 10px;">
-       <button onclick="applyWeekFilter()" style="background:#f4e733; color:black; border:none; padding:8px 15px; border-radius:5px; cursor:pointer">تطبيق</button>
-       <button onclick="closeWeekRangePicker()" style="background:#555; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer">إلغاء</button>
-     </div>
-   `;
+    <h3 style="color:#f4e733; text-align:center; margin-top:0">اختر أسبوع (إثنين-خميس)</h3>
+    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+      <input type="date" id="weekStartDate" style="flex:1; padding:8px; border-radius:5px;">
+      <span style="color:white; align-self:center">إلى</span>
+      <input type="date" id="weekEndDate" style="flex:1; padding:8px; border-radius:5px;">
+    </div>
+    <div style="display: flex; justify-content: center; gap: 10px;">
+      <button onclick="applyWeekFilter()" style="background:#f4e733; color:black; border:none; padding:8px 15px; border-radius:5px; cursor:pointer">تطبيق</button>
+      <button onclick="closeWeekRangePicker()" style="background:#555; color:white; border:none; padding:8px 15px; border-radius:5px; cursor:pointer">إلغاء</button>
+    </div>
+  `;
 
 document.body.appendChild(rangePicker);
 
@@ -1110,27 +1114,27 @@ const tr = document.createElement("tr");
 if (row.isGeneral) tr.classList.add("general-attendance");
 
 tr.innerHTML = `
-     <td>${formatDate(row.Timestamp)}</td>
-     <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-     <td>${row.ID || ""}</td>
-     <td>${row["Scanned By"] || ""}</td>
-     <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-     <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
-   `;
+    <td>${formatDate(row.Timestamp)}</td>
+    <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+    <td>${row.ID || ""}</td>
+    <td>${row["Scanned By"] || ""}</td>
+    <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+    <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+  `;
 tbody.appendChild(tr);
 });
 
 const thead = document.querySelector("#attendanceTable thead");
 thead.innerHTML = `
-   <tr>
-     <th>التاريخ والوقت</th>
-     <th>الاسم</th>
-     <th>المعرف</th>
-     <th>الموظف</th>
-     <th class="hidden-column">النشاط</th>
-     <th class="hidden-column">النوع</th>
-   </tr>
- `;
+  <tr>
+    <th>التاريخ والوقت</th>
+    <th>الاسم</th>
+    <th>المعرف</th>
+    <th>الموظف</th>
+    <th class="hidden-column">النشاط</th>
+    <th class="hidden-column">النوع</th>
+  </tr>
+`;
 }
 
 function updateSummary(isWeek = false) {
@@ -1148,38 +1152,38 @@ filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
 const summaryElement = document.querySelector('.summary-box');
 if (summaryElement) {
 summaryElement.innerHTML = `
-     <span id="summary">إجمالي الحضور: <span id="totalCount">${uniquePlayers.size}</span></span>
-     <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
-   `;
+    <span id="summary">إجمالي الحضور: <span id="totalCount">${uniquePlayers.size}</span></span>
+    <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
+  `;
 }
 }
 
 function clearWeekFilter() {
-  currentPeriod = 'today';
-  showWeeklySummary = false;
+currentPeriod = 'today';
+showWeeklySummary = false;
 
-  document.getElementById("filter-name").value = "";
-  document.getElementById("filter-id").value = "";
-  document.getElementById("filter-staff").value = "";
-  document.getElementById("filter-activity").value = "";
+document.getElementById("filter-name").value = "";
+document.getElementById("filter-id").value = "";
+document.getElementById("filter-staff").value = "";
+document.getElementById("filter-activity").value = "";
 
-  $('#filter-staff').val(null).trigger('change');
-  $('#filter-activity').val(null).trigger('change');
+$('#filter-staff').val(null).trigger('change');
+$('#filter-activity').val(null).trigger('change');
 
-  $('#activeFilters').empty();
+$('#activeFilters').empty();
 
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById("datePicker").value = today;
-  document.getElementById('datePicker').style.display = 'inline-block';
-  
-  filteredData = allData.filter(row => row.dateKey === today);
+const today = new Date().toISOString().split('T')[0];
+document.getElementById("datePicker").value = today;
+document.getElementById('datePicker').style.display = 'inline-block';
 
-  hideWeeklyControls();
-  document.getElementById('tableTitle').textContent = 'الحضور اليومي';
-  populateDropdowns(filteredData);
-  filterTable();
-  updateSummary();
-  updateTodayStats();
+filteredData = allData.filter(row => row.dateKey === today);
+
+hideWeeklyControls();
+document.getElementById('tableTitle').textContent = 'الحضور اليومي';
+populateDropdowns(filteredData);
+filterTable();
+updateSummary();
+updateTodayStats();
 }
 
 function closeWeekRangePicker() {
@@ -1236,89 +1240,89 @@ container.empty();
 $('#filter-name').attr('autocomplete', 'off');
 if ($('#filter-name').val()) {
 container.append(`
-     <div class="chip">
-       <span class="chip-remove" onclick="$('#filter-name').val(''); filterTable()">×</span>
-       اسم: ${$('#filter-name').val()}
-     </div>
-   `);
+    <div class="chip">
+      <span class="chip-remove" onclick="$('#filter-name').val(''); filterTable()">×</span>
+      اسم: ${$('#filter-name').val()}
+    </div>
+  `);
 }
 
 if ($('#filter-id').val()) {
 container.append(`
-     <div class="chip">
-       <span class="chip-remove" onclick="$('#filter-id').val(''); filterTable()">×</span>
-       المعرف: ${$('#filter-id').val()}
-     </div>
-   `);
+    <div class="chip">
+      <span class="chip-remove" onclick="$('#filter-id').val(''); filterTable()">×</span>
+      المعرف: ${$('#filter-id').val()}
+    </div>
+  `);
 }
 
 const staffValues = $('#filter-staff').val() ? [].concat($('#filter-staff').val()) : [];
 staffValues.forEach(val => {
 container.append(`
-     <div class="chip">
-       <span class="chip-remove" onclick="removeFilterValue('filter-staff', '${val.replace(/'/g, "\\'")}')">×</span>
-       الموظف: ${val}
-     </div>
-   `);
+    <div class="chip">
+      <span class="chip-remove" onclick="removeFilterValue('filter-staff', '${val.replace(/'/g, "\\'")}')">×</span>
+      الموظف: ${val}
+    </div>
+  `);
 });
 
 const activityValues = $('#filter-activity').val() ? [].concat($('#filter-activity').val()) : [];
 activityValues.forEach(val => {
 container.append(`
-     <div class="chip">
-       <span class="chip-remove" onclick="removeFilterValue('filter-activity', '${val.replace(/'/g, "\\'")}')">×</span>
-       النشاط: ${val}
-     </div>
-   `);
+    <div class="chip">
+      <span class="chip-remove" onclick="removeFilterValue('filter-activity', '${val.replace(/'/g, "\\'")}')">×</span>
+      النشاط: ${val}
+    </div>
+  `);
 });
 }
 
 function removeFilterValue(filterId, value) {
-  const currentValues = $(`#${filterId}`).val() || [];
-  const updatedValues = currentValues.filter(v => v !== value);
-  $(`#${filterId}`).val(updatedValues).trigger('change');
-  filterTable();
+const currentValues = $(`#${filterId}`).val() || [];
+const updatedValues = currentValues.filter(v => v !== value);
+$(`#${filterId}`).val(updatedValues).trigger('change');
+filterTable();
 }
 
 function clearFilters() {
-  currentPeriod = 'today'; 
-  showWeeklySummary = false;
+currentPeriod = 'today'; 
+showWeeklySummary = false;
 
-  document.getElementById("filter-name").value = "";
-  document.getElementById("filter-id").value = "";
-  document.getElementById("filter-staff").value = "";
-  document.getElementById("filter-activity").value = "";
-  document.getElementById("filterType").value = "";
+document.getElementById("filter-name").value = "";
+document.getElementById("filter-id").value = "";
+document.getElementById("filter-staff").value = "";
+document.getElementById("filter-activity").value = "";
+document.getElementById("filterType").value = "";
 
-  $('#filter-staff').val(null).trigger('change');
-  $('#filter-activity').val(null).trigger('change');
+$('#filter-staff').val(null).trigger('change');
+$('#filter-activity').val(null).trigger('change');
 
-  const today = new Date().toISOString().split('T')[0];
-  document.getElementById("datePicker").value = today;
-  document.getElementById('datePicker').style.display = 'inline-block';
+const today = new Date().toISOString().split('T')[0];
+document.getElementById("datePicker").value = today;
+document.getElementById('datePicker').style.display = 'inline-block';
 
-  filteredData = allData.filter(row => row.dateKey === today);
+filteredData = allData.filter(row => row.dateKey === today);
 
-  document.getElementById('viewToggle').style.display = 'none';
-  hideWeeklyControls();
+document.getElementById('viewToggle').style.display = 'none';
+hideWeeklyControls();
 
-  $('#activeFilters').empty();
-  populateDropdowns(filteredData);
-  filterTable();
-  updateSummary();
-  updateTodayStats();
+$('#activeFilters').empty();
+populateDropdowns(filteredData);
+filterTable();
+updateSummary();
+updateTodayStats();
 
-  if (document.getElementById("activityView").style.display !== "none") {
-    renderActivityTable();
-  }
-  if (document.getElementById("statsView").style.display !== "none") {
-    renderCharts();
-  }
-  if (document.getElementById("topParticipantsView").style.display !== "none") {
-    renderTopParticipants();
-  }
+if (document.getElementById("activityView").style.display !== "none") {
+renderActivityTable();
+}
+if (document.getElementById("statsView").style.display !== "none") {
+renderCharts();
+}
+if (document.getElementById("topParticipantsView").style.display !== "none") {
+renderTopParticipants();
+}
 
-  document.getElementById('tableTitle').textContent = 'الحضور اليومي';
+document.getElementById('tableTitle').textContent = 'الحضور اليومي';
 }
 
 
@@ -1335,100 +1339,87 @@ else if (value === "activity") document.getElementById("filter-activity").classL
 }
 
 function updateFilteredView() {
-    renderMainTable();
-    updateSummary();
-    updateTodayStats();
+renderMainTable();
+updateSummary();
+updateTodayStats();
 
-    if (document.getElementById("activityView").style.display !== "none") {
-        renderActivityTable();
-    }
+if (document.getElementById("activityView").style.display !== "none") {
+renderActivityTable();
+}
 
-    if (document.getElementById("statsView").style.display !== "none") {
-        renderCharts();
-    }
+if (document.getElementById("statsView").style.display !== "none") {
+renderCharts();
+}
 
-    if (document.getElementById("topParticipantsView").style.display !== "none") {
-        renderTopParticipants();
-    }
+if (document.getElementById("topParticipantsView").style.display !== "none") {
+renderTopParticipants();
+}
 }
 
 function renderMainTable() {
-  const tbody = document.querySelector("#attendanceTable tbody");
-  if (filteredData.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
-    return;
-  }
-
-  tbody.innerHTML = "";
-
-  let playerRecords = [];
-
-  if (showWeeklySummary) {
-    const players = {};
-    filteredData.forEach(row => {
-      if (!row.ID) return;
-      if (!players[row.ID]) players[row.ID] = [];
-      players[row.ID].push(row);
-    });
-
-    playerRecords = Object.values(players).map(playerRows => {
-      playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-      const generalRecord = playerRows.find(r => r.isGeneral);
-      return generalRecord || playerRows[0];
-    });
-  } else if ((currentPeriod === 'all' || currentPeriod === 'month') && showGroupedSummary) {
-    const dailyMap = {};
-    filteredData.forEach(row => {
-      if (!row.ID || !row.dateKey) return;
-      const key = `${row.ID}_${row.dateKey}`;
-      if (!dailyMap[key]) {
-        dailyMap[key] = row;
-      } else {
-        const existing = dailyMap[key];
-        if (row.isGeneral && !existing.isGeneral) {
-          dailyMap[key] = row;
-        } else if (!existing.isGeneral && new Date(row.Timestamp) < new Date(existing.Timestamp)) {
-          dailyMap[key] = row;
-        }
-      }
-    });
-    playerRecords = Object.values(dailyMap);
-  } else if (currentPeriod === 'today') {
-  const todayMap = {};
-  filteredData.forEach(row => {
-    if (!row.ID || !row.dateKey) return;
-    const key = `${row.ID}_${row.dateKey}`;
-    if (!todayMap[key]) {
-      todayMap[key] = row;
-    } else {
-      const existing = todayMap[key];
-      if (row.isGeneral && !existing.isGeneral) {
-        todayMap[key] = row;
-      } else if (!existing.isGeneral && new Date(row.Timestamp) < new Date(existing.Timestamp)) {
-        todayMap[key] = row;
-      }
-    }
-  });
-  playerRecords = Object.values(todayMap);
-} 
-else {
-  playerRecords = [...filteredData];
+const tbody = document.querySelector("#attendanceTable tbody");
+if (filteredData.length === 0) {
+tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
+return;
 }
 
-  playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-  playerRecords.forEach(row => {
-    const tr = document.createElement("tr");
-    if (row.isGeneral) tr.classList.add("general-attendance");
-    tr.innerHTML = `
-      <td>${formatDate(row.Timestamp)}</td>
-      <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-      <td>${row.ID || ""}</td>
-      <td>${row["Scanned By"] || ""}</td>
-      <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-      <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
-    `;
-    tbody.appendChild(tr);
-  });
+tbody.innerHTML = "";
+
+let playerRecords = [];
+
+if (showWeeklySummary) {
+const players = {};
+filteredData.forEach(row => {
+if (!row.ID) return;
+if (!players[row.ID]) players[row.ID] = [];
+players[row.ID].push(row);
+});
+
+playerRecords = Object.values(players).map(playerRows => {
+playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+const generalRecord = playerRows.find(r => r.isGeneral);
+return generalRecord || playerRows[0];
+});
+
+  } else if (currentPeriod === 'all' || currentPeriod === 'month') {
+const dailyMap = {};
+filteredData.forEach(row => {
+if (!row.ID || !row.dateKey) return;
+const key = `${row.ID}_${row.dateKey}`;
+if (!dailyMap[key]) {
+dailyMap[key] = row;
+} else {
+const existing = dailyMap[key];
+if (row.isGeneral && !existing.isGeneral) {
+dailyMap[key] = row;
+} else if (!existing.isGeneral && new Date(row.Timestamp) < new Date(existing.Timestamp)) {
+dailyMap[key] = row;
+}
+}
+});
+
+playerRecords = Object.values(dailyMap);
+
+} else {
+playerRecords = [...filteredData];
+}
+
+playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+
+playerRecords.forEach(row => {
+const tr = document.createElement("tr");
+if (row.isGeneral) tr.classList.add("general-attendance");
+
+tr.innerHTML = `
+     <td>${formatDate(row.Timestamp)}</td>
+     <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+     <td>${row.ID || ""}</td>
+     <td>${row["Scanned By"] || ""}</td>
+     <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+     <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+   `;
+tbody.appendChild(tr);
+});
 }
 
 function renderActivityTable() {
@@ -1439,24 +1430,24 @@ tbody.innerHTML = "";
 const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
 let dataset = [];
 if (currentPeriod === 'all') {
-  dataset = allData;
+dataset = allData;
 } else if (currentPeriod === 'week' && showWeeklySummary) {
-  dataset = filteredData;
+dataset = filteredData;
 } else if (currentPeriod === 'week' || currentPeriod === 'month') {
-  dataset = getFilteredDataByPeriod(currentPeriod);
+dataset = getFilteredDataByPeriod(currentPeriod);
 } else {
-  dataset = allData.filter(row => row.dateKey === selectedDate);
+dataset = allData.filter(row => row.dateKey === selectedDate);
 }
 
 if (dataset.length === 0) {
-  tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
-  return;
+tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
+return;
 }
 
 const activityRecords = getActivityRecords(dataset);
 const generalRecords = dataset.filter(row => 
-  row.isGeneral && 
-  !activityRecords.some(act => act.ID === row.ID)
+row.isGeneral && 
+!activityRecords.some(act => act.ID === row.ID)
 );
 
 const allPlayers = new Set(dataset.map(r => r.ID));
@@ -1485,18 +1476,18 @@ const activityOptions = Object.entries(activities)
 ).join('');
 
 controls.innerHTML = `
-   <div class="search-group">
-     <select id="activityFilter" onchange="filterActivityTable()">
-       <option value="">جميع الأنشطة</option>
-       ${activityOptions}
-     </select>
-     <span class="summary-box">
-       <span>إجمالي اللاعبين: ${allPlayers.size}</span>
-       <span>| أنشطة: ${activityPlayers.size}</span>
-       <span>| عام فقط: ${generalOnlyPlayers.size}</span>
-     </span>
-   </div>
- `;
+  <div class="search-group">
+    <select id="activityFilter" onchange="filterActivityTable()">
+      <option value="">جميع الأنشطة</option>
+      ${activityOptions}
+    </select>
+    <span class="summary-box">
+      <span>إجمالي اللاعبين: ${allPlayers.size}</span>
+      <span>| أنشطة: ${activityPlayers.size}</span>
+      <span>| عام فقط: ${generalOnlyPlayers.size}</span>
+    </span>
+  </div>
+`;
 
 if (generalOnlyPlayers.size > 0) {
 const headerRow = document.createElement("tr");
@@ -1513,12 +1504,12 @@ new Date(current.Timestamp) > new Date(latest.Timestamp) ? current : latest
 const row = document.createElement("tr");
 row.className = "no-activity";
 row.innerHTML = `
-       <td>${formatDate(latestRecord.Timestamp)}</td>
-       <td>${latestRecord["Child Name"] || ""} ${latestRecord.Parent || ""}</td>
-       <td>${latestRecord.ID || ""}</td>
-       <td>${latestRecord["Scanned By"] || ""}</td>
-       <td>عام</td>
-     `;
+      <td>${formatDate(latestRecord.Timestamp)}</td>
+      <td>${latestRecord["Child Name"] || ""} ${latestRecord.Parent || ""}</td>
+      <td>${latestRecord.ID || ""}</td>
+      <td>${latestRecord["Scanned By"] || ""}</td>
+      <td>عام</td>
+    `;
 tbody.appendChild(row);
 });
 }
@@ -1544,12 +1535,12 @@ Object.values(playersWithActivities).forEach(player => {
 const row = document.createElement("tr");
 row.className = "general-with-activities";
 row.innerHTML = `
-       <td>${formatDate(player.info.Timestamp)}</td>
-       <td>${player.info["Child Name"] || ""} ${player.info.Parent || ""}</td>
-       <td>${player.info.ID || ""}</td>
-       <td>${player.info["Scanned By"] || ""}</td>
-       <td>${Array.from(player.activities).join("، ")}</td>
-     `;
+      <td>${formatDate(player.info.Timestamp)}</td>
+      <td>${player.info["Child Name"] || ""} ${player.info.Parent || ""}</td>
+      <td>${player.info.ID || ""}</td>
+      <td>${player.info["Scanned By"] || ""}</td>
+      <td>${Array.from(player.activities).join("، ")}</td>
+    `;
 tbody.appendChild(row);
 });
 
@@ -1565,12 +1556,12 @@ data.items.forEach(entry => {
 const isMobile = window.innerWidth <= 768;
 const row = document.createElement("tr");
 row.innerHTML = `
-           <td>${formatDate(entry.Timestamp)}</td>
-           <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
-           <td>${entry.ID || ""}</td>
-           ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ''}
-           <td>${entry.Activity || ""}</td>
-         `;
+          <td>${formatDate(entry.Timestamp)}</td>
+          <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
+          <td>${entry.ID || ""}</td>
+          ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ''}
+          <td>${entry.Activity || ""}</td>
+        `;
 tbody.appendChild(row);
 });
 });
@@ -1587,9 +1578,9 @@ let dataset = [];
 if (currentPeriod === 'all') {
 dataset = allData;
 } else if (currentPeriod === 'week') {
-  dataset = showWeeklySummary ? filteredData : getFilteredDataByPeriod('week');
+dataset = showWeeklySummary ? filteredData : getFilteredDataByPeriod('week');
 } else if (currentPeriod === 'month') {
-  dataset = getFilteredDataByPeriod('month');
+dataset = getFilteredDataByPeriod('month');
 } else {
 dataset = allData.filter(row => row.dateKey === selectedDate);
 }
@@ -1605,14 +1596,14 @@ const filtered = [];
 const seenKeys = new Set();
 
 activityRecords
-  .filter(row => row.Activity === activity)
-  .forEach(item => {
-    const key = `${item.ID}_${item.dateKey}_${item.Activity}`;
-    if (!seenKeys.has(key)) {
-      seenKeys.add(key);
-      filtered.push(item);
-    }
-  });
+.filter(row => row.Activity === activity)
+.forEach(item => {
+const key = `${item.ID}_${item.dateKey}_${item.Activity}`;
+if (!seenKeys.has(key)) {
+seenKeys.add(key);
+filtered.push(item);
+}
+});
 
 if (filtered.length === 0) {
 tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور لنشاط ${activity}</td></tr>`;
@@ -1627,12 +1618,12 @@ tbody.appendChild(headerRow);
 filtered.forEach(entry => {
 const row = document.createElement("tr");
 row.innerHTML = `
-     <td>${formatDate(entry.Timestamp)}</td>
-     <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
-     <td>${entry.ID || ""}</td>
-     <td>${entry["Scanned By"] || ""}</td>
-     <td>${entry.Activity || ""}</td>
-   `;
+    <td>${formatDate(entry.Timestamp)}</td>
+    <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
+    <td>${entry.ID || ""}</td>
+    <td>${entry["Scanned By"] || ""}</td>
+    <td>${entry.Activity || ""}</td>
+  `;
 tbody.appendChild(row);
 });
 }
@@ -1738,10 +1729,10 @@ const staffList = Object.entries(staffToday)
 .join("<br>");
 
 document.getElementById("todayStats").innerHTML = `
-       <p><strong>حسب الموظف:</strong><br>${staffList || "لا يوجد بيانات"}</p>
-       <p><strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}</p>
-       <p><strong>إجمالي اليوم:</strong> ${todayData.length}</p>
-     `;
+      <p><strong>حسب الموظف:</strong><br>${staffList || "لا يوجد بيانات"}</p>
+      <p><strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}</p>
+      <p><strong>إجمالي اليوم:</strong> ${todayData.length}</p>
+    `;
 }
 
 function updateWeekSummary(startDate, endDate) {
@@ -1753,13 +1744,13 @@ filteredData.forEach(row => filteredUniquePlayers.add(row.ID));
 const summaryElement = document.querySelector('.summary-box');
 if (summaryElement) {
 summaryElement.innerHTML = `
-     <span>إجمالي الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}: 
-     <span id="totalCount">${uniqueCount}</span></span>
-     <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
-     <button onclick="clearWeekFilter()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
-       <i class="fas fa-times"></i>
-     </button>
-   `;
+    <span>إجمالي الحضور من ${formatDisplayDate(startDate)} إلى ${formatDisplayDate(endDate)}: 
+    <span id="totalCount">${uniqueCount}</span></span>
+    <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniquePlayers.size}</span></span>
+    <button onclick="clearWeekFilter()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
+      <i class="fas fa-times"></i>
+    </button>
+  `;
 }
 }
 
@@ -1857,12 +1848,12 @@ thursday.setDate(monday.getDate() + 3);
 
 const summaryElement = document.querySelector('.summary-box');
 summaryElement.innerHTML = `
-     <span>إجمالي الحضور من ${formatDisplayDate(monday)} إلى ${formatDisplayDate(thursday)}: 
-     <span id="totalCount">${uniqueCount}</span></span>
-     <button onclick="clearFilters()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
-       <i class="fas fa-times"></i>
-     </button>
-   `;
+    <span>إجمالي الحضور من ${formatDisplayDate(monday)} إلى ${formatDisplayDate(thursday)}: 
+    <span id="totalCount">${uniqueCount}</span></span>
+    <button onclick="clearFilters()" style="background: none; border: none; color: #f4e733; cursor: pointer; margin-right: 5px;">
+      <i class="fas fa-times"></i>
+    </button>
+  `;
 }
 }
 
@@ -1902,20 +1893,19 @@ const tr = document.createElement("tr");
 if (row.isGeneral) tr.classList.add("general-attendance");
 
 tr.innerHTML = `
-     <td>${formatDate(row.Timestamp)}</td>
-     <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-     <td>${row.ID || ""}</td>
-     <td>${row["Scanned By"] || ""}</td>
-     <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-     <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
-   `;
+    <td>${formatDate(row.Timestamp)}</td>
+    <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+    <td>${row.ID || ""}</td>
+    <td>${row["Scanned By"] || ""}</td>
+    <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+    <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+  `;
 tbody.appendChild(tr);
 });
 }
 
 let showWeeklySummary = false;
-let showGroupedSummary = false;  
-
+  
 function toggleView() {
 showWeeklySummary = !showWeeklySummary;
 const toggleBtn = document.getElementById('viewToggle');
@@ -1975,30 +1965,30 @@ else if (index % 2 !== 0) order = index;
 else order = -index;                    
 
 card.style = `
-     background: #222;
-     border: 2px solid ${index === 0 ? '#f4e733' : '#555'};
-     border-radius: 12px;
-     padding: 12px;
-     text-align: center;
-     width: ${index === 0 ? '180px' : '140px'};
-     position: relative;
-     transform: scale(${index === 0 ? 1.1 : 1});
-     box-shadow: ${index === 0 ? '0 0 15px #f4e733aa' : 'none'};
-     animation: pop 0.5s ease;
-     order: ${order};
-   `;
+    background: #222;
+    border: 2px solid ${index === 0 ? '#f4e733' : '#555'};
+    border-radius: 12px;
+    padding: 12px;
+    text-align: center;
+    width: ${index === 0 ? '180px' : '140px'};
+    position: relative;
+    transform: scale(${index === 0 ? 1.1 : 1});
+    box-shadow: ${index === 0 ? '0 0 15px #f4e733aa' : 'none'};
+    animation: pop 0.5s ease;
+    order: ${order};
+  `;
 
 const emoji = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🏅';
 
 card.innerHTML = `
-     <div style="font-size: 24px;">${emoji}</div>
-     <img src="${participant.id}.png" alt="${participant.name}" 
-          onerror="this.onerror=null;this.src='user-icon.png';"
-          style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid #f4e733;">
-     <h4 style="color:#f4e733; margin: 10px 0 4px 0;">${participant.name}</h4>
-     <p style="color:#ccc; font-size: 14px;">ID: ${participant.id}</p>
-     <p style="color:#aaa; font-size: 14px;">أنشطة: ${participant.count}</p>
-   `;
+    <div style="font-size: 24px;">${emoji}</div>
+    <img src="${participant.id}.png" alt="${participant.name}" 
+         onerror="this.onerror=null;this.src='user-icon.png';"
+         style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid #f4e733;">
+    <h4 style="color:#f4e733; margin: 10px 0 4px 0;">${participant.name}</h4>
+    <p style="color:#ccc; font-size: 14px;">ID: ${participant.id}</p>
+    <p style="color:#aaa; font-size: 14px;">أنشطة: ${participant.count}</p>
+  `;
 
 container.appendChild(card);
 });
@@ -2031,17 +2021,6 @@ updateTitleAndControls('week');
 if (document.getElementById("activityView").style.display !== "none") renderActivityTable();
 if (document.getElementById("statsView").style.display !== "none") renderCharts();
 if (document.getElementById("topParticipantsView").style.display !== "none") renderTopParticipants();
-}
-
-function toggleAllMonthView() {
-  showGroupedSummary = !showGroupedSummary;
-  
-  const toggleBtn = document.getElementById('allMonthToggleBtn');
-  toggleBtn.innerHTML = showGroupedSummary 
-    ? '<i class="fas fa-exchange-alt"></i> الحضور الكامل'
-    : '<i class="fas fa-exchange-alt"></i> الاسماء';
-  
-  renderMainTable();
 }
   
 function exportToExcel() {
