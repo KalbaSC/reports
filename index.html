@@ -21,8 +21,8 @@
 
 <style>
 @font-face {
-font-family: 'NotoKufiArabic';
-src: url('NotoKufiArabic.ttf') format('truetype');
+    font-family: 'NotoKufiArabic';
+    src: url('https://kalbasc.github.io/reports/NotoKufiArabic.ttf') format('truetype');
 }
 html {
 height: 100%;
@@ -2069,8 +2069,7 @@ const emoji = index === 0 ? '👑' : index === 1 ? '🥈' : index === 2 ? '🥉'
 
 card.innerHTML = `
     <div style="font-size: 24px;">${emoji}</div>
-    <img src="${participant.id}.png" alt="${participant.name}" 
-         onerror="this.onerror=null;this.src='user-icon.png';"
+    <img src="user-icon.png" alt="${participant.name}"  
          style="width:100px; height:100px; border-radius:50%; object-fit:cover; border:2px solid #f4e733;">
     <h4 style="color:#f4e733; margin: 10px 0 4px 0;">${participant.name}</h4>
     <p style="color:#ccc; font-size: 14px;">ID: ${participant.id}</p>
@@ -2270,11 +2269,11 @@ function prepareStatsExportData() {
     {"الإحصائية": "حضور بالوقت", "القيمة": stats.early},
     {"الإحصائية": "حضور متأخر", "القيمة": stats.late},
     {"الإحصائية": "متوسط الحضور اليومي", "القيمة": stats.avgDaily},
-    ...Object.entries(staffCounts).map(([staff, count]) => ({
+    ...Object.entries(stats.staffCounts).map(([staff, count]) => ({
       "الإحصائية": `حضور ${staff}`,
       "القيمة": count
     })),
-    ...Object.entries(activityCounts).map(([activity, count]) => ({
+    ...Object.entries(stats.activityCounts).map(([activity, count]) => ({
       "الإحصائية": `مشاركة في ${activity}`,
       "القيمة": count
     }))
