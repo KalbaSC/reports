@@ -1365,6 +1365,8 @@ const selectedDate = document.getElementById("datePicker").value || new Date().t
 let dateRecords;
 if (currentPeriod === 'all') {
   dateRecords = allData;
+} else if (currentPeriod === 'week' && showWeeklySummary) {
+  dateRecords = filteredData;
 } else if (currentPeriod === 'week' || currentPeriod === 'month') {
   dateRecords = getFilteredDataByPeriod(currentPeriod);
 } else {
