@@ -2172,7 +2172,15 @@ function renderTopParticipants() {
       <p style="color:#aaa; font-size: 14px;">أنشطة: ${participant.count}</p>
     `;
 
-    container.appendChild(card);
+    if(index === 0) {
+      container.insertBefore(card, container.firstChild);
+    } else if(index === 1) {
+      container.appendChild(card);
+    } else if(index === 2) {
+      container.insertBefore(card, container.children[1] || null);
+    } else {
+      container.appendChild(card);
+    }
   });
 
   container.style.display = 'flex';
