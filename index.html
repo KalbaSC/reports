@@ -824,6 +824,10 @@ onclick="promptForPassword()">
 <canvas id="attendanceChart" height="200"></canvas>
 </div>
 <div class="stat-card">
+<h3 style="color:#f4e733;">الحضور حسب الأنشطة</h3>
+<canvas id="activityChart" height="200"></canvas>
+</div>    
+<div class="stat-card">
 <h3 style="color:#f4e733;">إحصائيات اليوم</h3>
 <div id="todayStats"></div>
 </div>
@@ -1869,6 +1873,43 @@ function renderTimingChart() {
     });
 }
 
+function renderActivityChart() {
+    const activityCounts = {};
+    filteredData.forEach(row => {
+        if (row.Activity && !row.isGeneral) {
+            activityCounts[row.Activity] = (activityCounts[row.Activity] || 0) + 1;
+        }
+    });
+
+    if (charts.activities) charts.activities.destroy();
+
+    const ctx = document.getElementById('activityChart').getContext('2d');
+    charts.activities = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(activityCounts),
+            datasets: [{
+                data: Object.values(activityCounts),
+                backgroundColor: ['#4caf50', '#ffeb3b', '#f44336', '#2196f3', '#ff9800', '#9c27b0'] // Customize as needed
+            }]
+        },
+   options: {
+    plugins: {
+        legend: { position: 'bottom', labels: { color: 'white' } },
+        title: {
+            display: true,
+            text: 'مشاركة الحضور حسب الأنشطة',
+            color: 'white',
+            font: {
+                size: 18
+            }
+        }
+    },
+    cutout: '50%',
+    responsive: true
+    }
+}
+    
 function updateWeekSummary(startDate, endDate) {
 const uniqueCount = countUniqueWeeklyAttendances(filteredData);
 
