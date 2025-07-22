@@ -1237,22 +1237,44 @@ function updateSummary(isWeek = false) {
 
   const period = currentPeriod;
   const selectedDate = document.getElementById("datePicker").value;
-  const uniqueDailyAttendances = new Set();
-  const uniqueIDs = new Set();
+  let total = 0;
+  let uniqueIDs = new Set();
 
-  allData.forEach(row => {
-    if (period === 'today' && selectedDate && row.dateKey !== selectedDate) return;
-    if (period === 'month' && !(new Date(row.Timestamp).getMonth() === new Date().getMonth() &&
-                                new Date(row.Timestamp).getFullYear() === new Date().getFullYear())) return;
+  if (period === 'month' || period === 'all') {
+    const uniquePerDay = {};
 
-    uniqueDailyAttendances.add(`${row.ID}_${row.dateKey}`);
-    uniqueIDs.add(row.ID);
-  });
+    filteredData.forEach(row => {
+      const key = `${row.ID}_${row.dateKey}`;
+      if (!uniquePerDay[key]) {
+        uniquePerDay[key] = row;
+      } else {
+        if (!uniquePerDay[key].isGeneral && row.isGeneral) {
+          uniquePerDay[key] = row;
+        } else if (uniquePerDay[key].isGeneral === row.isGeneral) {
+          if (new Date(row.Timestamp) < new Date(uniquePerDay[key].Timestamp)) {
+            uniquePerDay[key] = row;
+          }
+        }
+      }
+    });
+
+    total = Object.keys(uniquePerDay).length;
+    uniqueIDs = new Set(Object.values(uniquePerDay).map(r => r.ID));
+
+  } else {
+    const uniqueDailyAttendances = new Set();
+    allData.forEach(row => {
+      if (period === 'today' && selectedDate && row.dateKey !== selectedDate) return;
+      uniqueDailyAttendances.add(`${row.ID}_${row.dateKey}`);
+      uniqueIDs.add(row.ID);
+    });
+    total = uniqueDailyAttendances.size;
+  }
 
   const summaryElement = document.querySelector('.summary-box');
   if (summaryElement) {
     summaryElement.innerHTML = `
-      <span id="summary">إجمالي الحضور: <span id="totalCount">${uniqueDailyAttendances.size}</span></span>
+      <span id="summary">إجمالي الحضور: <span id="totalCount">${total}</span></span>
       <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${uniqueIDs.size}</span></span>
     `;
   }
