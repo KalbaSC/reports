@@ -1890,26 +1890,27 @@ function renderActivityChart() {
             labels: Object.keys(activityCounts),
             datasets: [{
                 data: Object.values(activityCounts),
-                backgroundColor: ['#4caf50', '#ffeb3b', '#f44336', '#2196f3', '#ff9800', '#9c27b0'] 
+                backgroundColor: ['#4caf50', '#ffeb3b', '#f44336', '#2196f3', '#ff9800', '#9c27b0']
             }]
         },
-   options: {
-    plugins: {
-        legend: { position: 'bottom', labels: { color: 'white' } },
-        title: {
-            display: true,
-            text: 'مشاركة الحضور حسب الأنشطة',
-            color: 'white',
-            font: {
-                size: 18
-            }
+        options: {
+            plugins: {
+                legend: { position: 'bottom', labels: { color: 'white' } },
+                title: {
+                    display: true,
+                    text: 'مشاركة الحضور حسب الأنشطة',
+                    color: 'white',
+                    font: {
+                        size: 18
+                    }
+                }
+            },
+            cutout: '50%',
+            responsive: true
         }
-    },
-    cutout: '50%',
-    responsive: true
-    }
+    }); 
 }
- }   
+  
 function updateWeekSummary(startDate, endDate) {
 const uniqueCount = countUniqueWeeklyAttendances(filteredData);
 
