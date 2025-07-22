@@ -2139,24 +2139,15 @@ function exportToExcel() {
   XLSX.writeFile(wb, `${filename}.xlsx`);
 }
     
-function registerArabicFont(doc) {
-  doc.addFileToVFS('NotoKufiArabic.ttf', '...base64 encoded font data...');
-  doc.addFont('NotoKufiArabic.ttf', 'NotoKufiArabic', 'normal');
-}
-    
 function exportToPDF() {
-  // Use the jsPDF from the global scope
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
   
-  // Register Arabic font if needed
-  try {
-doc.setFont('helvetica', 'bold');
-  } catch (e) {
-    // Fallback to a standard font if Arabic font not available
-    doc.setFont('helvetica', 'normal');
-    console.warn("Arabic font not available, using fallback font");
-  }
+  // Set right-to-left direction for Arabic
+  doc.setR2L(true);
+  
+  // Use a standard font that supports Arabic (available in most PDF readers)
+  doc.setFont('Arial Unicode MS', 'normal');
   
   // Add title and date
   doc.setFontSize(16);
@@ -2187,15 +2178,14 @@ doc.setFont('helvetica', 'bold');
   doc.save(`إحصائيات راصد - نادي كلباء الرياضي الثقافي_${new Date().toISOString().split('T')[0]}.pdf`);
 }
 
-// Make sure to update your export functions to use the correct autoTable syntax
 function exportMainTableToPDF(doc) {
   const columns = [
-    { header: "التاريخ", dataKey: "date" },
-    { header: "الوقت", dataKey: "time" },
-    { header: "الاسم", dataKey: "name" },
-    { header: "المعرف", dataKey: "id" },
-    { header: "الموظف", dataKey: "staff" },
-    { header: "النشاط", dataKey: "activity" }
+    { title: "التاريخ", dataKey: "date" },
+    { title: "الوقت", dataKey: "time" },
+    { title: "الاسم", dataKey: "name" },
+    { title: "المعرف", dataKey: "id" },
+    { title: "الموظف", dataKey: "staff" },
+    { title: "النشاط", dataKey: "activity" }
   ];
   
   const rows = filteredData.map(row => ({
@@ -2208,26 +2198,80 @@ function exportMainTableToPDF(doc) {
   }));
   
   doc.autoTable({
-    columns: columns,
+    columns,
     body: rows,
     startY: 30,
     styles: {
-      font: 'helvetica', // Fallback font
+      font: 'Arial Unicode MS',
       fontSize: 8,
       cellPadding: 3,
-      overflow: 'linebreak'
+      overflow: 'linebreak',
+      halign: 'right'
     },
     headStyles: {
       fillColor: [244, 231, 51],
       textColor: [0, 0, 0],
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      halign: 'right'
     },
     bodyStyles: {
       textColor: [255, 255, 255],
-      fillColor: [30, 30, 30]
+      fillColor: [30, 30, 30],
+      halign: 'right'
     },
     alternateRowStyles: {
-      fillColor: [50, 50, 50]
+      fillColor: [50, 50, 50],
+      halign: 'right'
+    },
+    margin: { top: 35 }
+  });
+}
+
+function exportActivitiesTableToPDF(doc) {
+  const activityData = getActivityRecords(filteredData.length > 0 ? filteredData : allData);
+  const columns = [
+    { title: "التاريخ", dataKey: "date" },
+    { title: "الوقت", dataKey: "time" },
+    { title: "الاسم", dataKey: "name" },
+    { title: "المعرف", dataKey: "id" },
+    { title: "النشاط", dataKey: "activity" },
+    { title: "الموظف", dataKey: "staff" }
+  ];
+  
+  const rows = activityData.map(row => ({
+    date: formatDate(row.Timestamp).split(' ')[0],
+    time: formatDate(row.Timestamp).split(' ')[1],
+    name: `${row["Child Name"] || ""} ${row.Parent || ""}`.trim(),
+    id: row.ID || "",
+    activity: row.Activity || "",
+    staff: row["Scanned By"] || ""
+  }));
+  
+  doc.autoTable({
+    columns,
+    body: rows,
+    startY: 30,
+    styles: {
+      font: 'Arial Unicode MS',
+      fontSize: 8,
+      cellPadding: 3,
+      overflow: 'linebreak',
+      halign: 'right'
+    },
+    headStyles: {
+      fillColor: [244, 231, 51],
+      textColor: [0, 0, 0],
+      fontStyle: 'bold',
+      halign: 'right'
+    },
+    bodyStyles: {
+      textColor: [255, 255, 255],
+      fillColor: [30, 30, 30],
+      halign: 'right'
+    },
+    alternateRowStyles: {
+      fillColor: [50, 50, 50],
+      halign: 'right'
     },
     margin: { top: 35 }
   });
@@ -2339,22 +2383,26 @@ function exportMainTableToPDF(doc) {
     body: rows,
     startY: 30,
     styles: {
-      font: "NotoKufiArabic",
+      font: 'Arial Unicode MS',
       fontSize: 8,
       cellPadding: 3,
-      overflow: 'linebreak'
+      overflow: 'linebreak',
+      halign: 'right'
     },
     headStyles: {
       fillColor: [244, 231, 51],
       textColor: [0, 0, 0],
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      halign: 'right'
     },
     bodyStyles: {
       textColor: [255, 255, 255],
-      fillColor: [30, 30, 30]
+      fillColor: [30, 30, 30],
+      halign: 'right'
     },
     alternateRowStyles: {
-      fillColor: [50, 50, 50]
+      fillColor: [50, 50, 50],
+      halign: 'right'
     },
     margin: { top: 35 }
   });
@@ -2385,27 +2433,31 @@ function exportActivitiesTableToPDF(doc) {
     body: rows,
     startY: 30,
     styles: {
-      font: "NotoKufiArabic",
+      font: 'Arial Unicode MS',
       fontSize: 8,
       cellPadding: 3,
-      overflow: 'linebreak'
+      overflow: 'linebreak',
+      halign: 'right'
     },
     headStyles: {
       fillColor: [244, 231, 51],
       textColor: [0, 0, 0],
-      fontStyle: 'bold'
+      fontStyle: 'bold',
+      halign: 'right'
     },
     bodyStyles: {
       textColor: [255, 255, 255],
-      fillColor: [30, 30, 30]
+      fillColor: [30, 30, 30],
+      halign: 'right'
     },
     alternateRowStyles: {
-      fillColor: [50, 50, 50]
+      fillColor: [50, 50, 50],
+      halign: 'right'
     },
     margin: { top: 35 }
   });
 }
-
+    
 function exportStatsToPDF(doc) {
   const stats = calculateDetailedStats();
   
