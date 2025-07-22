@@ -1511,8 +1511,10 @@ tbody.innerHTML = "";
 let dataset = [];
 if (currentPeriod === 'all') {
 dataset = allData;
-} else if (currentPeriod === 'week' || currentPeriod === 'month') {
-dataset = getFilteredDataByPeriod(currentPeriod);
+} else if (currentPeriod === 'week') {
+  dataset = showWeeklySummary ? filteredData : getFilteredDataByPeriod('week');
+} else if (currentPeriod === 'month') {
+  dataset = getFilteredDataByPeriod('month');
 } else {
 dataset = allData.filter(row => row.dateKey === selectedDate);
 }
