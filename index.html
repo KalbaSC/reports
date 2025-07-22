@@ -1362,29 +1362,29 @@ const controls = document.getElementById("activityControls");
 tbody.innerHTML = "";
 
 const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
-let dateRecords;
+let dataset = [];
 if (currentPeriod === 'all') {
-  dateRecords = allData;
+  dataset = allData;
 } else if (currentPeriod === 'week' && showWeeklySummary) {
-  dateRecords = filteredData;
+  dataset = filteredData;
 } else if (currentPeriod === 'week' || currentPeriod === 'month') {
-  dateRecords = getFilteredDataByPeriod(currentPeriod);
+  dataset = getFilteredDataByPeriod(currentPeriod);
 } else {
-  dateRecords = allData.filter(row => row.dateKey === selectedDate);
+  dataset = allData.filter(row => row.dateKey === selectedDate);
 }
 
-if (dateRecords.length === 0) {
-tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
-return;
+if (dataset.length === 0) {
+  tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
+  return;
 }
 
-const activityRecords = getActivityRecords(dateRecords);
-const generalRecords = dateRecords.filter(row => 
-row.isGeneral && 
-!activityRecords.some(act => act.ID === row.ID)
+const activityRecords = getActivityRecords(dataset);
+const generalRecords = dataset.filter(row => 
+  row.isGeneral && 
+  !activityRecords.some(act => act.ID === row.ID)
 );
 
-const allPlayers = new Set(dateRecords.map(r => r.ID));
+const allPlayers = new Set(dataset.map(r => r.ID));
 const activityPlayers = new Set(activityRecords.map(r => r.ID));
 const generalOnlyPlayers = new Set(generalRecords.map(r => r.ID));
 
