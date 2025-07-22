@@ -835,26 +835,22 @@ document.getElementById("todayStats").innerHTML = `
      `;
 }
 
-function populateDropdowns() {
-const activities = new Set(['عام']);
-const staff = new Set();
+function populateDropdowns(data = allData) {
+  const activities = new Set(['عام']);
+  const staff = new Set();
 
-allData.forEach(row => {
-if (row.Activity && row.Activity.trim() !== "") activities.add(row.Activity);
-if (row["Scanned By"]) staff.add(row["Scanned By"]);
-});
+  data.forEach(row => {
+    if (row.Activity && row.Activity.trim() !== "") activities.add(row.Activity);
+    if (row["Scanned By"]) staff.add(row["Scanned By"]);
+  });
 
-$('#filter-staff, #filter-activity').select2({
-placeholder: "اختر متعدد",
-allowClear: true
-});
+  populateDropdown('filter-activity', activities, 'اختر النشاط');
+  populateDropdown('filter-staff', staff, 'اختر الموظف');
 
-setTimeout(() => {
-$('.select2-results__options').removeAttr('aria-live');
-}, 100);
-
-populateDropdown('filter-activity', activities, 'اختر النشاط');
-populateDropdown('filter-staff', staff, 'اختر الموظف');
+  $('#filter-staff, #filter-activity').select2({
+    placeholder: "اختر متعدد",
+    allowClear: true
+  });
 }
 
 function populateDropdown(id, values, defaultText) {
@@ -869,44 +865,44 @@ select.appendChild(opt);
 }
 
 async function fetchData() {
-try {
-const loadingElement = document.getElementById("loading");
-if (loadingElement) {
-loadingElement.style.display = "block";
-}
+  try {
+    const loadingElement = document.getElementById("loading");
+    if (loadingElement) {
+      loadingElement.style.display = "block";
+    }
 
-const res = await fetch(scriptURL);
-if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+    const res = await fetch(scriptURL);
+    if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
 
-const rawData = await res.json();
-if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
+    const rawData = await res.json();
+    if (!Array.isArray(rawData)) throw new Error("Invalid data format received");
 
-allData = processRawData(rawData);
+    allData = processRawData(rawData);
 
-const today = new Date().toISOString().split('T')[0];
-document.getElementById("datePicker").value = today;
-filteredData = allData.filter(row => row.dateKey === today);
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById("datePicker").value = today;
+    filteredData = allData.filter(row => row.dateKey === today);
 
-renderMainTable();
-updateSummary();
-populateDropdowns();
-updateTodayStats();
+    renderMainTable();
+    updateSummary();
+    populateDropdowns(filteredData);
+    updateTodayStats();
 
-console.log("Data loaded successfully:", allData.length, "records");
+    console.log("Data loaded successfully:", allData.length, "records");
 
-} catch (error) {
-console.error("Error loading data:", error);
-const tbody = document.querySelector("#attendanceTable tbody");
-if (tbody) {
-tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
-}
+  } catch (error) {
+    console.error("Error loading data:", error);
+    const tbody = document.querySelector("#attendanceTable tbody");
+    if (tbody) {
+      tbody.innerHTML = `<tr><td colspan="6" class="empty-state">حدث خطأ في تحميل البيانات</td></tr>`;
+    }
 
-} finally {
-const loadingElement = document.getElementById("loading");
-if (loadingElement) {
-loadingElement.style.display = "none";
-}
-}
+  } finally {
+    const loadingElement = document.getElementById("loading");
+    if (loadingElement) {
+      loadingElement.style.display = "none";
+    }
+  }
 }
 
 function showMainView() {
@@ -965,6 +961,7 @@ return;
 }
 
 filteredData = getFilteredDataByPeriod(period);
+populateDropdowns();  
 updatePeriodSummary(period);
 
 if (document.getElementById("mainView").style.display !== "none") {
@@ -1144,8 +1141,8 @@ function clearWeekFilter() {
 
   hideWeeklyControls();
   document.getElementById('tableTitle').textContent = 'الحضور اليومي';
-
-  updateFilteredView();
+  populateDropdowns(filteredData);
+  filterTable();
   updateSummary();
   updateTodayStats();
 }
@@ -1271,8 +1268,8 @@ function clearFilters() {
   hideWeeklyControls();
 
   $('#activeFilters').empty();
-
-  renderMainTable();
+  populateDropdowns(filteredData);
+  filterTable();
   updateSummary();
   updateTodayStats();
 
