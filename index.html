@@ -1318,75 +1318,69 @@ function updateFilteredView() {
 }
 
 function renderMainTable() {
-const tbody = document.querySelector("#attendanceTable tbody");
-if (filteredData.length === 0) {
-tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
-return;
-}
+  const tbody = document.querySelector("#attendanceTable tbody");
+  if (filteredData.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">لا يوجد بيانات</td></tr>`;
+    return;
+  }
 
-tbody.innerHTML = "";
+  tbody.innerHTML = "";
 
-if (showWeeklySummary) {
-const players = {};
-filteredData.forEach(row => {
-if (!row.ID) return;
-if (!players[row.ID]) players[row.ID] = [];
-players[row.ID].push(row);
-});
+  let playerRecords = [];
 
-const playerRecords = Object.values(players).map(playerRows => {
-playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-const generalRecord = playerRows.find(row => row.isGeneral);
-return generalRecord || playerRows[0];
-});
+  if (showWeeklySummary) {
+    const players = {};
+    filteredData.forEach(row => {
+      if (!row.ID) return;
+      if (!players[row.ID]) players[row.ID] = [];
+      players[row.ID].push(row);
+    });
 
-playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+    playerRecords = Object.values(players).map(playerRows => {
+      playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+      const generalRecord = playerRows.find(r => r.isGeneral);
+      return generalRecord || playerRows[0];
+    });
 
-playerRecords.forEach(row => {
-const tr = document.createElement("tr");
-if (row.isGeneral) tr.classList.add("general-attendance");
+  } else if (currentPeriod === 'all' || currentPeriod === 'month') {
+    const dailyMap = {};
+    filteredData.forEach(row => {
+      if (!row.ID || !row.dateKey) return;
+      const key = `${row.ID}_${row.dateKey}`;
+      if (!dailyMap[key]) {
+        dailyMap[key] = row;
+      } else {
+        const existing = dailyMap[key];
+        if (row.isGeneral && !existing.isGeneral) {
+          dailyMap[key] = row;
+        } else if (!existing.isGeneral && new Date(row.Timestamp) < new Date(existing.Timestamp)) {
+          dailyMap[key] = row;
+        }
+      }
+    });
 
-tr.innerHTML = `
-       <td>${formatDate(row.Timestamp)}</td>
-       <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-       <td>${row.ID || ""}</td>
-       <td>${row["Scanned By"] || ""}</td>
-       <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-       <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
-     `;
-tbody.appendChild(tr);
-});
-} else {
-const players = {};
-filteredData.forEach(row => {
-if (!row.ID) return;
-if (!players[row.ID]) players[row.ID] = [];
-players[row.ID].push(row);
-});
+    playerRecords = Object.values(dailyMap);
 
-const playerRecords = Object.values(players).map(playerRows => {
-playerRows.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
-const generalRecord = playerRows.find(row => row.isGeneral);
-return generalRecord || playerRows[0];
-});
+  } else {
+    playerRecords = [...filteredData];
+  }
 
-playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
+  playerRecords.sort((a, b) => new Date(a.Timestamp) - new Date(b.Timestamp));
 
-playerRecords.forEach(row => {
-const tr = document.createElement("tr");
-if (row.isGeneral) tr.classList.add("general-attendance");
+  playerRecords.forEach(row => {
+    const tr = document.createElement("tr");
+    if (row.isGeneral) tr.classList.add("general-attendance");
 
-tr.innerHTML = `
-       <td>${formatDate(row.Timestamp)}</td>
-       <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
-       <td>${row.ID || ""}</td>
-       <td>${row["Scanned By"] || ""}</td>
-       <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
-       <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
-     `;
-tbody.appendChild(tr);
-});
-}
+    tr.innerHTML = `
+      <td>${formatDate(row.Timestamp)}</td>
+      <td>${row["Child Name"] || ""} ${row.Parent || ""}</td>
+      <td>${row.ID || ""}</td>
+      <td>${row["Scanned By"] || ""}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : (row.Activity || "")}</td>
+      <td class="hidden-column">${row.isGeneral ? "عام" : "نشاط"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
 }
 
 function renderActivityTable() {
