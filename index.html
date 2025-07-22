@@ -2356,6 +2356,40 @@ function countActivities() {
 }
 
 // PDF Export Helpers
+function exportToPDF() {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF('p', 'mm', 'a4');
+
+  // Set Right-to-Left
+  doc.setR2L(true);
+
+  // Title and Date
+  doc.setFontSize(16);
+  doc.setTextColor(244, 231, 51);
+  doc.text(getCurrentTitle(), 105, 15, { align: 'center' });
+
+  doc.setFontSize(12);
+  doc.setTextColor(255, 255, 255);
+  doc.text(`تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG')}`, 105, 22, { align: 'center' });
+
+  // Export data depending on view
+  if (document.getElementById("mainView").style.display !== "none") {
+    exportMainTableToPDF(doc);
+  } else if (document.getElementById("activityView").style.display !== "none") {
+    exportActivitiesTableToPDF(doc);
+  } else if (document.getElementById("statsView").style.display !== "none") {
+    exportStatsToPDF(doc);
+  }
+
+  // Footer
+  doc.setFontSize(10);
+  doc.setTextColor(150, 150, 150);
+  doc.text("نادي كلباء الرياضي الثقافي - راصد", 105, 285, { align: 'center' });
+
+  // Save PDF
+  doc.save(`إحصائيات راصد - نادي كلباء الرياضي الثقافي_${new Date().toISOString().split('T')[0]}.pdf`);
+}
+
 function exportMainTableToPDF(doc) {
   const columns = [
     { title: "التاريخ", dataKey: "date" },
@@ -2365,7 +2399,7 @@ function exportMainTableToPDF(doc) {
     { title: "الموظف", dataKey: "staff" },
     { title: "النشاط", dataKey: "activity" }
   ];
-  
+
   const rows = filteredData.map(row => ({
     date: formatDate(row.Timestamp).split(' ')[0],
     time: formatDate(row.Timestamp).split(' ')[1],
@@ -2374,39 +2408,22 @@ function exportMainTableToPDF(doc) {
     staff: row["Scanned By"] || "",
     activity: row.isGeneral ? "عام" : (row.Activity || "")
   }));
-  
+
   doc.autoTable({
     columns,
     body: rows,
     startY: 30,
-    styles: {
-      font: 'Arial Unicode MS',
-      fontSize: 8,
-      cellPadding: 3,
-      overflow: 'linebreak',
-      halign: 'right'
-    },
-    headStyles: {
-      fillColor: [244, 231, 51],
-      textColor: [0, 0, 0],
-      fontStyle: 'bold',
-      halign: 'right'
-    },
-    bodyStyles: {
-      textColor: [255, 255, 255],
-      fillColor: [30, 30, 30],
-      halign: 'right'
-    },
-    alternateRowStyles: {
-      fillColor: [50, 50, 50],
-      halign: 'right'
-    },
+    styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak', halign: 'right' },
+    headStyles: { fillColor: [244, 231, 51], textColor: [0, 0, 0], fontStyle: 'bold' },
+    bodyStyles: { textColor: [255, 255, 255], fillColor: [30, 30, 30] },
+    alternateRowStyles: { fillColor: [50, 50, 50] },
     margin: { top: 35 }
   });
 }
 
 function exportActivitiesTableToPDF(doc) {
   const activityData = getActivityRecords(filteredData.length > 0 ? filteredData : allData);
+
   const columns = [
     { title: "التاريخ", dataKey: "date" },
     { title: "الوقت", dataKey: "time" },
@@ -2415,7 +2432,7 @@ function exportActivitiesTableToPDF(doc) {
     { title: "النشاط", dataKey: "activity" },
     { title: "الموظف", dataKey: "staff" }
   ];
-  
+
   const rows = activityData.map(row => ({
     date: formatDate(row.Timestamp).split(' ')[0],
     time: formatDate(row.Timestamp).split(' ')[1],
@@ -2424,120 +2441,23 @@ function exportActivitiesTableToPDF(doc) {
     activity: row.Activity || "",
     staff: row["Scanned By"] || ""
   }));
-  
+
   doc.autoTable({
     columns,
     body: rows,
     startY: 30,
-    styles: {
-      font: 'Arial Unicode MS',
-      fontSize: 8,
-      cellPadding: 3,
-      overflow: 'linebreak',
-      halign: 'right'
-    },
-    headStyles: {
-      fillColor: [244, 231, 51],
-      textColor: [0, 0, 0],
-      fontStyle: 'bold',
-      halign: 'right'
-    },
-    bodyStyles: {
-      textColor: [255, 255, 255],
-      fillColor: [30, 30, 30],
-      halign: 'right'
-    },
-    alternateRowStyles: {
-      fillColor: [50, 50, 50],
-      halign: 'right'
-    },
+    styles: { fontSize: 8, cellPadding: 3, overflow: 'linebreak', halign: 'right' },
+    headStyles: { fillColor: [244, 231, 51], textColor: [0, 0, 0], fontStyle: 'bold' },
+    bodyStyles: { textColor: [255, 255, 255], fillColor: [30, 30, 30] },
+    alternateRowStyles: { fillColor: [50, 50, 50] },
     margin: { top: 35 }
   });
-}
-    
-function exportStatsToPDF(doc) {
-  const stats = calculateDetailedStats();
-  
-  // Staff Distribution Chart
-  const staffCanvas = document.getElementById('pieStaff');
-  if (staffCanvas) {
-    const staffImg = staffCanvas.toDataURL('image/png');
-    doc.addImage(staffImg, 'PNG', 20, 40, 80, 60);
-  }
-  
-  // Timing Chart
-  const timingCanvas = document.getElementById('earlyLate');
-  if (timingCanvas) {
-    const timingImg = timingCanvas.toDataURL('image/png');
-    doc.addImage(timingImg, 'PNG', 110, 40, 80, 60);
-  }
-  
-  // Stats Table
-  const statsColumns = [
-    { title: "الإحصائية", dataKey: "stat" },
-    { title: "القيمة", dataKey: "value" }
-  ];
-  
-  const statsRows = [
-    { stat: "إجمالي الحضور", value: stats.total },
-    { stat: "حضور بالوقت", value: stats.early },
-    { stat: "حضور متأخر", value: stats.late },
-    { stat: "متوسط الحضور اليومي", value: stats.avgDaily },
-    ...Object.entries(stats.staffCounts).map(([staff, count]) => ({
-      stat: `حضور ${staff}`,
-      value: count
-    }))
-  ];
-  
-doc.autoTable({
-  columns: statsColumns,
-  body: statsRows,
-  startY: 120,
-  styles: {
-    font: 'Arial Unicode MS', // Changed
-    fontSize: 10,
-    cellPadding: 4,
-    halign: 'right' // Added
-  },
-  headStyles: {
-    fillColor: [244, 231, 51],
-    textColor: [0, 0, 0],
-    fontStyle: 'bold',
-    halign: 'right' // Added
-  },
-  bodyStyles: {
-    textColor: [255, 255, 255],
-    fillColor: [30, 30, 30],
-    halign: 'right' // Added
-  }
-});
 }
 
 function getCurrentTitle() {
   let title = "راصد - نادي كلباء الرياضي الثقافي";
-  
-  if (document.getElementById("activityView").style.display !== "none") {
-    const activityFilter = document.getElementById("activityFilter").value;
-    if (activityFilter) {
-      title += ` - نشاط ${activityFilter}`;
-    } else {
-      title += " - جميع الأنشطة";
-    }
-  } 
-  else if (document.getElementById("statsView").style.display !== "none") {
-    title += " - الإحصائيات";
-  }
-  
-  if (currentPeriod === 'week') {
-    title += " (الأسبوع الحالي)";
-  } 
-  else if (currentPeriod === 'month') {
-    title += " (الشهر الحالي)";
-  }
-  else if (currentPeriod === 'all') {
-    title += " (جميع البيانات)";
-  }
-  
+  if (document.getElementById("activityView").style.display !== "none") title += " - الأنشطة";
+  else if (document.getElementById("statsView").style.display !== "none") title += " - الإحصائيات";
   return title;
 }
 
