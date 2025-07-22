@@ -1123,14 +1123,31 @@ summaryElement.innerHTML = `
 }
 
 function clearWeekFilter() {
-const today = new Date().toISOString().split('T')[0];
-document.getElementById("datePicker").value = today;
-document.getElementById('datePicker').style.display = 'inline-block';
-filteredData = allData.filter(row => row.dateKey === today);
-updateFilteredView();
-updateSummary();
-hideWeeklyControls();
-document.getElementById('tableTitle').textContent = 'الحضور اليومي';
+  currentPeriod = 'today';
+  showWeeklySummary = false;
+
+  document.getElementById("filter-name").value = "";
+  document.getElementById("filter-id").value = "";
+  document.getElementById("filter-staff").value = "";
+  document.getElementById("filter-activity").value = "";
+
+  $('#filter-staff').val(null).trigger('change');
+  $('#filter-activity').val(null).trigger('change');
+
+  $('#activeFilters').empty();
+
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById("datePicker").value = today;
+  document.getElementById('datePicker').style.display = 'inline-block';
+  
+  filteredData = allData.filter(row => row.dateKey === today);
+
+  hideWeeklyControls();
+  document.getElementById('tableTitle').textContent = 'الحضور اليومي';
+
+  updateFilteredView();
+  updateSummary();
+  updateTodayStats();
 }
 
 function closeWeekRangePicker() {
@@ -1225,38 +1242,53 @@ container.append(`
 }
 
 function removeFilterValue(filterId, value) {
-const currentValues = $(`#${filterId}`).val() || [];
-const updatedValues = currentValues.filter(v => v !== value);
-$(`#${filterId}`).val(updatedValues).trigger('change');
-filterTable();
+  const currentValues = $(`#${filterId}`).val() || [];
+  const updatedValues = currentValues.filter(v => v !== value);
+  $(`#${filterId}`).val(updatedValues).trigger('change');
+  filterTable();
 }
 
 function clearFilters() {
-document.getElementById("filter-name").value = "";
-document.getElementById("filter-id").value = "";
-document.getElementById("filter-staff").value = "";
-document.getElementById("filter-activity").value = "";
-document.getElementById("filterType").value = "";
+  currentPeriod = 'today'; 
+  showWeeklySummary = false;
 
-const today = new Date().toISOString().split('T')[0];
-document.getElementById("datePicker").value = today;
+  document.getElementById("filter-name").value = "";
+  document.getElementById("filter-id").value = "";
+  document.getElementById("filter-staff").value = "";
+  document.getElementById("filter-activity").value = "";
+  document.getElementById("filterType").value = "";
 
-showFilterOptions("");
-filteredData = allData.filter(row => row.dateKey === today);
-document.getElementById('datePicker').style.display = 'inline-block';
-document.getElementById('viewToggle').style.display = 'none';
-showWeeklySummary = false;
+  $('#filter-staff').val(null).trigger('change');
+  $('#filter-activity').val(null).trigger('change');
 
-$('#filter-staff').val(null).trigger('change');
-$('#filter-activity').val(null).trigger('change');
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById("datePicker").value = today;
+  document.getElementById('datePicker').style.display = 'inline-block';
 
-renderMainTable();
-updateSummary();
-hideWeeklyControls();
-document.getElementById('tableTitle').textContent = 'الحضور اليومي';
+  filteredData = allData.filter(row => row.dateKey === today);
 
-$('#activeFilters').empty();
+  document.getElementById('viewToggle').style.display = 'none';
+  hideWeeklyControls();
+
+  $('#activeFilters').empty();
+
+  renderMainTable();
+  updateSummary();
+  updateTodayStats();
+
+  if (document.getElementById("activityView").style.display !== "none") {
+    renderActivityTable();
+  }
+  if (document.getElementById("statsView").style.display !== "none") {
+    renderCharts();
+  }
+  if (document.getElementById("topParticipantsView").style.display !== "none") {
+    renderTopParticipants();
+  }
+
+  document.getElementById('tableTitle').textContent = 'الحضور اليومي';
 }
+
 
 function showFilterOptions(value) {
 document.getElementById("filter-name").classList.add("hidden");
