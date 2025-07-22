@@ -1303,17 +1303,21 @@ else if (value === "activity") document.getElementById("filter-activity").classL
 }
 
 function updateFilteredView() {
-renderMainTable();
-updateSummary();
-updateTodayStats();
+    renderMainTable();
+    updateSummary();
+    updateTodayStats();
 
-if (document.getElementById("activityView").style.display !== "none") {
-renderActivityTable();
-}
+    if (document.getElementById("activityView").style.display !== "none") {
+        renderActivityTable();
+    }
 
-if (document.getElementById("statsView").style.display !== "none") {
-renderCharts();
-}
+    if (document.getElementById("statsView").style.display !== "none") {
+        renderCharts();
+    }
+
+    if (document.getElementById("topParticipantsView").style.display !== "none") {
+        renderTopParticipants();
+    }
 }
 
 function renderMainTable() {
