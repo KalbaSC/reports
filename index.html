@@ -1509,8 +1509,16 @@ renderActivityTable();
 return;
 }
 
-const filtered = activityRecords.filter(row => row.Activity === activity);
-
+const filtered = activityRecords
+  .filter(row => row.Activity === activity)
+  .reduce((unique, item) => {
+    const key = `${item.ID}_${item.dateKey}`;
+    if (!unique.some(u => `${u.ID}_${u.dateKey}` === key)) {
+      unique.push(item);
+    }
+    return unique;
+  }, []);
+       
 if (filtered.length === 0) {
 tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور لنشاط ${activity}</td></tr>`;
 return;
