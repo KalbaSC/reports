@@ -1235,14 +1235,23 @@ thead.innerHTML = `
 function updateSummary(isWeek = false) {
   if (isWeek) return;
 
-  const totalCount = allData.length;
-  const filteredCount = filteredData.length;
+  const uniqueDailyAttendances = new Set();
+  allData.forEach(row => {
+    if (row.ID) {
+      uniqueDailyAttendances.add(`${row.ID}_${row.dateKey}`);
+    }
+  });
+
+  const filteredUniqueIDs = new Set();
+  filteredData.forEach(row => {
+    filteredUniqueIDs.add(row.ID);
+  });
 
   const summaryElement = document.querySelector('.summary-box');
   if (summaryElement) {
     summaryElement.innerHTML = `
-      <span id="summary">إجمالي الحضور: <span id="totalCount">${totalCount}</span></span>
-      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredCount}</span></span>
+      <span id="summary">إجمالي الحضور: <span id="totalCount">${uniqueDailyAttendances.size}</span></span>
+      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniqueIDs.size}</span></span>
     `;
   }
 }
