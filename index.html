@@ -1822,32 +1822,51 @@ btn.innerHTML = `<i class="fas fa-eye"></i> ${isShowing ? 'إخفاء' : 'عرض
 }
 
 function renderTimingChart() {
-let early = 0, late = 0;
-filteredData.forEach(row => {
-const time = new Date(row.Timestamp);
-const hours = time.getHours();
-const minutes = time.getMinutes();
-const totalMinutes = hours * 60 + minutes;
-(totalMinutes < (17 * 60 + 11)) ? early++ : late++;
-});
+    let early = 0, late = 0;
+    const uniqueAttendance = {};
 
-if (charts.timing) charts.timing.destroy();
+    filteredData.forEach(row => {
+        if (!row.ID) return;
+        const key = `${row.ID}_${row.dateKey}`;
+        
+        if (!uniqueAttendance[key]) {
+            uniqueAttendance[key] = row;
+        } else {
+            const existing = uniqueAttendance[key];
 
-const ctx = document.getElementById('earlyLate').getContext('2d');
-charts.timing = new Chart(ctx, {
-type: 'bar',
-data: {
-labels: ['حضور بالوقت', 'حضور متأخر'],
-datasets: [{
-data: [early, late],
-backgroundColor: ['#66cc66', '#cc3333']
-}]
-},
-options: {
-plugins: { legend: { display: false } },
-scales: { y: { beginAtZero: true } }
-}
-});
+            if (!existing.isGeneral && row.isGeneral) {
+                uniqueAttendance[key] = row;
+            } else if (existing.isGeneral === row.isGeneral) {
+                if (new Date(row.Timestamp) < new Date(existing.Timestamp)) {
+                    uniqueAttendance[key] = row;
+                }
+            }
+        }
+    });
+
+    Object.values(uniqueAttendance).forEach(row => {
+        const time = new Date(row.Timestamp);
+        const totalMinutes = time.getHours() * 60 + time.getMinutes();
+        (totalMinutes < (17 * 60 + 11)) ? early++ : late++;
+    });
+
+    if (charts.timing) charts.timing.destroy();
+
+    const ctx = document.getElementById('earlyLate').getContext('2d');
+    charts.timing = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['حضور بالوقت', 'حضور متأخر'],
+            datasets: [{
+                data: [early, late],
+                backgroundColor: ['#66cc66', '#cc3333']
+            }]
+        },
+        options: {
+            plugins: { legend: { display: false } },
+            scales: { y: { beginAtZero: true } }
+        }
+    });
 }
 
 function updateWeekSummary(startDate, endDate) {
