@@ -1232,26 +1232,28 @@ thead.innerHTML = `
 `;
 }
 
-function updateSummary(isWeek = false) {
+updateSummary(isWeek = false) {
   if (isWeek) return;
 
-  const uniqueDailyAttendances = new Set();
-  allData.forEach(row => {
-    if (row.ID) {
-      uniqueDailyAttendances.add(`${row.ID}_${row.dateKey}`);
-    }
-  });
+  const period = currentPeriod;
 
-  const filteredUniqueIDs = new Set();
-  filteredData.forEach(row => {
-    filteredUniqueIDs.add(row.ID);
+  const selectedDate = document.getElementById("datePicker").value;
+  const uniqueDailyAttendances = new Set();
+  const uniqueIDs = new Set();
+
+  allData.forEach(row => {
+    if (period === 'today' && selectedDate && row.dateKey !== selectedDate) return;
+    if (period === 'month' && !(new Date(row.Timestamp).getMonth() === new Date().getMonth() && new Date(row.Timestamp).getFullYear() === new Date().getFullYear())) return;
+
+    uniqueDailyAttendances.add(`${row.ID}_${row.dateKey}`);
+    uniqueIDs.add(row.ID);
   });
 
   const summaryElement = document.querySelector('.summary-box');
   if (summaryElement) {
     summaryElement.innerHTML = `
       <span id="summary">إجمالي الحضور: <span id="totalCount">${uniqueDailyAttendances.size}</span></span>
-      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredUniqueIDs.size}</span></span>
+      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${uniqueIDs.size}</span></span>
     `;
   }
 }
