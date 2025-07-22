@@ -1833,35 +1833,6 @@ scales: { y: { beginAtZero: true } }
 });
 }
 
-function renderDailyStats() {
-const today = new Date().toDateString();
-const todayData = filteredData.filter(row => 
-new Date(row.Timestamp).toDateString() === today
-);
-
-const staffToday = {};
-let early = 0, late = 0;
-
-todayData.forEach(row => {
-const name = row["Scanned By"] || "غير معروف";
-staffToday[name] = (staffToday[name] || 0) + 1;
-
-const time = new Date(row.Timestamp);
-const totalMinutes = time.getHours() * 60 + time.getMinutes();
-(totalMinutes < (17 * 60 + 11)) ? early++ : late++;
-});
-
-const staffList = Object.entries(staffToday)
-.map(([name, count]) => `${name}: ${count}`)
-.join("<br>");
-
-document.getElementById("todayStats").innerHTML = `
-      <p><strong>حسب الموظف:</strong><br>${staffList || "لا يوجد بيانات"}</p>
-      <p><strong>حسب الوقت:</strong><br>بالوقت: ${early} | متأخر: ${late}</p>
-      <p><strong>إجمالي اليوم:</strong> ${todayData.length}</p>
-    `;
-}
-
 function updateWeekSummary(startDate, endDate) {
 const uniqueCount = countUniqueWeeklyAttendances(filteredData);
 
