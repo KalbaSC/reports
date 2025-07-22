@@ -1232,18 +1232,18 @@ thead.innerHTML = `
 `;
 }
 
-updateSummary(isWeek = false) {
+function updateSummary(isWeek = false) {
   if (isWeek) return;
 
   const period = currentPeriod;
-
   const selectedDate = document.getElementById("datePicker").value;
   const uniqueDailyAttendances = new Set();
   const uniqueIDs = new Set();
 
   allData.forEach(row => {
     if (period === 'today' && selectedDate && row.dateKey !== selectedDate) return;
-    if (period === 'month' && !(new Date(row.Timestamp).getMonth() === new Date().getMonth() && new Date(row.Timestamp).getFullYear() === new Date().getFullYear())) return;
+    if (period === 'month' && !(new Date(row.Timestamp).getMonth() === new Date().getMonth() &&
+                                new Date(row.Timestamp).getFullYear() === new Date().getFullYear())) return;
 
     uniqueDailyAttendances.add(`${row.ID}_${row.dateKey}`);
     uniqueIDs.add(row.ID);
