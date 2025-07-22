@@ -11,6 +11,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet" />
@@ -2131,28 +2132,41 @@ function exportToExcel() {
   }
   
   // Generate filename based on current view and period
-  let filename = "حضور_مخيم_كلباء";
+  let filename = "إحصائيات راصد - نادي كلباء الرياضي الثقافي";
   if (currentPeriod === 'week') filename += "_الأسبوع";
   else if (currentPeriod === 'month') filename += "_الشهر";
   else if (currentPeriod === 'all') filename += "_الكلي";
   
   XLSX.writeFile(wb, `${filename}.xlsx`);
 }
-
+    
+function registerArabicFont(doc) {
+  doc.addFileToVFS('NotoKufiArabic.ttf', '...base64 encoded font data...');
+  doc.addFont('NotoKufiArabic.ttf', 'NotoKufiArabic', 'normal');
+}
+    
 function exportToPDF() {
+  // Use the jsPDF from the global scope
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF('p', 'mm', 'a4');
-  const title = getCurrentTitle();
+  
+  // Register Arabic font if needed
+  try {
+    doc.setFont('NotoKufiArabic', 'normal');
+  } catch (e) {
+    // Fallback to a standard font if Arabic font not available
+    doc.setFont('helvetica', 'normal');
+    console.warn("Arabic font not available, using fallback font");
+  }
   
   // Add title and date
-  doc.setFont('NotoKufiArabic', 'normal');
   doc.setFontSize(16);
   doc.setTextColor(244, 231, 51);
-  doc.text(title, 105, 15, null, null, 'center');
+  doc.text(getCurrentTitle(), 105, 15, { align: 'center' });
   
   doc.setFontSize(12);
   doc.setTextColor(255, 255, 255);
-  doc.text(`تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG')}`, 105, 22, null, null, 'center');
+  doc.text(`تاريخ التصدير: ${new Date().toLocaleDateString('ar-EG')}`, 105, 22, { align: 'center' });
   
   // Export different content based on current view
   if (document.getElementById("mainView").style.display !== "none") {
@@ -2168,12 +2182,58 @@ function exportToPDF() {
   // Add footer
   doc.setFontSize(10);
   doc.setTextColor(150, 150, 150);
-  doc.text("نادي كلباء الرياضي الثقافي - نظام متابعة الحضور", 105, 285, null, null, 'center');
+  doc.text("نادي كلباء الرياضي الثقافي - راصد", 105, 285, { align: 'center' });
   
   // Save the PDF
-  doc.save(`حضور_مخيم_كلباء_${new Date().toISOString().split('T')[0]}.pdf`);
+  doc.save(`إحصائيات راصد - نادي كلباء الرياضي الثقافي_${new Date().toISOString().split('T')[0]}.pdf`);
 }
 
+// Make sure to update your export functions to use the correct autoTable syntax
+function exportMainTableToPDF(doc) {
+  const columns = [
+    { header: "التاريخ", dataKey: "date" },
+    { header: "الوقت", dataKey: "time" },
+    { header: "الاسم", dataKey: "name" },
+    { header: "المعرف", dataKey: "id" },
+    { header: "الموظف", dataKey: "staff" },
+    { header: "النشاط", dataKey: "activity" }
+  ];
+  
+  const rows = filteredData.map(row => ({
+    date: formatDate(row.Timestamp).split(' ')[0],
+    time: formatDate(row.Timestamp).split(' ')[1],
+    name: `${row["Child Name"] || ""} ${row.Parent || ""}`.trim(),
+    id: row.ID || "",
+    staff: row["Scanned By"] || "",
+    activity: row.isGeneral ? "عام" : (row.Activity || "")
+  }));
+  
+  doc.autoTable({
+    columns: columns,
+    body: rows,
+    startY: 30,
+    styles: {
+      font: 'helvetica', // Fallback font
+      fontSize: 8,
+      cellPadding: 3,
+      overflow: 'linebreak'
+    },
+    headStyles: {
+      fillColor: [244, 231, 51],
+      textColor: [0, 0, 0],
+      fontStyle: 'bold'
+    },
+    bodyStyles: {
+      textColor: [255, 255, 255],
+      fillColor: [30, 30, 30]
+    },
+    alternateRowStyles: {
+      fillColor: [50, 50, 50]
+    },
+    margin: { top: 35 }
+  });
+}
+    
 // Helper functions for data preparation
 function prepareMainExportData() {
   return filteredData.map(row => ({
@@ -2403,7 +2463,7 @@ function exportStatsToPDF(doc) {
 }
 
 function getCurrentTitle() {
-  let title = "تقرير حضور مخيم كلباء";
+  let title = "راصد - نادي كلباء الرياضي الثقافي";
   
   if (document.getElementById("activityView").style.display !== "none") {
     const activityFilter = document.getElementById("activityFilter").value;
