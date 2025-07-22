@@ -1065,8 +1065,8 @@ function toggleDisplayMode() {
     displayAllRecords = !displayAllRecords;
     const btn = document.getElementById('toggleDisplayMode');
 btn.innerHTML = displayAllRecords 
-    ? '<i class="fas fa-exchange-alt"></i> عرض الفريد'
-    : '<i class="fas fa-exchange-alt"></i> عرض الفريد يومياً';
+    ? '<i class="fas fa-exchange-alt"></i> عرض الفريد يومياً'
+    : '<i class="fas fa-exchange-alt"></i> عرض الفريد';
 
     renderMainTable();
     updateSummary();
@@ -1248,22 +1248,21 @@ thead.innerHTML = `
 `;
 }
 
-function updateSummary(dataSet = filteredData, isWeek = false) {
+function updateSummary(isWeek = false) {
   if (isWeek) return;
 
-  const total = dataSet.length;
-  const filteredCount = new Set(dataSet.map(r => r.ID)).size;
+  const total = displayAllRecords 
+      ? filteredData.length 
+      : new Set(filteredData.map(r => r.ID)).size;
 
   const summaryElement = document.querySelector('.summary-box');
   if (summaryElement) {
     summaryElement.innerHTML = `
       <span id="summary">إجمالي الحضور: <span id="totalCount">${total}</span></span>
-      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${filteredCount}</span></span>
+      <span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">${total}</span></span>
     `;
   }
 }
-
-
 
 function clearWeekFilter() {
 currentPeriod = 'today';
@@ -1580,7 +1579,6 @@ function renderMainTable() {
         `;
         tbody.appendChild(tr);
     });
-updateSummary(recordsToRender);
 }
 
 function renderActivityTable() {
