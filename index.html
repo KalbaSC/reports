@@ -1405,7 +1405,48 @@ renderTopParticipants();
 document.getElementById('tableTitle').textContent = 'الحضور اليومي';
 }
 
+function renderDailyStats() {
+  const dailyCounts = {};
 
+  filteredData.forEach(row => {
+    const dateKey = row.dateKey;
+    if (!dailyCounts[dateKey]) {
+      dailyCounts[dateKey] = 0;
+    }
+    dailyCounts[dateKey]++;
+  });
+
+  const labels = Object.keys(dailyCounts).sort();
+  const dataCounts = labels.map(date => dailyCounts[date]);
+
+  if (charts.daily) charts.daily.destroy();
+
+  const ctx = document.getElementById('attendanceChart').getContext('2d');
+  charts.daily = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: 'عدد الحضور',
+        data: dataCounts,
+        backgroundColor: '#f4e733'
+      }]
+    },
+    options: {
+      plugins: {
+        legend: {
+          display: false
+        }
+      },
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
+  });
+}
+    
 function showFilterOptions(value) {
 document.getElementById("filter-name").classList.add("hidden");
 document.getElementById("filter-id").classList.add("hidden");
