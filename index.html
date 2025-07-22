@@ -788,14 +788,22 @@ return formatted;
 }
 
 function getActivityRecords(rawData) {
-if (!Array.isArray(rawData)) return [];
+  if (!Array.isArray(rawData)) return [];
 
-return rawData.filter(item => 
-item && typeof item === 'object' && 
-item.ID && item.Timestamp && 
-item.Activity && item.Activity.trim() !== "" &&
-item.Activity !== "عام"
-);
+  const uniqueRecords = [];
+  const seen = new Set();
+
+  rawData.forEach(item => {
+    if (item && item.ID && item.Timestamp && item.Activity && item.Activity.trim() !== "" && item.Activity !== "عام") {
+      const key = `${item.ID}_${new Date(item.Timestamp).toISOString().split('T')[0]}_${item.Activity}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniqueRecords.push(item);
+      }
+}
+  });
+
+  return uniqueRecords;
 }
 
 function updateTodayStats(data = filteredData) {
@@ -1488,11 +1496,9 @@ tbody.appendChild(row);
 function filterActivityTable() {
 const activity = document.getElementById("activityFilter").value;
 const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
-
 const tbody = document.querySelector("#activityTable tbody");
 tbody.innerHTML = "";
 
-  // Select correct dataset based on period
 let dataset = [];
 if (currentPeriod === 'all') {
 dataset = allData;
@@ -1509,16 +1515,19 @@ renderActivityTable();
 return;
 }
 
-  const filtered = activityRecords
-    .filter(row => row.Activity === activity)
-    .reduce((unique, item) => {
-      const key = `${item.ID}_${item.dateKey}_${item.Activity}`;
-      if (!unique.some(u => `${u.ID}_${u.dateKey}_${u.Activity}` === key)) {
-        unique.push(item);
-      }
-      return unique;
-    }, []);
-       
+const filtered = [];
+const seenKeys = new Set();
+
+activityRecords
+  .filter(row => row.Activity === activity)
+  .forEach(item => {
+    const key = `${item.ID}_${item.dateKey}_${item.Activity}`;
+    if (!seenKeys.has(key)) {
+      seenKeys.add(key);
+      filtered.push(item);
+    }
+  });
+
 if (filtered.length === 0) {
 tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور لنشاط ${activity}</td></tr>`;
 return;
@@ -1528,9 +1537,8 @@ const headerRow = document.createElement("tr");
 headerRow.className = "activity-group";
 headerRow.innerHTML = `<td colspan="5">${activity} (${filtered.length} لاعب)</td>`;
 tbody.appendChild(headerRow);
-       
+
 filtered.forEach(entry => {
-       
 const row = document.createElement("tr");
 row.innerHTML = `
      <td>${formatDate(entry.Timestamp)}</td>
