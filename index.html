@@ -1064,9 +1064,9 @@ renderActivityTable();
 function toggleDisplayMode() {
     displayAllRecords = !displayAllRecords;
     const btn = document.getElementById('toggleDisplayMode');
-    btn.innerHTML = displayAllRecords 
-        ? '<i class="fas fa-exchange-alt"></i> عرض الفريد'
-        : '<i class="fas fa-exchange-alt"></i> عرض الكل';
+btn.innerHTML = displayAllRecords 
+    ? '<i class="fas fa-exchange-alt"></i> عرض الفريد'
+    : '<i class="fas fa-exchange-alt"></i> عرض الفريد يومياً';
 
     renderMainTable();
     updateSummary();
@@ -1525,8 +1525,30 @@ function renderMainTable() {
     let recordsToRender = [];
 
     if (displayAllRecords) {
-        recordsToRender = [...filteredData];
+        // ✅ Unique per ID + dateKey, prioritizing general attendance
+        const uniquePerDay = {};
+
+        filteredData.forEach(row => {
+            const key = `${row.ID}_${row.dateKey}`;
+            if (!uniquePerDay[key]) {
+                uniquePerDay[key] = row;
+            } else {
+                // Prioritize isGeneral
+                if (!uniquePerDay[key].isGeneral && row.isGeneral) {
+                    uniquePerDay[key] = row;
+                } else if (uniquePerDay[key].isGeneral === row.isGeneral) {
+                    // If same type, pick earlier timestamp
+                    if (new Date(row.Timestamp) < new Date(uniquePerDay[key].Timestamp)) {
+                        uniquePerDay[key] = row;
+                    }
+                }
+            }
+        });
+
+        recordsToRender = Object.values(uniquePerDay);
+
     } else {
+        // ✅ Unique per player (only first or general)
         const players = {};
         filteredData.forEach(row => {
             if (!row.ID) return;
