@@ -733,9 +733,10 @@ onclick="promptForPassword()">
 
 </div>
 
-<div class="summary-box">
-<span id="summary">إجمالي الحضور: <span id="totalCount">0</span></span>
-<span id="filteredSummary">| النتائج المصفاة: <span id="filteredCount">0</span></span>
+<div id="summaryBox">
+  إجمالي اللاعبين: <span id="totalPlayersCount">0</span> |
+  أنشطة: <span id="activityPlayersCount">0</span> |
+  <span id="generalOnlyCount">عام فقط: 0</span>
 </div>
 
 <button id="showWeeklyMsgBtn" class="export" style="display:none; background:#f4e733; color:black; margin-top:10px;" onclick="openWeeklyMessage()">عرض ملخص الحضور الأسبوعي</button>
@@ -1747,7 +1748,7 @@ function filterActivityTable() {
   const activityRecords = getActivityRecords(dataset);
 
   if (!activity) {
-    renderActivityTable(); // هذه تعرض كل شيء مع "عام فقط"
+    renderActivityTable(); 
     return;
   }
 
@@ -1785,14 +1786,13 @@ function filterActivityTable() {
     });
   }
 
-  // ✅ إضافة لاعبي "عام فقط" في نفس الفترة المحددة
   const generalRecords = dataset.filter(r => r.isGeneral);
   const activityOnlyRecords = dataset.filter(r => r.Activity);
 
   const generalOnlyPlayers = new Map();
   generalRecords.forEach(r => {
     if (!activityOnlyRecords.some(a => a.ID === r.ID) && !generalOnlyPlayers.has(r.ID)) {
-      generalOnlyPlayers.set(r.ID, r); // نحفظ آخر ظهور لكل لاعب عام فقط
+      generalOnlyPlayers.set(r.ID, r); 
     }
   });
 
@@ -1815,6 +1815,13 @@ function filterActivityTable() {
       tbody.appendChild(row);
     });
   }
+
+  const totalPlayerIDs = new Set(dataset.map(r => r.ID));
+  const activityPlayerIDs = new Set(activityOnlyRecords.map(r => r.ID));
+
+  document.getElementById("totalPlayersCount").textContent = totalPlayerIDs.size;
+  document.getElementById("activityPlayersCount").textContent = activityPlayerIDs.size;
+  document.getElementById("generalOnlyCount").textContent = `عام فقط: ${generalOnlyPlayers.size}`;
 }
 
 function renderCharts() {
