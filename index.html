@@ -1611,7 +1611,7 @@ row.isGeneral &&
 
 const allPlayers = new Set(dataset.map(r => r.ID));
 const activityPlayers = new Set(activityRecords.map(r => r.ID));
-const generalOnlyPlayers = new Set(generalRecords.map(r => r.ID));
+const generalOnlyPlayers = new Set(generalRecords.filter(r => !activityPlayers.has(r.ID)).map(r => r.ID));
 
 const activities = {};
 activityRecords.forEach(item => {
