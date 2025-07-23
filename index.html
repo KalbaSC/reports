@@ -1604,10 +1604,11 @@ return;
 }
 
 const activityRecords = getActivityRecords(dataset);
-const generalRecords = dataset.filter(row => 
-row.isGeneral && 
-!activityRecords.some(act => act.ID === row.ID)
-);
+const generalRecords = dataset.filter(row => {
+  const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
+  const hasNoActivity = !row.Activity || row.Activity.trim() === "";
+  return isGeneral && hasNoActivity;
+});
 
 const allPlayers = new Set(dataset.map(r => r.ID));
 const activityPlayers = new Set(activityRecords.map(r => r.ID));
