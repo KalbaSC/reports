@@ -1606,7 +1606,7 @@ return;
 const activityRecords = getActivityRecords(dataset);
 const generalRecords = dataset.filter(row => {
   const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-  const hasNoActivity = !row.Activity || row.Activity.trim() === "";
+  const hasNoActivity = !row.Activity || row.Activity.trim() === "" || row.Activity === "عام";
   return isGeneral && hasNoActivity;
 });
 
