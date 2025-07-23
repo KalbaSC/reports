@@ -2284,30 +2284,74 @@ function exportToExcel() {
 
 // Helper functions for data preparation
 function prepareMainExportData() {
-  return filteredData.map(row => ({
+  const rows = document.querySelectorAll('#attendanceTable tbody tr');
+  const exportData = [];
+  const seenIds = new Set();
+
+  rows.forEach(row => {
+    const cells = row.querySelectorAll('td');
+    if (cells.length < 6) return;
+
+    const id = cells[2].textContent.trim();
+    if (seenIds.has(id)) return; // Skip duplicates
+    seenIds.add(id);
+
+    const date = cells[0].textContent.trim().split(' ')[0];
+    const time = cells[0].textContent.trim().split(' ')[1];
+    const fullName = cells[1].textContent.trim(); // Already child + parent
+    const staff = cells[3].textContent.trim();
+    const activity = cells[4].textContent.trim();
+    const type = cells[5].textContent.trim();
+
+    exportData.push({
+      "التاريخ": date,
+      "الوقت": time,
+      "الاسم": fullName,
+      "المعرف": id,
+      "الموظف المسجل": staff,
+      "النشاط": activity,
+      "النوع": type,
+      "الحالة": type === "عام" ? "حضور عام" : "حضور نشاط"
+    });
+  });
+
+  return exportData;
+}
+
+function prepareMainExportData() {
+  const uniqueDaily = {};
+
+  filteredData.forEach(row => {
+    if (!row.ID || !row.dateKey) return;
+
+    const key = `${row.ID}_${row.dateKey}`;
+
+    if (!uniqueDaily[key]) {
+      uniqueDaily[key] = row;
+    } else {
+      const existing = uniqueDaily[key];
+      const currentIsGeneral = row.isGeneral;
+      const existingIsGeneral = existing.isGeneral;
+
+      if (!existingIsGeneral && currentIsGeneral) {
+        uniqueDaily[key] = row;
+      } else if (existingIsGeneral === currentIsGeneral) {
+        if (new Date(row.Timestamp) < new Date(existing.Timestamp)) {
+          uniqueDaily[key] = row;
+        }
+      }
+    }
+  });
+
+  return Object.values(uniqueDaily).map(row => ({
     "التاريخ": formatDate(row.Timestamp).split(' ')[0],
     "الوقت": formatDate(row.Timestamp).split(' ')[1],
-    "اسم الطفل": row["Child Name"] || "",
-    "اسم ولي الأمر": row.Parent || "",
+    "الاسم الكامل": `${row["Child Name"] || ""} ${row.Parent || ""}`.trim(),
     "المعرف": row.ID || "",
-    "الموظف المسجل": row["Scanned By"] || "",
+    "الموظف": row["Scanned By"] || "",
     "النشاط": row.isGeneral ? "عام" : (row.Activity || ""),
     "النوع": row.isGeneral ? "عام" : "نشاط",
     "الحالة": row.isGeneral ? "حضور عام" : "حضور نشاط"
-  }));
-}
-
-function prepareActivitiesExportData() {
-  const activityData = getActivityRecords(filteredData.length > 0 ? filteredData : allData);
-  return activityData.map(row => ({
-    "التاريخ": formatDate(row.Timestamp).split(' ')[0],
-    "الوقت": formatDate(row.Timestamp).split(' ')[1],
-    "اسم الطفل": row["Child Name"] || "",
-    "اسم ولي الأمر": row.Parent || "",
-    "المعرف": row.ID || "",
-    "الموظف المسجل": row["Scanned By"] || "",
-    "النشاط": row.Activity || "",
-    "ملاحظات": ""
   }));
 }
 
