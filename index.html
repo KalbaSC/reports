@@ -1728,63 +1728,93 @@ tbody.appendChild(row);
 }
 
 function filterActivityTable() {
-const activity = document.getElementById("activityFilter").value;
-const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
-const tbody = document.querySelector("#activityTable tbody");
-tbody.innerHTML = "";
+  const activity = document.getElementById("activityFilter").value;
+  const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
+  const tbody = document.querySelector("#activityTable tbody");
+  tbody.innerHTML = "";
 
-let dataset = [];
-if (currentPeriod === 'all') {
-dataset = allData;
-} else if (currentPeriod === 'week') {
-dataset = showWeeklySummary ? filteredData : getFilteredDataByPeriod('week');
-} else if (currentPeriod === 'month') {
-dataset = getFilteredDataByPeriod('month');
-} else {
-dataset = allData.filter(row => row.dateKey === selectedDate);
-}
+  let dataset = [];
+  if (currentPeriod === 'all') {
+    dataset = allData;
+  } else if (currentPeriod === 'week') {
+    dataset = showWeeklySummary ? filteredData : getFilteredDataByPeriod('week');
+  } else if (currentPeriod === 'month') {
+    dataset = getFilteredDataByPeriod('month');
+  } else {
+    dataset = allData.filter(row => row.dateKey === selectedDate);
+  }
 
-const activityRecords = getActivityRecords(dataset);
+  const activityRecords = getActivityRecords(dataset);
 
-if (!activity) {
-renderActivityTable();
-return;
-}
+  if (!activity) {
+    renderActivityTable(); // هذه تعرض كل شيء مع "عام فقط"
+    return;
+  }
 
-const filtered = [];
-const seenKeys = new Set();
+  const filtered = [];
+  const seenKeys = new Set();
 
-activityRecords
-.filter(row => row.Activity === activity)
-.forEach(item => {
-const key = `${item.ID}_${item.dateKey}_${item.Activity}`;
-if (!seenKeys.has(key)) {
-seenKeys.add(key);
-filtered.push(item);
-}
-});
+  activityRecords
+    .filter(row => row.Activity === activity)
+    .forEach(item => {
+      const key = `${item.ID}_${item.dateKey}_${item.Activity}`;
+      if (!seenKeys.has(key)) {
+        seenKeys.add(key);
+        filtered.push(item);
+      }
+    });
 
-if (filtered.length === 0) {
-tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور لنشاط ${activity}</td></tr>`;
-return;
-}
+  if (filtered.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور لنشاط ${activity}</td></tr>`;
+  } else {
+    const headerRow = document.createElement("tr");
+    headerRow.className = "activity-group";
+    headerRow.innerHTML = `<td colspan="5">${activity} (${filtered.length} لاعب)</td>`;
+    tbody.appendChild(headerRow);
 
-const headerRow = document.createElement("tr");
-headerRow.className = "activity-group";
-headerRow.innerHTML = `<td colspan="5">${activity} (${filtered.length} لاعب)</td>`;
-tbody.appendChild(headerRow);
+    filtered.forEach(entry => {
+      const row = document.createElement("tr");
+      row.innerHTML = `
+        <td>${formatDate(entry.Timestamp)}</td>
+        <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
+        <td>${entry.ID || ""}</td>
+        <td>${entry["Scanned By"] || ""}</td>
+        <td>${entry.Activity || ""}</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
 
-filtered.forEach(entry => {
-const row = document.createElement("tr");
-row.innerHTML = `
-    <td>${formatDate(entry.Timestamp)}</td>
-    <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
-    <td>${entry.ID || ""}</td>
-    <td>${entry["Scanned By"] || ""}</td>
-    <td>${entry.Activity || ""}</td>
-  `;
-tbody.appendChild(row);
-});
+  // ✅ إضافة لاعبي "عام فقط" في نفس الفترة المحددة
+  const generalRecords = dataset.filter(r => r.isGeneral);
+  const activityOnlyRecords = dataset.filter(r => r.Activity);
+
+  const generalOnlyPlayers = new Map();
+  generalRecords.forEach(r => {
+    if (!activityOnlyRecords.some(a => a.ID === r.ID) && !generalOnlyPlayers.has(r.ID)) {
+      generalOnlyPlayers.set(r.ID, r); // نحفظ آخر ظهور لكل لاعب عام فقط
+    }
+  });
+
+  if (generalOnlyPlayers.size > 0) {
+    const generalHeader = document.createElement("tr");
+    generalHeader.className = "no-activity";
+    generalHeader.innerHTML = `<td colspan="5">لاعبون حضروا عام فقط (${generalOnlyPlayers.size} لاعب)</td>`;
+    tbody.appendChild(generalHeader);
+
+    generalOnlyPlayers.forEach(record => {
+      const row = document.createElement("tr");
+      row.className = "no-activity";
+      row.innerHTML = `
+        <td>${formatDate(record.Timestamp)}</td>
+        <td>${record["Child Name"] || ""} ${record.Parent || ""}</td>
+        <td>${record.ID || ""}</td>
+        <td>${record["Scanned By"] || ""}</td>
+        <td>عام</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
 }
 
 function renderCharts() {
