@@ -1613,19 +1613,15 @@ function renderActivityTable() {
 
   const activityRecords = getActivityRecords(dataset);
 
-  const allPlayers = new Set(dataset.map(r => r.ID));
-const activityPlayers = new Set();
-activityRecords.forEach(r => {
-  if (r.Activity && r.Activity !== "عام") {
-    activityPlayers.add(r.ID);
-  }
-});
+const allPlayers = new Set(dataset.map(r => r.ID?.trim()));
+const activityPlayers = new Set(activityRecords.map(r => r.ID?.trim()));
 
 const generalOnlyPlayers = new Set();
 dataset.forEach(row => {
+  const id = row.ID?.trim();
   const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-  if (isGeneral && !activityPlayers.has(row.ID)) {
-    generalOnlyPlayers.add(row.ID);
+  if (id && isGeneral && !activityPlayers.has(id)) {
+    generalOnlyPlayers.add(id);
   }
 });
 
