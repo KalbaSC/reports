@@ -780,14 +780,16 @@ onclick="promptForPassword()">
 
 <div class="container" id="activityView" style="display: none;">
 <h2 style="color:#f4e733; text-align:center">الحضور حسب الأنشطة</h2>
-    <span class="summary-box">
-        <span>إجمالي اللاعبين: ${allPlayers.size}</span>
-        <span>| أنشطة: ${activityPlayers.size} (${((activityPlayers.size / allPlayers.size) * 100).toFixed(0)}%)</span>
-        <span>| عام فقط: ${generalOnlyIDs.size} (${((generalOnlyIDs.size / allPlayers.size) * 100).toFixed(0)}%)</span>
-        <div style="background:#444; height:18px; border-radius:10px; overflow:hidden; margin-top:8px; width:100%; max-width:400px;">
-          <div style="height:100%; width:${(activityPlayers.size / allPlayers.size) * 100}%; background:#f4e733;"></div>
-        </div>
-      </span>
+    
+<div class="summary-box" id="activitySummaryBox">
+  <span id="totalPlayers">إجمالي اللاعبين: 0</span>
+  <span id="activityCount">| أنشطة: 0 (0%)</span>
+  <span id="generalOnlyCount">| عام فقط: 0 (0%)</span>
+  <div style="background:#444; height:18px; border-radius:10px; overflow:hidden; margin-top:8px; width:100%; max-width:400px;">
+    <div id="activityBar" style="height:100%; width:0%; background:#f4e733;"></div>
+  </div>
+</div>
+
 <div class="export-buttons" style="display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px;">
     <button class="export" onclick="exportToExcel()">
       <span class="download-icon"></span> Excel
@@ -1648,7 +1650,10 @@ dataset.forEach(row => {
 // استبعاد من حضروا أنشطة من قائمة "عام فقط"
 activityIDs.forEach(id => generalOnlyIDs.delete(id));
 
-  // ✅ عرض صندوق الإحصائيات
+document.getElementById("totalPlayers").textContent = `إجمالي اللاعبين: ${allPlayers.size}`;
+document.getElementById("activityCount").textContent = `| أنشطة: ${activityPlayers.size} (${((activityPlayers.size / allPlayers.size) * 100).toFixed(0)}%)`;
+document.getElementById("generalOnlyCount").textContent = `| عام فقط: ${generalOnlyIDs.size} (${((generalOnlyIDs.size / allPlayers.size) * 100).toFixed(0)}%)`;
+document.getElementById("activityBar").style.width = `${(activityPlayers.size / allPlayers.size) * 100}%`;
   
   // 🟢 عرض اللاعبين "عام فقط"
   if (generalOnlyIDs.size > 0) {
