@@ -1628,9 +1628,12 @@ function renderActivityTable() {
           .join('')}
       </select>
       <span class="summary-box">
-        <span>إجمالي اللاعبين: ${allPlayers.size}</span>
-        <span>| أنشطة: ${activityPlayers.size}</span>
-        <span>| عام فقط: ${generalOnlyPlayers.size}</span>
+<span>إجمالي اللاعبين: ${allPlayers.size}</span>
+<span>| أنشطة: ${activityPlayers.size} (${((activityPlayers.size / allPlayers.size) * 100).toFixed(0)}%)</span>
+<span>| عام فقط: ${generalOnlyPlayers.size} (${((generalOnlyPlayers.size / allPlayers.size) * 100).toFixed(0)}%)</span>
+<div style="background:#444; height:18px; border-radius:10px; overflow:hidden; margin-top:8px; width:100%; max-width:400px;">
+  <div style="height:100%; width:${(activityPlayers.size / allPlayers.size) * 100}%; background:#f4e733;"></div>
+</div>
       </span>
     </div>
   `;
