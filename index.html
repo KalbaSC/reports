@@ -1604,12 +1604,16 @@ return;
 }
 
 const activityRecords = getActivityRecords(dataset);
+const idsWithActivity = new Set(activityRecords.map(r => r.ID));
+
 const generalRecords = dataset.filter(row => {
   const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-  const activity = row.Activity ? row.Activity.trim() : "";
+  const activity = (row.Activity || "").trim();
   const hasNoActivity = activity === "" || activity === "عام";
-  return isGeneral && hasNoActivity;
+  const neverDidActivity = !idsWithActivity.has(row.ID);
+  return isGeneral && hasNoActivity && neverDidActivity;
 });
+
 
 const allPlayers = new Set(dataset.map(r => r.ID));
 const activityPlayers = new Set(activityRecords.map(r => r.ID));
