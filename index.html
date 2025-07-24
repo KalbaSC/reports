@@ -1611,38 +1611,46 @@ function renderActivityTable() {
     return;
   }
 
+  // ✅ تأكد من وجود dateKey في كل صف
+  dataset.forEach(row => {
+    if (!row.dateKey && row.Timestamp) {
+      row.dateKey = new Date(row.Timestamp).toISOString().split('T')[0];
+    }
+  });
+
   const activityRecords = getActivityRecords(dataset);
+  const allPlayers = new Set(dataset.map(r => r.ID));
+  const activityPlayers = new Set(activityRecords.map(r => r.ID));
 
-const allPlayers = new Set(dataset.map(r => r.ID?.trim()));
-const activityPlayers = new Set(activityRecords.map(r => r.ID?.trim()));
+  // ✅ حساب اللاعبين الذين حضروا "عام فقط"
+  const generalOnlyPlayers = new Set();
+  const attendanceByDate = {};
 
-const generalOnlyPlayers = new Set();
-const attendanceByDate = {};
+  dataset.forEach(row => {
+    const id = row.ID?.trim();
+    const dateKey = row.dateKey;
+    if (!id || !dateKey) return;
 
-dataset.forEach(row => {
-  const id = row.ID?.trim();
-  const dateKey = row.dateKey;
-  if (!id || !dateKey) return;
+    const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
+    const isActivity = row.Activity && row.Activity.trim() !== "" && row.Activity !== "عام";
 
-  const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-  const isActivity = row.Activity && row.Activity.trim() !== "" && row.Activity !== "عام";
+    const key = `${id}_${dateKey}`;
+    if (!attendanceByDate[key]) {
+      attendanceByDate[key] = { hasGeneral: false, hasActivity: false };
+    }
 
-  const key = `${id}_${dateKey}`;
-  if (!attendanceByDate[key]) {
-    attendanceByDate[key] = { hasGeneral: false, hasActivity: false };
-  }
+    if (isGeneral) attendanceByDate[key].hasGeneral = true;
+    if (isActivity) attendanceByDate[key].hasActivity = true;
+  });
 
-  if (isGeneral) attendanceByDate[key].hasGeneral = true;
-  if (isActivity) attendanceByDate[key].hasActivity = true;
-});
+  Object.entries(attendanceByDate).forEach(([key, value]) => {
+    if (value.hasGeneral && !value.hasActivity) {
+      const id = key.split("_")[0];
+      generalOnlyPlayers.add(id);
+    }
+  });
 
-Object.entries(attendanceByDate).forEach(([key, value]) => {
-  if (value.hasGeneral && !value.hasActivity) {
-    const id = key.split("_")[0];
-    generalOnlyPlayers.add(id);
-  }
-});
-
+  // ✅ صندوق الإحصائيات
   const activitySummaryHTML = `
     <div class="search-group">
       <select id="activityFilter" onchange="filterActivityTable()">
@@ -1652,12 +1660,12 @@ Object.entries(attendanceByDate).forEach(([key, value]) => {
           .join('')}
       </select>
       <span class="summary-box">
-<span>إجمالي اللاعبين: ${allPlayers.size}</span>
-<span>| أنشطة: ${activityPlayers.size} (${((activityPlayers.size / allPlayers.size) * 100).toFixed(0)}%)</span>
-<span>| عام فقط: ${generalOnlyPlayers.size} (${((generalOnlyPlayers.size / allPlayers.size) * 100).toFixed(0)}%)</span>
-<div style="background:#444; height:18px; border-radius:10px; overflow:hidden; margin-top:8px; width:100%; max-width:400px;">
-  <div style="height:100%; width:${(activityPlayers.size / allPlayers.size) * 100}%; background:#f4e733;"></div>
-</div>
+        <span>إجمالي اللاعبين: ${allPlayers.size}</span>
+        <span>| أنشطة: ${activityPlayers.size} (${((activityPlayers.size / allPlayers.size) * 100).toFixed(0)}%)</span>
+        <span>| عام فقط: ${generalOnlyPlayers.size} (${((generalOnlyPlayers.size / allPlayers.size) * 100).toFixed(0)}%)</span>
+        <div style="background:#444; height:18px; border-radius:10px; overflow:hidden; margin-top:8px; width:100%; max-width:400px;">
+          <div style="height:100%; width:${(activityPlayers.size / allPlayers.size) * 100}%; background:#f4e733;"></div>
+        </div>
       </span>
     </div>
   `;
@@ -1721,7 +1729,6 @@ Object.entries(attendanceByDate).forEach(([key, value]) => {
     });
   }
 
-  // 🟣 عرض كل نشاط كمجموعة مستقلة
   const activityGroups = getActivityGroups(activityRecords);
   Object.entries(activityGroups)
     .sort((a, b) => b[1].players.size - a[1].players.size)
@@ -1746,7 +1753,6 @@ Object.entries(attendanceByDate).forEach(([key, value]) => {
     });
 }
 
-// تساعد في تجميع الأنشطة
 function getActivityGroups(activityRecords) {
   const activities = {};
   activityRecords.forEach(item => {
@@ -1800,6 +1806,11 @@ if (!seenKeys.has(key)) {
 seenKeys.add(key);
 filtered.push(item);
 }
+});
+dataset.forEach(row => {
+  if (!row.dateKey && row.Timestamp) {
+    row.dateKey = new Date(row.Timestamp).toISOString().split('T')[0];
+  }
 });
 
 if (filtered.length === 0) {
