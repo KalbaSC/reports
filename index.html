@@ -1624,31 +1624,32 @@ function renderActivityTable() {
 
   // ✅ حساب اللاعبين الذين حضروا "عام فقط"
   const generalOnlyPlayers = new Set();
-  const attendanceByDate = {};
+const attendanceByDate = {};
 
-  dataset.forEach(row => {
-    const id = row.ID?.trim();
-    const dateKey = row.dateKey;
-    if (!id || !dateKey) return;
+dataset.forEach(row => {
+  const id = row.ID?.trim();
+  const dateKey = row.dateKey || (row.Timestamp ? new Date(row.Timestamp).toISOString().split('T')[0] : null);
+  if (!id || !dateKey) return;
 
-    const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-    const isActivity = row.Activity && row.Activity.trim() !== "" && row.Activity !== "عام";
+  const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
+  const isActivity = row.Activity && row.Activity.trim() !== "" && row.Activity !== "عام";
 
-    const key = `${id}_${dateKey}`;
-    if (!attendanceByDate[key]) {
-      attendanceByDate[key] = { hasGeneral: false, hasActivity: false };
-    }
+  const key = `${id}_${dateKey}`;
+  if (!attendanceByDate[key]) {
+    attendanceByDate[key] = { hasGeneral: false, hasActivity: false };
+  }
 
-    if (isGeneral) attendanceByDate[key].hasGeneral = true;
-    if (isActivity) attendanceByDate[key].hasActivity = true;
-  });
+  if (isGeneral) attendanceByDate[key].hasGeneral = true;
+  if (isActivity) attendanceByDate[key].hasActivity = true;
+});
 
-  Object.entries(attendanceByDate).forEach(([key, value]) => {
-    if (value.hasGeneral && !value.hasActivity) {
-      const id = key.split("_")[0];
-      generalOnlyPlayers.add(id);
-    }
-  });
+// فقط من حضر عام ولم يحضر نشاط في نفس اليوم
+Object.entries(attendanceByDate).forEach(([key, value]) => {
+  if (value.hasGeneral && !value.hasActivity) {
+    const id = key.split("_")[0];
+    generalOnlyPlayers.add(id);
+  }
+});
 
   // ✅ صندوق الإحصائيات
   const activitySummaryHTML = `
