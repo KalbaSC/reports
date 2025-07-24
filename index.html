@@ -927,22 +927,29 @@ return formatted;
 }
 
 function getActivityRecords(rawData) {
-if (!Array.isArray(rawData)) return [];
+  if (!Array.isArray(rawData)) return [];
 
-const uniqueRecords = [];
-const seen = new Set();
+  const uniqueRecords = [];
+  const seen = new Set();
 
-rawData.forEach(item => {
-if (item && item.ID && item.Timestamp && item.Activity && item.Activity.trim() !== "" && item.Activity !== "عام") {
-const key = `${item.ID}_${new Date(item.Timestamp).toISOString().split('T')[0]}_${item.Activity}`;
-if (!seen.has(key)) {
-seen.add(key);
-uniqueRecords.push(item);
-}
-}
-});
+  rawData.forEach(item => {
+    if (
+      item &&
+      item.ID &&
+      item.Timestamp &&
+      item.Activity &&
+      item.Activity.trim() !== "" &&
+      item.Activity !== "عام" // ✅ هذا يمنع "عام" من الدخول في حساب الأنشطة
+    ) {
+      const key = `${item.ID}_${new Date(item.Timestamp).toISOString().split('T')[0]}_${item.Activity}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        uniqueRecords.push(item);
+      }
+    }
+  });
 
-return uniqueRecords;
+  return uniqueRecords;
 }
 
 function updateTodayStats(data = filteredData) {
@@ -1607,18 +1614,21 @@ function renderActivityTable() {
   const activityRecords = getActivityRecords(dataset);
 
   const allPlayers = new Set(dataset.map(r => r.ID));
-  const activityPlayers = new Set(activityRecords.map(r => r.ID));
+const activityPlayers = new Set();
+activityRecords.forEach(r => {
+  if (r.Activity && r.Activity !== "عام") {
+    activityPlayers.add(r.ID);
+  }
+});
 
-  // ✅ حساب اللاعبين الذين حضروا عام فقط (بدون أي نشاط)
-  const generalOnlyPlayers = new Set();
-  dataset.forEach(row => {
-    const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-    if (isGeneral && !activityPlayers.has(row.ID)) {
-      generalOnlyPlayers.add(row.ID);
-    }
-  });
+const generalOnlyPlayers = new Set();
+dataset.forEach(row => {
+  const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
+  if (isGeneral && !activityPlayers.has(row.ID)) {
+    generalOnlyPlayers.add(row.ID);
+  }
+});
 
-  // ⬆️ ملخص الإحصائيات بالأعلى
   const activitySummaryHTML = `
     <div class="search-group">
       <select id="activityFilter" onchange="filterActivityTable()">
@@ -1902,7 +1912,7 @@ function renderTimingChart() {
 function renderActivityChart() {
     const activityCounts = {};
     filteredData.forEach(row => {
-        if (row.Activity && !row.isGeneral) {
+        if (row.Activity && row.Activity !== "عام") {
             activityCounts[row.Activity] = (activityCounts[row.Activity] || 0) + 1;
         }
     });
