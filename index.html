@@ -1582,158 +1582,155 @@ function renderMainTable() {
 }
 
 function renderActivityTable() {
-const tbody = document.querySelector("#activityTable tbody");
-const controls = document.getElementById("activityControls");
-tbody.innerHTML = "";
+  const tbody = document.querySelector("#activityTable tbody");
+  const controls = document.getElementById("activityControls");
+  tbody.innerHTML = "";
 
-const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
-let dataset = [];
-if (currentPeriod === 'all') {
-dataset = allData;
-} else if (currentPeriod === 'week' && showWeeklySummary) {
-dataset = filteredData;
-} else if (currentPeriod === 'week' || currentPeriod === 'month') {
-dataset = getFilteredDataByPeriod(currentPeriod);
-} else {
-dataset = allData.filter(row => row.dateKey === selectedDate);
-}
+  const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
+  let dataset = [];
+  if (currentPeriod === 'all') {
+    dataset = allData;
+  } else if (currentPeriod === 'week' && showWeeklySummary) {
+    dataset = filteredData;
+  } else if (currentPeriod === 'week' || currentPeriod === 'month') {
+    dataset = getFilteredDataByPeriod(currentPeriod);
+  } else {
+    dataset = allData.filter(row => row.dateKey === selectedDate);
+  }
 
-if (dataset.length === 0) {
-tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
-return;
-}
+  if (dataset.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
+    return;
+  }
 
-const activityRecords = getActivityRecords(dataset);
-const activityIDsToday = new Set(
-  dataset
-    .filter(r => r.Activity && r.Activity.trim() !== "" && r.Activity.trim() !== "عام")
-    .map(r => r.ID)
-);
+  const activityRecords = getActivityRecords(dataset);
+  const allPlayers = new Set(dataset.map(r => r.ID));
+  const activityPlayers = new Set(activityRecords.map(r => r.ID));
 
-const generalRecords = dataset.filter(row => {
-  const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-  const activity = (row.Activity || "").trim();
-  const hasNoActivity = activity === "" || activity === "عام";
-  const didNoActivityToday = !activityIDsToday.has(row.ID);
-  return isGeneral && hasNoActivity && didNoActivityToday;
-});
+  // ✅ فلترة "عام فقط" حسب اليوم فقط (بدون شرط أنه لم يحضر أي نشاط في أيام أخرى)
+  const generalRecords = dataset.filter(row => {
+    const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
+    const activity = (row.Activity || "").trim();
+    const hasNoActivity = activity === "" || activity === "عام";
+    return isGeneral && hasNoActivity;
+  });
 
-const allPlayers = new Set(dataset.map(r => r.ID));
-const activityPlayers = new Set(activityRecords.map(r => r.ID));
-const generalOnlyPlayers = new Set(generalRecords.map(r => r.ID));
+  const generalOnlyPlayers = new Set(generalRecords.map(r => r.ID));
 
-const activities = {};
-activityRecords.forEach(item => {
-const activity = item.Activity || "غير محدد";
-if (!activities[activity]) {
-activities[activity] = {
-count: 0,
-players: new Set(),
-items: []
-};
-}
-activities[activity].count++;
-activities[activity].players.add(item.ID);
-activities[activity].items.push(item);
-});
+  const activities = {};
+  activityRecords.forEach(item => {
+    const activity = item.Activity || "غير محدد";
+    if (!activities[activity]) {
+      activities[activity] = {
+        count: 0,
+        players: new Set(),
+        items: []
+      };
+    }
+    activities[activity].count++;
+    activities[activity].players.add(item.ID);
+    activities[activity].items.push(item);
+  });
 
-const activityOptions = Object.entries(activities)
-.sort((a, b) => b[1].players.size - a[1].players.size)
-.map(([activity, data]) => 
-`<option value="${activity}">${activity} (${data.players.size})</option>`
-).join('');
+  const activityOptions = Object.entries(activities)
+    .sort((a, b) => b[1].players.size - a[1].players.size)
+    .map(([activity, data]) =>
+      `<option value="${activity}">${activity} (${data.players.size})</option>`
+    ).join('');
 
-controls.innerHTML = `
-  <div class="search-group">
-    <select id="activityFilter" onchange="filterActivityTable()">
-      <option value="">جميع الأنشطة</option>
-      ${activityOptions}
-    </select>
-    <span class="summary-box">
-      <span>إجمالي اللاعبين: ${allPlayers.size}</span>
-      <span>| أنشطة: ${activityPlayers.size}</span>
-      <span>| عام فقط: ${generalOnlyPlayers.size}</span>
-    </span>
-  </div>
-`;
+  controls.innerHTML = `
+    <div class="search-group">
+      <select id="activityFilter" onchange="filterActivityTable()">
+        <option value="">جميع الأنشطة</option>
+        ${activityOptions}
+      </select>
+      <span class="summary-box">
+        <span>إجمالي اللاعبين: ${allPlayers.size}</span>
+        <span>| أنشطة: ${activityPlayers.size}</span>
+        <span>| عام فقط: ${generalOnlyPlayers.size}</span>
+      </span>
+    </div>
+  `;
 
-if (generalOnlyPlayers.size > 0) {
-const headerRow = document.createElement("tr");
-headerRow.className = "no-activity";
-headerRow.innerHTML = `<td colspan="5">لاعبون بلا أنشطة (${generalOnlyPlayers.size} لاعب)</td>`;
-tbody.appendChild(headerRow);
+  // 🟡 عرض لاعبي "عام فقط"
+  if (generalOnlyPlayers.size > 0) {
+    const headerRow = document.createElement("tr");
+    headerRow.className = "no-activity";
+    headerRow.innerHTML = `<td colspan="5">لاعبون بلا أنشطة (${generalOnlyPlayers.size} لاعب)</td>`;
+    tbody.appendChild(headerRow);
 
-generalOnlyPlayers.forEach(playerId => {
-const playerRecords = generalRecords.filter(r => r.ID === playerId);
-const latestRecord = playerRecords.reduce((latest, current) => 
-new Date(current.Timestamp) > new Date(latest.Timestamp) ? current : latest
-);
+    generalOnlyPlayers.forEach(playerId => {
+      const playerRecords = generalRecords.filter(r => r.ID === playerId);
+      const latestRecord = playerRecords.reduce((latest, current) =>
+        new Date(current.Timestamp) > new Date(latest.Timestamp) ? current : latest
+      );
 
-const row = document.createElement("tr");
-row.className = "no-activity";
-row.innerHTML = `
-      <td>${formatDate(latestRecord.Timestamp)}</td>
-      <td>${latestRecord["Child Name"] || ""} ${latestRecord.Parent || ""}</td>
-      <td>${latestRecord.ID || ""}</td>
-      <td>${latestRecord["Scanned By"] || ""}</td>
-      <td>عام</td>
-    `;
-tbody.appendChild(row);
-});
-}
+      const row = document.createElement("tr");
+      row.className = "no-activity";
+      row.innerHTML = `
+        <td>${formatDate(latestRecord.Timestamp)}</td>
+        <td>${latestRecord["Child Name"] || ""} ${latestRecord.Parent || ""}</td>
+        <td>${latestRecord.ID || ""}</td>
+        <td>${latestRecord["Scanned By"] || ""}</td>
+        <td>عام</td>
+      `;
+      tbody.appendChild(row);
+    });
+  }
 
-if (activityPlayers.size > 0) {
-const headerRow = document.createElement("tr");
-headerRow.className = "general-with-activities";
-headerRow.innerHTML = `<td colspan="5">لاعبون مع أنشطة (${activityPlayers.size} لاعب)</td>`;
-tbody.appendChild(headerRow);
+  // 🟢 عرض لاعبي الأنشطة
+  if (activityPlayers.size > 0) {
+    const headerRow = document.createElement("tr");
+    headerRow.className = "general-with-activities";
+    headerRow.innerHTML = `<td colspan="5">لاعبون مع أنشطة (${activityPlayers.size} لاعب)</td>`;
+    tbody.appendChild(headerRow);
 
-const playersWithActivities = {};
-activityRecords.forEach(record => {
-if (!playersWithActivities[record.ID]) {
-playersWithActivities[record.ID] = {
-info: record,
-activities: new Set()
-};
-}
-playersWithActivities[record.ID].activities.add(record.Activity);
-});
+    const playersWithActivities = {};
+    activityRecords.forEach(record => {
+      if (!playersWithActivities[record.ID]) {
+        playersWithActivities[record.ID] = {
+          info: record,
+          activities: new Set()
+        };
+      }
+      playersWithActivities[record.ID].activities.add(record.Activity);
+    });
 
-Object.values(playersWithActivities).forEach(player => {
-const row = document.createElement("tr");
-row.className = "general-with-activities";
-row.innerHTML = `
-      <td>${formatDate(player.info.Timestamp)}</td>
-      <td>${player.info["Child Name"] || ""} ${player.info.Parent || ""}</td>
-      <td>${player.info.ID || ""}</td>
-      <td>${player.info["Scanned By"] || ""}</td>
-      <td>${Array.from(player.activities).join("، ")}</td>
-    `;
-tbody.appendChild(row);
-});
+    Object.values(playersWithActivities).forEach(player => {
+      const row = document.createElement("tr");
+      row.className = "general-with-activities";
+      row.innerHTML = `
+        <td>${formatDate(player.info.Timestamp)}</td>
+        <td>${player.info["Child Name"] || ""} ${player.info.Parent || ""}</td>
+        <td>${player.info.ID || ""}</td>
+        <td>${player.info["Scanned By"] || ""}</td>
+        <td>${Array.from(player.activities).join("، ")}</td>
+      `;
+      tbody.appendChild(row);
+    });
 
-Object.entries(activities)
-.sort((a, b) => b[1].players.size - a[1].players.size)
-.forEach(([activity, data]) => {
-const headerRow = document.createElement("tr");
-headerRow.className = "activity-group";
-headerRow.innerHTML = `<td colspan="5">${activity} (${data.players.size} لاعب)</td>`;
-tbody.appendChild(headerRow);
+    Object.entries(activities)
+      .sort((a, b) => b[1].players.size - a[1].players.size)
+      .forEach(([activity, data]) => {
+        const headerRow = document.createElement("tr");
+        headerRow.className = "activity-group";
+        headerRow.innerHTML = `<td colspan="5">${activity} (${data.players.size} لاعب)</td>`;
+        tbody.appendChild(headerRow);
 
-data.items.forEach(entry => {
-const isMobile = window.innerWidth <= 768;
-const row = document.createElement("tr");
-row.innerHTML = `
-          <td>${formatDate(entry.Timestamp)}</td>
-          <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
-          <td>${entry.ID || ""}</td>
-          ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ''}
-          <td>${entry.Activity || ""}</td>
-        `;
-tbody.appendChild(row);
-});
-});
-}
+        data.items.forEach(entry => {
+          const isMobile = window.innerWidth <= 768;
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${formatDate(entry.Timestamp)}</td>
+            <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
+            <td>${entry.ID || ""}</td>
+            ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ''}
+            <td>${entry.Activity || ""}</td>
+          `;
+          tbody.appendChild(row);
+        });
+      });
+  }
 }
 
 function filterActivityTable() {
