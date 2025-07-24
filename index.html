@@ -1587,45 +1587,33 @@ function renderActivityTable() {
   tbody.innerHTML = "";
 
   const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
-  let dataset = [];
-  if (currentPeriod === 'all') {
-    dataset = allData;
-  } else if (currentPeriod === 'week' && showWeeklySummary) {
-    dataset = filteredData;
-  } else if (currentPeriod === 'week' || currentPeriod === 'month') {
-    dataset = getFilteredDataByPeriod(currentPeriod);
-  } else {
-    dataset = allData.filter(row => row.dateKey === selectedDate);
-  }
+  const dataset = allData.filter(row => row.dateKey === selectedDate);
 
   if (dataset.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
     return;
   }
 
-  const activityRecords = getActivityRecords(dataset);
+  const activityRecords = getActivityRecords(dataset); // فقط أنشطة بنفس اليوم
+  const idsWithActivity = new Set(activityRecords.map(r => r.ID));
+
+  const generalOnlyPlayers = new Set(
+    dataset.filter(row =>
+      (row.General === "✔️ حضر" || row.General === "حضر") &&
+      (!row.Activity || row.Activity === "عام" || row.Activity.trim() === "") &&
+      !idsWithActivity.has(row.ID)
+    ).map(r => r.ID)
+  );
+
   const allPlayers = new Set(dataset.map(r => r.ID));
   const activityPlayers = new Set(activityRecords.map(r => r.ID));
 
-  // ✅ فلترة "عام فقط" حسب اليوم فقط (بدون شرط أنه لم يحضر أي نشاط في أيام أخرى)
-  const generalRecords = dataset.filter(row => {
-    const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-    const activity = (row.Activity || "").trim();
-    const hasNoActivity = activity === "" || activity === "عام";
-    return isGeneral && hasNoActivity;
-  });
-
-  const generalOnlyPlayers = new Set(generalRecords.map(r => r.ID));
-
+  // بناء جدول الأنشطة
   const activities = {};
   activityRecords.forEach(item => {
     const activity = item.Activity || "غير محدد";
     if (!activities[activity]) {
-      activities[activity] = {
-        count: 0,
-        players: new Set(),
-        items: []
-      };
+      activities[activity] = { count: 0, players: new Set(), items: [] };
     }
     activities[activity].count++;
     activities[activity].players.add(item.ID);
@@ -1652,7 +1640,7 @@ function renderActivityTable() {
     </div>
   `;
 
-  // 🟡 عرض لاعبي "عام فقط"
+  // عرض اللاعبين العام فقط
   if (generalOnlyPlayers.size > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "no-activity";
@@ -1660,7 +1648,7 @@ function renderActivityTable() {
     tbody.appendChild(headerRow);
 
     generalOnlyPlayers.forEach(playerId => {
-      const playerRecords = generalRecords.filter(r => r.ID === playerId);
+      const playerRecords = dataset.filter(r => r.ID === playerId && (r.General === "✔️ حضر" || r.General === "حضر"));
       const latestRecord = playerRecords.reduce((latest, current) =>
         new Date(current.Timestamp) > new Date(latest.Timestamp) ? current : latest
       );
@@ -1678,7 +1666,7 @@ function renderActivityTable() {
     });
   }
 
-  // 🟢 عرض لاعبي الأنشطة
+  // عرض اللاعبين مع أنشطة
   if (activityPlayers.size > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "general-with-activities";
@@ -1724,7 +1712,7 @@ function renderActivityTable() {
             <td>${formatDate(entry.Timestamp)}</td>
             <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
             <td>${entry.ID || ""}</td>
-            ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ''}
+            ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ""}
             <td>${entry.Activity || ""}</td>
           `;
           tbody.appendChild(row);
