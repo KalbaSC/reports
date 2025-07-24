@@ -1640,25 +1640,25 @@ dataset.forEach(row => {
 // استبعاد من حضروا أنشطة من قائمة "عام فقط"
 activityIDs.forEach(id => generalOnlyIDs.delete(id));
 
-const activitySummaryHTML = 
-    <div class="search-group">
-      <select id="activityFilter" onchange="filterActivityTable()">
-        <option value="">جميع الأنشطة</option>
-        ${Object.entries(getActivityGroups(activityRecords))
-          .map(([activity, data]) => <option value="${activity}">${activity} (${data.players.size})</option>)
-          .join('')}
-      </select>
-      <span class="summary-box">
-        <span>إجمالي اللاعبين: ${allPlayers.size}</span>
-        <span>| أنشطة: ${activityPlayers.size} (${((activityPlayers.size / allPlayers.size) * 100).toFixed(0)}%)</span>
-        <span>| عام فقط: ${generalOnlyIDs.size} (${((generalOnlyIDs.size / allPlayers.size) * 100).toFixed(0)}%)</span>
-        <div style="background:#444; height:18px; border-radius:10px; overflow:hidden; margin-top:8px; width:100%; max-width:400px;">
-          <div style="height:100%; width:${(activityPlayers.size / allPlayers.size) * 100}%; background:#f4e733;"></div>
-        </div>
-      </span>
-    </div>
-  ;
-  controls.innerHTML = activitySummaryHTML;
+const activitySummaryHTML = `
+  <div class="search-group">
+    <select id="activityFilter" onchange="filterActivityTable()">
+      <option value="">جميع الأنشطة</option>
+      ${Object.entries(getActivityGroups(activityRecords))
+        .map(([activity, data]) => `<option value="${activity}">${activity} (${data.players.size})</option>`)
+        .join('')}
+    </select>
+    <span class="summary-box">
+      <span>إجمالي اللاعبين: ${allPlayers.size}</span>
+      <span>| أنشطة: ${activityPlayers.size} (${((activityPlayers.size / allPlayers.size) * 100).toFixed(0)}%)</span>
+      <span>| عام فقط: ${generalOnlyIDs.size} (${((generalOnlyIDs.size / allPlayers.size) * 100).toFixed(0)}%)</span>
+      <div style="background:#444; height:18px; border-radius:10px; overflow:hidden; margin-top:8px; width:100%; max-width:400px;">
+        <div style="height:100%; width:${(activityPlayers.size / allPlayers.size) * 100}%; background:#f4e733;"></div>
+      </div>
+    </span>
+  </div>
+`;
+controls.innerHTML = activitySummaryHTML;
   
   // 🟢 عرض اللاعبين "عام فقط"
   if (generalOnlyIDs.size > 0) {
