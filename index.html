@@ -1611,7 +1611,7 @@ function renderActivityTable() {
     return;
   }
 
-  // ✅ تأكد من وجود dateKey في كل صف
+  // ✅ تأكد من وجود dateKey
   dataset.forEach(row => {
     if (!row.dateKey && row.Timestamp) {
       row.dateKey = new Date(row.Timestamp).toISOString().split('T')[0];
@@ -1619,39 +1619,29 @@ function renderActivityTable() {
   });
 
   const activityRecords = getActivityRecords(dataset);
+
   const allPlayers = new Set(dataset.map(r => r.ID));
   const activityPlayers = new Set(activityRecords.map(r => r.ID));
 
-  // ✅ حساب اللاعبين الذين حضروا "عام فقط"
-  const generalOnlyPlayers = new Set();
-const attendanceByDate = {};
+  // ✅ احسب "عام فقط"
+  const generalOnlyIDs = new Set();
+  const activityIDs = new Set();
 
-dataset.forEach(row => {
-  const id = row.ID?.trim();
-  const dateKey = row.dateKey || (row.Timestamp ? new Date(row.Timestamp).toISOString().split('T')[0] : null);
-  if (!id || !dateKey) return;
+  dataset.forEach(row => {
+    const id = row.ID?.trim();
+    if (!id) return;
 
-  const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-  const isActivity = row.Activity && row.Activity.trim() !== "" && row.Activity !== "عام";
+    const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
+    const isActivity = row.Activity && row.Activity.trim() !== "" && row.Activity !== "عام";
 
-  const key = `${id}_${dateKey}`;
-  if (!attendanceByDate[key]) {
-    attendanceByDate[key] = { hasGeneral: false, hasActivity: false };
-  }
+    if (isGeneral) generalOnlyIDs.add(id);
+    if (isActivity) activityIDs.add(id);
+  });
 
-  if (isGeneral) attendanceByDate[key].hasGeneral = true;
-  if (isActivity) attendanceByDate[key].hasActivity = true;
-});
+  // حذف من حضروا نشاط من قائمة العام
+  activityIDs.forEach(id => generalOnlyIDs.delete(id));
 
-// فقط من حضر عام ولم يحضر نشاط في نفس اليوم
-Object.entries(attendanceByDate).forEach(([key, value]) => {
-  if (value.hasGeneral && !value.hasActivity) {
-    const id = key.split("_")[0];
-    generalOnlyPlayers.add(id);
-  }
-});
-
-  // ✅ صندوق الإحصائيات
+  // ✅ عرض صندوق الإحصائيات
   const activitySummaryHTML = `
     <div class="search-group">
       <select id="activityFilter" onchange="filterActivityTable()">
@@ -1663,7 +1653,7 @@ Object.entries(attendanceByDate).forEach(([key, value]) => {
       <span class="summary-box">
         <span>إجمالي اللاعبين: ${allPlayers.size}</span>
         <span>| أنشطة: ${activityPlayers.size} (${((activityPlayers.size / allPlayers.size) * 100).toFixed(0)}%)</span>
-        <span>| عام فقط: ${generalOnlyPlayers.size} (${((generalOnlyPlayers.size / allPlayers.size) * 100).toFixed(0)}%)</span>
+        <span>| عام فقط: ${generalOnlyIDs.size} (${((generalOnlyIDs.size / allPlayers.size) * 100).toFixed(0)}%)</span>
         <div style="background:#444; height:18px; border-radius:10px; overflow:hidden; margin-top:8px; width:100%; max-width:400px;">
           <div style="height:100%; width:${(activityPlayers.size / allPlayers.size) * 100}%; background:#f4e733;"></div>
         </div>
@@ -1672,14 +1662,14 @@ Object.entries(attendanceByDate).forEach(([key, value]) => {
   `;
   controls.innerHTML = activitySummaryHTML;
 
-  // 🟢 عرض "عام فقط"
-  if (generalOnlyPlayers.size > 0) {
+  // 🟢 عرض اللاعبين "عام فقط"
+  if (generalOnlyIDs.size > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "no-activity";
-    headerRow.innerHTML = `<td colspan="5">لاعبون بلا أنشطة (${generalOnlyPlayers.size} لاعب)</td>`;
+    headerRow.innerHTML = `<td colspan="5">لاعبون حضروا فقط عام (${generalOnlyIDs.size} لاعب)</td>`;
     tbody.appendChild(headerRow);
 
-    generalOnlyPlayers.forEach(playerId => {
+    generalOnlyIDs.forEach(playerId => {
       const playerRecords = dataset.filter(r => r.ID === playerId && (r.General === "✔️ حضر" || r.General === "حضر"));
       const latestRecord = playerRecords.reduce((latest, current) =>
         new Date(current.Timestamp) > new Date(latest.Timestamp) ? current : latest
@@ -1698,7 +1688,7 @@ Object.entries(attendanceByDate).forEach(([key, value]) => {
     });
   }
 
-  // 🟡 عرض "أنشطة"
+  // 🟡 عرض اللاعبين مع أنشطة
   if (activityPlayers.size > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "general-with-activities";
@@ -1730,6 +1720,7 @@ Object.entries(attendanceByDate).forEach(([key, value]) => {
     });
   }
 
+  // 🧱 تفصيل الأنشطة (حسب النوع)
   const activityGroups = getActivityGroups(activityRecords);
   Object.entries(activityGroups)
     .sort((a, b) => b[1].players.size - a[1].players.size)
