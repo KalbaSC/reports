@@ -1618,28 +1618,27 @@ function renderActivityTable() {
     }
   });
 
-  const activityRecords = getActivityRecords(dataset);
+const activityRecords = getActivityRecords(dataset);
+const allPlayers = new Set(dataset.map(r => r.ID));
+const activityPlayers = new Set(activityRecords.map(r => r.ID));
 
-  const allPlayers = new Set(dataset.map(r => r.ID));
-  const activityPlayers = new Set(activityRecords.map(r => r.ID));
+// ✅ حساب اللاعبين الذين حضروا "عام فقط" ولم يحضروا أي نشاط (غير "عام")
+const generalOnlyIDs = new Set();
+const activityIDs = new Set();
 
-  // ✅ احسب "عام فقط"
-  const generalOnlyIDs = new Set();
-  const activityIDs = new Set();
+dataset.forEach(row => {
+  const id = row.ID?.trim();
+  if (!id) return;
 
-  dataset.forEach(row => {
-    const id = row.ID?.trim();
-    if (!id) return;
+  const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
+  const isActivity = row.Activity && row.Activity.trim() !== "" && row.Activity !== "عام";
 
-    const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-    const isActivity = row.Activity && row.Activity.trim() !== "" && row.Activity !== "عام";
+  if (isGeneral) generalOnlyIDs.add(id);
+  if (isActivity) activityIDs.add(id);
+});
 
-    if (isGeneral) generalOnlyIDs.add(id);
-    if (isActivity) activityIDs.add(id);
-  });
-
-  // حذف من حضروا نشاط من قائمة العام
-  activityIDs.forEach(id => generalOnlyIDs.delete(id));
+// استبعاد من حضروا أنشطة من قائمة "عام فقط"
+activityIDs.forEach(id => generalOnlyIDs.delete(id));
 
   // ✅ عرض صندوق الإحصائيات
   const activitySummaryHTML = `
