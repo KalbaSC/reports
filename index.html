@@ -1604,14 +1604,19 @@ return;
 }
 
 const activityRecords = getActivityRecords(dataset);
-const idsWithActivity = new Set(activityRecords.map(r => r.ID));
+const activityIDsToday = new Set(
+  dataset
+    .filter(r => r.Activity && r.Activity.trim() !== "" && r.Activity.trim() !== "عام")
+    .map(r => r.ID)
+);
 
 const generalRecords = dataset.filter(row => {
   const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-  const hasActivity = row.Activity && row.Activity.trim() !== "" && row.Activity.trim() !== "عام";
-  return isGeneral && !hasActivity && !idsWithActivity.has(row.ID);
+  const activity = (row.Activity || "").trim();
+  const hasNoActivity = activity === "" || activity === "عام";
+  const didNoActivityToday = !activityIDsToday.has(row.ID);
+  return isGeneral && hasNoActivity && didNoActivityToday;
 });
-
 
 const allPlayers = new Set(dataset.map(r => r.ID));
 const activityPlayers = new Set(activityRecords.map(r => r.ID));
