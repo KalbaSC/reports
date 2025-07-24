@@ -1608,10 +1608,8 @@ const idsWithActivity = new Set(activityRecords.map(r => r.ID));
 
 const generalRecords = dataset.filter(row => {
   const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-  const activity = (row.Activity || "").trim();
-  const hasNoActivity = activity === "" || activity === "عام";
-  const neverDidActivity = !idsWithActivity.has(row.ID);
-  return isGeneral && hasNoActivity && neverDidActivity;
+  const hasActivity = row.Activity && row.Activity.trim() !== "" && row.Activity.trim() !== "عام";
+  return isGeneral && !hasActivity && !idsWithActivity.has(row.ID);
 });
 
 
