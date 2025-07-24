@@ -1617,10 +1617,28 @@ const allPlayers = new Set(dataset.map(r => r.ID?.trim()));
 const activityPlayers = new Set(activityRecords.map(r => r.ID?.trim()));
 
 const generalOnlyPlayers = new Set();
+const attendanceByDate = {};
+
 dataset.forEach(row => {
   const id = row.ID?.trim();
+  const dateKey = row.dateKey;
+  if (!id || !dateKey) return;
+
   const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-  if (id && isGeneral && !activityPlayers.has(id)) {
+  const isActivity = row.Activity && row.Activity.trim() !== "" && row.Activity !== "عام";
+
+  const key = `${id}_${dateKey}`;
+  if (!attendanceByDate[key]) {
+    attendanceByDate[key] = { hasGeneral: false, hasActivity: false };
+  }
+
+  if (isGeneral) attendanceByDate[key].hasGeneral = true;
+  if (isActivity) attendanceByDate[key].hasActivity = true;
+});
+
+Object.entries(attendanceByDate).forEach(([key, value]) => {
+  if (value.hasGeneral && !value.hasActivity) {
+    const id = key.split("_")[0];
     generalOnlyPlayers.add(id);
   }
 });
