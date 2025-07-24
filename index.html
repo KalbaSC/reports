@@ -2367,6 +2367,24 @@ function prepareMainExportData() {
   }));
 }
 
+function prepareActivitiesExportData() {
+  const records = getActivityRecords(filteredData.length > 0 ? filteredData : allData);
+  const exportData = [];
+
+  records.forEach(row => {
+    exportData.push({
+      "التاريخ": formatDate(row.Timestamp).split(' ')[0],
+      "الوقت": formatDate(row.Timestamp).split(' ')[1],
+      "الاسم الكامل": `${row["Child Name"] || ""} ${row.Parent || ""}`.trim(),
+      "المعرف": row.ID || "",
+      "الموظف": row["Scanned By"] || "",
+      "النشاط": row.Activity || ""
+    });
+  });
+
+  return exportData;
+}
+    
 function prepareStatsExportData() {
   const stats = calculateDetailedStats();
   return [
