@@ -1587,50 +1587,46 @@ function renderActivityTable() {
   tbody.innerHTML = "";
 
   const selectedDate = document.getElementById("datePicker").value || new Date().toISOString().split('T')[0];
-  const dataset = allData.filter(row => row.dateKey === selectedDate);
+  let dataset = [];
+
+  if (currentPeriod === 'all') {
+    dataset = allData;
+  } else if (currentPeriod === 'week' && showWeeklySummary) {
+    dataset = filteredData;
+  } else if (currentPeriod === 'week' || currentPeriod === 'month') {
+    dataset = getFilteredDataByPeriod(currentPeriod);
+  } else {
+    dataset = allData.filter(row => row.dateKey === selectedDate);
+  }
 
   if (dataset.length === 0) {
     tbody.innerHTML = `<tr><td colspan="5" class="empty-state">لا يوجد حضور في هذا التاريخ</td></tr>`;
     return;
   }
 
-  const activityRecords = getActivityRecords(dataset); // فقط أنشطة بنفس اليوم
+  const activityRecords = getActivityRecords(dataset);
   const idsWithActivity = new Set(activityRecords.map(r => r.ID));
 
   const generalOnlyPlayers = new Set(
-    dataset.filter(row =>
-      (row.General === "✔️ حضر" || row.General === "حضر") &&
-      (!row.Activity || row.Activity === "عام" || row.Activity.trim() === "") &&
-      !idsWithActivity.has(row.ID)
-    ).map(r => r.ID)
+    dataset
+      .filter(row => {
+        const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
+        return isGeneral && !idsWithActivity.has(row.ID);
+      })
+      .map(r => r.ID)
   );
 
   const allPlayers = new Set(dataset.map(r => r.ID));
   const activityPlayers = new Set(activityRecords.map(r => r.ID));
 
-  // بناء جدول الأنشطة
-  const activities = {};
-  activityRecords.forEach(item => {
-    const activity = item.Activity || "غير محدد";
-    if (!activities[activity]) {
-      activities[activity] = { count: 0, players: new Set(), items: [] };
-    }
-    activities[activity].count++;
-    activities[activity].players.add(item.ID);
-    activities[activity].items.push(item);
-  });
-
-  const activityOptions = Object.entries(activities)
-    .sort((a, b) => b[1].players.size - a[1].players.size)
-    .map(([activity, data]) =>
-      `<option value="${activity}">${activity} (${data.players.size})</option>`
-    ).join('');
-
-  controls.innerHTML = `
+  // ⬇️ الإحصائيات بالأعلى
+  const activitySummaryHTML = `
     <div class="search-group">
       <select id="activityFilter" onchange="filterActivityTable()">
         <option value="">جميع الأنشطة</option>
-        ${activityOptions}
+        ${Object.entries(getActivityGroups(activityRecords))
+          .map(([activity, data]) => `<option value="${activity}">${activity} (${data.players.size})</option>`)
+          .join('')}
       </select>
       <span class="summary-box">
         <span>إجمالي اللاعبين: ${allPlayers.size}</span>
@@ -1639,8 +1635,9 @@ function renderActivityTable() {
       </span>
     </div>
   `;
+  controls.innerHTML = activitySummaryHTML;
 
-  // عرض اللاعبين العام فقط
+  // ⬇️ لاعبين عام فقط
   if (generalOnlyPlayers.size > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "no-activity";
@@ -1666,7 +1663,7 @@ function renderActivityTable() {
     });
   }
 
-  // عرض اللاعبين مع أنشطة
+  // ⬇️ لاعبين مع أنشطة
   if (activityPlayers.size > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "general-with-activities";
@@ -1696,29 +1693,50 @@ function renderActivityTable() {
       `;
       tbody.appendChild(row);
     });
-
-    Object.entries(activities)
-      .sort((a, b) => b[1].players.size - a[1].players.size)
-      .forEach(([activity, data]) => {
-        const headerRow = document.createElement("tr");
-        headerRow.className = "activity-group";
-        headerRow.innerHTML = `<td colspan="5">${activity} (${data.players.size} لاعب)</td>`;
-        tbody.appendChild(headerRow);
-
-        data.items.forEach(entry => {
-          const isMobile = window.innerWidth <= 768;
-          const row = document.createElement("tr");
-          row.innerHTML = `
-            <td>${formatDate(entry.Timestamp)}</td>
-            <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
-            <td>${entry.ID || ""}</td>
-            ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ""}
-            <td>${entry.Activity || ""}</td>
-          `;
-          tbody.appendChild(row);
-        });
-      });
   }
+
+  // ⬇️ كل مجموعة نشاط لحالها
+  const activityGroups = getActivityGroups(activityRecords);
+  Object.entries(activityGroups)
+    .sort((a, b) => b[1].players.size - a[1].players.size)
+    .forEach(([activity, data]) => {
+      const headerRow = document.createElement("tr");
+      headerRow.className = "activity-group";
+      headerRow.innerHTML = `<td colspan="5">${activity} (${data.players.size} لاعب)</td>`;
+      tbody.appendChild(headerRow);
+
+      data.items.forEach(entry => {
+        const isMobile = window.innerWidth <= 768;
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${formatDate(entry.Timestamp)}</td>
+          <td>${entry["Child Name"] || ""} ${entry.Parent || ""}</td>
+          <td>${entry.ID || ""}</td>
+          ${!isMobile ? `<td>${entry["Scanned By"] || ""}</td>` : ""}
+          <td>${entry.Activity || ""}</td>
+        `;
+        tbody.appendChild(row);
+      });
+    });
+}
+
+// تساعد في تجميع الأنشطة
+function getActivityGroups(activityRecords) {
+  const activities = {};
+  activityRecords.forEach(item => {
+    const activity = item.Activity || "غير محدد";
+    if (!activities[activity]) {
+      activities[activity] = {
+        count: 0,
+        players: new Set(),
+        items: []
+      };
+    }
+    activities[activity].count++;
+    activities[activity].players.add(item.ID);
+    activities[activity].items.push(item);
+  });
+  return activities;
 }
 
 function filterActivityTable() {
