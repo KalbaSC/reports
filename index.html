@@ -1605,21 +1605,20 @@ function renderActivityTable() {
   }
 
   const activityRecords = getActivityRecords(dataset);
-  const idsWithActivity = new Set(activityRecords.map(r => r.ID));
-
-  const generalOnlyPlayers = new Set(
-    dataset
-      .filter(row => {
-        const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
-        return isGeneral && !idsWithActivity.has(row.ID);
-      })
-      .map(r => r.ID)
-  );
 
   const allPlayers = new Set(dataset.map(r => r.ID));
   const activityPlayers = new Set(activityRecords.map(r => r.ID));
 
-  // ⬇️ الإحصائيات بالأعلى
+  // ✅ حساب اللاعبين الذين حضروا عام فقط (بدون أي نشاط)
+  const generalOnlyPlayers = new Set();
+  dataset.forEach(row => {
+    const isGeneral = row.General === "✔️ حضر" || row.General === "حضر";
+    if (isGeneral && !activityPlayers.has(row.ID)) {
+      generalOnlyPlayers.add(row.ID);
+    }
+  });
+
+  // ⬆️ ملخص الإحصائيات بالأعلى
   const activitySummaryHTML = `
     <div class="search-group">
       <select id="activityFilter" onchange="filterActivityTable()">
@@ -1637,7 +1636,7 @@ function renderActivityTable() {
   `;
   controls.innerHTML = activitySummaryHTML;
 
-  // ⬇️ لاعبين عام فقط
+  // 🟢 عرض "عام فقط"
   if (generalOnlyPlayers.size > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "no-activity";
@@ -1663,7 +1662,7 @@ function renderActivityTable() {
     });
   }
 
-  // ⬇️ لاعبين مع أنشطة
+  // 🟡 عرض "أنشطة"
   if (activityPlayers.size > 0) {
     const headerRow = document.createElement("tr");
     headerRow.className = "general-with-activities";
@@ -1695,7 +1694,7 @@ function renderActivityTable() {
     });
   }
 
-  // ⬇️ كل مجموعة نشاط لحالها
+  // 🟣 عرض كل نشاط كمجموعة مستقلة
   const activityGroups = getActivityGroups(activityRecords);
   Object.entries(activityGroups)
     .sort((a, b) => b[1].players.size - a[1].players.size)
